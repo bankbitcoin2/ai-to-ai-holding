@@ -1,11 +1,12 @@
 {
   "meta": {
     "schema_version": "2.0",
-    "source": "apiservice.dtn.go.th (DTN — กรมการค้าต่างประเทศ)",
-    "tariff_year": "2027",
-    "updated_at": "2026-06-20T20:39:42.069900",
-    "total_hs_codes": 0,
-    "status": "auto-pulled"
+    "source": "apiservice.dtn.go.th (DTN) — imported from saved responses",
+    "tariff_year": "2020/2027",
+    "updated_at": "2026-06-20T13:41:24.332816",
+    "total_hs_codes": 4,
+    "status": "manual-import",
+    "note": "FTA rates only from 4 saved DTN responses. MFN rates pending."
   },
   "fta_agreements": {
     "MFN": "Most Favoured Nation",
@@ -22,5 +23,150 @@
     "TCFTA": "Thailand–Chile",
     "TPFTA": "Thailand–Peru"
   },
-  "rates": {}
+  "rates": {
+    "31042000": {
+      "hs_code": "31042000",
+      "MFN": null,
+      "FTA": {
+        "AU": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "BN": {
+          "best_rate": 0.0,
+          "fta_code": "AJCEP"
+        },
+        "CL": {
+          "best_rate": 0.0,
+          "fta_code": "TCFTA"
+        },
+        "IN": {
+          "best_rate": 5.0,
+          "fta_code": "AIFTA"
+        },
+        "KH": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "LA": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "MM": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        },
+        "NZ": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "PH": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "TH": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        }
+      }
+    },
+    "1702401000": {
+      "hs_code": "1702401000",
+      "MFN": null,
+      "FTA": {
+        "KR": {
+          "best_rate": 5.0,
+          "fta_code": "AKFTA"
+        },
+        "MY": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        }
+      }
+    },
+    "5101190000": {
+      "hs_code": "5101190000",
+      "MFN": null,
+      "FTA": {
+        "BN": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "ID": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "AJCEP"
+        },
+        "KR": {
+          "best_rate": 0.0,
+          "fta_code": "AKFTA"
+        },
+        "MM": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "MY": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "PE": {
+          "best_rate": 0.0,
+          "fta_code": "TPFTA"
+        }
+      }
+    },
+    "84322900": {
+      "hs_code": "84322900",
+      "MFN": null,
+      "FTA": {
+        "AU": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "BN": {
+          "best_rate": 0.0,
+          "fta_code": "AJCEP"
+        },
+        "CL": {
+          "best_rate": 0.0,
+          "fta_code": "TCFTA"
+        },
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "KH": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "LA": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "MM": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        },
+        "PH": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "TH": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        },
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        }
+      }
+    }
+  }
 }
