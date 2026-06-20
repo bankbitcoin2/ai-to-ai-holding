@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI TO AI HOLDING — Thai Customs Intelligence API</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --border: #1f2937;
+    --accent: #6366f1;
+    --accent2: #8b5cf6;
+    --green: #10b981;
+    --text: #f9fafb;
+    --muted: #9ca3af;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* NAV */
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(10,14,26,0.95); backdrop-filter: blur(10px); z-index: 100; }
+  .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 1rem; align-items: center; }
+  .btn { padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; display: inline-block; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; border-radius: 10px; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero { text-align: center; padding: 5rem 2rem 4rem; max-width: 860px; margin: 0 auto; }
+  .badge { display: inline-block; padding: 0.35rem 1rem; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); border-radius: 999px; font-size: 0.8rem; color: var(--accent); margin-bottom: 1.5rem; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.2; margin-bottom: 1.25rem; }
+  .hero h1 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 1.15rem; color: var(--muted); line-height: 1.7; margin-bottom: 2.5rem; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  /* STATS */
+  .stats { display: flex; justify-content: center; gap: 3rem; padding: 2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.75rem; font-weight: 800; color: var(--text); }
+  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+
+  /* FEATURES */
+  .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-title { text-align: center; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .section-sub { text-align: center; color: var(--muted); margin-bottom: 3rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; transition: border-color 0.2s; }
+  .card:hover { border-color: var(--accent); }
+  .card-icon { font-size: 1.75rem; margin-bottom: 1rem; }
+  .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+  /* PRICING */
+  .pricing-card { background: var(--card); border: 1px solid var(--accent); border-radius: 16px; padding: 2.5rem; max-width: 420px; margin: 0 auto; text-align: center; }
+  .price { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+  .price span { font-size: 1rem; color: var(--muted); font-weight: 400; }
+  .price-desc { color: var(--muted); margin: 0.5rem 0 1.5rem; }
+  .feature-list { list-style: none; text-align: left; margin-bottom: 2rem; }
+  .feature-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+  .feature-list li::before { content: "✓"; color: var(--green); font-weight: 700; }
+
+  /* HOW IT WORKS */
+  .steps { display: flex; flex-direction: column; gap: 1rem; max-width: 640px; margin: 0 auto; }
+  .step { display: flex; gap: 1.25rem; align-items: flex-start; }
+  .step-num { background: var(--accent); color: white; width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; }
+  .step-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .step-content p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+
+  /* REGISTER MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 460px; margin: 1rem; }
+  .modal h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .modal p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .form-group input, .form-group select { width: 100%; padding: 0.65rem 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .modal-footer { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+  .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); flex: 1; }
+  .result-box { background: var(--bg); border: 1px solid var(--green); border-radius: 10px; padding: 1.25rem; margin-top: 1rem; display: none; }
+  .result-box .key { font-family: monospace; font-size: 0.8rem; color: var(--green); word-break: break-all; background: rgba(16,185,129,0.1); padding: 0.5rem; border-radius: 6px; margin-top: 0.5rem; }
+  .result-box .warn { color: #f59e0b; font-size: 0.8rem; margin-top: 0.5rem; }
+  .error-msg { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">AI<span>TO</span>AI <span style="color:var(--muted);font-weight:400">HOLDING</span></div>
+  <div class="nav-links">
+    <a href="/docs" class="btn btn-outline" target="_blank">API Docs</a>
+    <a href="/dashboard" class="btn btn-primary">Client Login</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">🇹🇭 Thai Customs Intelligence · AI-to-AI Economy</div>
+  <h1>ระบบจำแนกพิกัดศุลกากร<br><span>สำหรับ AI Agent</span></h1>
+  <p>API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ</p>
+  <div class="hero-cta">
+    <button class="btn btn-primary btn-lg" onclick="openRegister()">เริ่มต้นฟรี — รับ API Key</button>
+    <a href="/v1/sandbox/classify" class="btn btn-outline btn-lg" onclick="trySandbox(event)">ทดลองใช้ฟรี</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">6,000+</div><div class="stat-label">HS Code ที่รองรับ</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">ให้บริการตลอดเวลา</div></div>
+  <div class="stat"><div class="stat-num">$0.001</div><div class="stat-label">ต่อ 1 รายการ</div></div>
+  <div class="stat"><div class="stat-num">&lt;2s</div><div class="stat-label">Response time</div></div>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+  <div class="section-title">ทำไมต้องเลือกเรา</div>
+  <div class="section-sub">ออกแบบมาเพื่อ AI Agent โดยเฉพาะ ไม่ใช่มนุษย์</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h3>HS Code Classification</h3>
+      <p>จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <h3>คำนวณภาษีอัตโนมัติ</h3>
+      <p>คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h3>AI-Native API</h3>
+      <p>รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h3>Prepaid Credit</h3>
+      <p>ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>OGA Compliance Check</h3>
+      <p>ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌏</div>
+      <h3>ASEAN Ready</h3>
+      <p>รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" style="background: var(--card); border-radius: 16px; border: 1px solid var(--border); padding: 3rem 2rem;">
+  <div class="section-title">วิธีเริ่มต้นใช้งาน</div>
+  <div class="section-sub">4 ขั้นตอน เริ่มได้ใน 2 นาที</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>สมัครรับ API Key ฟรี</h4>
+        <p>ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>ทดลองใช้ Sandbox ฟรี</h4>
+        <p>POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>เติม Credit เพื่อใช้ Production</h4>
+        <p>เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>เรียก API ได้เลย</h4>
+        <p>POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="section">
+  <div class="section-title">ราคา</div>
+  <div class="section-sub">ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง</div>
+  <div class="pricing-card">
+    <div class="price">$0.001 <span>/ รายการ</span></div>
+    <div class="price-desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</div>
+    <ul class="feature-list">
+      <li>HS Code Classification พร้อม Confidence Score</li>
+      <li>คำนวณภาษีนำเข้า + VAT อัตโนมัติ</li>
+      <li>OGA Compliance Check</li>
+      <li>อ้างอิงกฎหมายทุกผลลัพธ์</li>
+      <li>Sandbox ฟรีไม่จำกัด</li>
+      <li>รองรับ MCP, GPT Actions, LangChain</li>
+    </ul>
+    <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()">สมัครฟรี — รับ API Key</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 AI TO AI HOLDING · <a href="/docs">API Documentation</a> · <a href="/.well-known/ai-plugin.json">AI Plugin Manifest</a></p>
+  <p style="margin-top:0.5rem">Customs Intelligence Division · Built for AI Agents</p>
+</footer>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <h2>สมัครรับ API Key</h2>
+    <p>ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที</p>
+    <div id="registerForm">
+      <div class="form-group">
+        <label>ชื่อ AI Agent / ระบบของคุณ</label>
+        <input type="text" id="agentName" placeholder="เช่น MyTradingBot, Claude-Customs" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>ประเภทงาน</label>
+        <select id="profession">
+          <option value="IMPORT_AI">นำเข้าสินค้า (Import)</option>
+          <option value="EXPORT_AI">ส่งออกสินค้า (Export)</option>
+          <option value="BROKER_AI">ตัวแทนศุลกากร (Broker)</option>
+          <option value="ECOMMERCE_AI">E-Commerce</option>
+          <option value="UNKNOWN">อื่นๆ</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ระบบ AI ที่ใช้ (ไม่บังคับ)</label>
+        <input type="text" id="originSystem" placeholder="เช่น Claude, GPT-4, LangChain" />
+      </div>
+      <div id="errorMsg" class="error-msg"></div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel btn-lg" onclick="closeRegister()">ยกเลิก</button>
+        <button class="btn btn-primary btn-lg" style="flex:2" onclick="doRegister()" id="registerBtn">สมัครเลย</button>
+      </div>
+    </div>
+    <div class="result-box" id="resultBox">
+      <div style="color: var(--green); font-weight: 600; margin-bottom: 0.5rem;">✅ สมัครสำเร็จ!</div>
+      <div style="font-size: 0.85rem; color: var(--muted);">API Key ของคุณ:</div>
+      <div class="key" id="resultKey"></div>
+      <div class="warn">⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก</div>
+      <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+        <button class="btn btn-outline" style="flex:1" onclick="copyKey()">📋 Copy Key</button>
+        <a href="/dashboard" class="btn btn-primary" style="flex:1; text-align:center">ไปที่ Dashboard →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://web-production-c9da4.up.railway.app';
+
+function openRegister() {
+  document.getElementById('registerModal').classList.add('show');
+}
+function closeRegister() {
+  document.getElementById('registerModal').classList.remove('show');
+}
+
+async function doRegister() {
+  const btn = document.getElementById('registerBtn');
+  const err = document.getElementById('errorMsg');
+  err.style.display = 'none';
+  btn.textContent = 'กำลังสมัคร...';
+  btn.disabled = true;
+
+  const body = {
+    agent_name: document.getElementById('agentName').value.trim(),
+    contact_email: document.getElementById('email').value.trim(),
+    profession: document.getElementById('profession').value,
+    origin_system: document.getElementById('originSystem').value.trim() || null,
+  };
+
+  if (!body.agent_name || !body.contact_email) {
+    err.textContent = 'กรุณากรอกชื่อและ Email';
+    err.style.display = 'block';
+    btn.textContent = 'สมัครเลย';
+    btn.disabled = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(API + '/v1/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'เกิดข้อผิดพลาด');
+
+    document.getElementById('resultKey').textContent = data.api_key;
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resultBox').style.display = 'block';
+    localStorage.setItem('aitai_key', data.api_key);
+    localStorage.setItem('aitai_agent', data.agent_name);
+  } catch (e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+    btn.textContent = 'สมัครเลย';
+    btn.disabled = false;
+  }
+}
+
+function copyKey() {
+  const key = document.getElementById('resultKey').textContent;
+  navigator.clipboard.writeText(key);
+  alert('คัดลอก API Key แล้ว!');
+}
+
+function trySandbox(e) {
+  e.preventDefault();
+  alert('Sandbox endpoint:\nPOST ' + API + '/v1/sandbox/classify\n\nดู docs ที่ ' + API + '/docs');
+}
+
+document.getElementById('registerModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRegister();
+});
+</script>
+</body>
+</html>

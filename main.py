@@ -81,24 +81,6 @@ async def health():
     }
 
 
-@app.get("/", include_in_schema=False)
-async def root():
-    return JSONResponse({
-        "organization": "AI TO AI HOLDING",
-        "division": "Customs Intelligence Division",
-        "phase": "Phase 1 - Foundation v1",
-        "status": "OPERATIONAL",
-        "auth": "X-API-Key header required on all production endpoints",
-        "endpoints": {
-            "sandbox_classify": "POST /v1/sandbox/classify  <- FREE trial (no key)",
-            "classify_invoice": "POST /v1/customs/classify  <- Production (API key)",
-            "get_case":         "GET  /v1/customs/case/{id} <- Production (API key)",
-            "treasury_settle":  "POST /v1/treasury/settle   <- Internal (API key)",
-            "ceo_command":      "POST /v1/ceo/command       <- Chairman (API key + IP)",
-            "kill_switch":      "POST /v1/chairman/kill-switch/activate <- Chairman only",
-            "docs":             "/docs",
-        },
-    })
 
 
 # ── AI-to-AI Discovery Layer ──────────────────────────────────────────
@@ -136,6 +118,19 @@ async def well_known_index():
         "sandbox": "POST /v1/sandbox/classify (no auth, free trial)",
         "production": "POST /v1/customs/classify (X-API-Key required)",
     }
+
+
+# ── Static Files (Landing page + Dashboard) ──────────────────
+_STATIC = Path(__file__).parent / "static"
+
+@app.get("/dashboard", include_in_schema=False)
+async def dashboard():
+    return FileResponse(_STATIC / "dashboard.html", media_type="text/html")
+
+# Override root to serve landing page
+@app.get("/", include_in_schema=False)
+async def landing():
+    return FileResponse(_STATIC / "index.html", media_type="text/html")
 
 
 # Routers

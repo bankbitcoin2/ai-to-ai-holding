@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Dashboard — AI TO AI HOLDING</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0e1a; --card: #111827; --border: #1f2937;
+    --accent: #6366f1; --green: #10b981; --red: #ef4444;
+    --yellow: #f59e0b; --text: #f9fafb; --muted: #9ca3af;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* LOGIN */
+  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+  .login-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 420px; }
+  .login-card h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .login-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.75rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .form-group input { width: 100%; padding: 0.7rem 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; font-family: monospace; }
+  .form-group input:focus { outline: none; border-color: var(--accent); }
+  .btn { padding: 0.7rem 1.5rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: white; width: 100%; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+  .error-msg { color: var(--red); font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+  .login-footer { text-align: center; margin-top: 1.5rem; color: var(--muted); font-size: 0.85rem; }
+  .login-footer a { color: var(--accent); text-decoration: none; }
+
+  /* DASHBOARD */
+  #dashboard { display: none; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); }
+  .logo { font-size: 1rem; font-weight: 700; }
+  .logo span { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .agent-badge { font-size: 0.85rem; color: var(--muted); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 0.4rem; }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 2rem; }
+
+  /* CREDIT CARD */
+  .credit-card { background: linear-gradient(135deg, #1e1b4b, #312e81); border: 1px solid var(--accent); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
+  .credit-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(99,102,241,0.1); border-radius: 50%; }
+  .credit-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; }
+  .credit-amount { font-size: 3rem; font-weight: 800; color: white; margin-bottom: 0.25rem; }
+  .credit-sub { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; }
+  .credit-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .btn-topup { background: white; color: #312e81; font-weight: 700; padding: 0.6rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.9rem; }
+  .btn-topup:hover { opacity: 0.9; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .stat-card .value { font-size: 1.5rem; font-weight: 700; }
+
+  /* SANDBOX */
+  .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .section-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.75rem; font-size: 0.85rem; font-family: monospace; resize: vertical; min-height: 80px; }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  .result-area { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.8rem; color: var(--green); white-space: pre-wrap; word-break: break-all; min-height: 60px; margin-top: 0.75rem; display: none; }
+
+  /* TOPUP MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 400px; margin: 1rem; }
+  .modal h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .modal p { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.25rem; }
+  .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+  .amount-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem; text-align: center; cursor: pointer; color: var(--text); font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
+  .amount-btn:hover, .amount-btn.active { border-color: var(--accent); color: var(--accent); }
+  .modal-footer { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+
+  /* API KEY BOX */
+  .key-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-family: monospace; font-size: 0.8rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+  .key-box span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .copy-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; flex-shrink: 0; }
+  .copy-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  .tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .tag-green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .tag-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>🔑 Client Login</h1>
+    <p>ใส่ API Key ที่ได้จากการสมัครเพื่อเข้าสู่ Dashboard</p>
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="text" id="keyInput" placeholder="sk-aitai-..." />
+    </div>
+    <div id="loginError" class="error-msg"></div>
+    <button class="btn btn-primary" onclick="doLogin()" style="margin-top:0.5rem">เข้าสู่ระบบ</button>
+    <div class="login-footer">
+      ยังไม่มี API Key? <a href="/">สมัครฟรีที่นี่</a>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <nav>
+    <div class="logo">AI<span>TO</span>AI <span style="color:var(--muted);font-weight:400">Dashboard</span></div>
+    <div class="nav-right">
+      <span class="agent-badge"><span class="status-dot"></span><span id="navAgent">Agent</span></span>
+      <button class="btn btn-outline" onclick="doLogout()" style="padding:0.4rem 0.9rem;font-size:0.8rem">ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- CREDIT CARD -->
+    <div class="credit-card">
+      <div class="credit-label">Credit คงเหลือ</div>
+      <div class="credit-amount">$<span id="creditBalance">0.00</span></div>
+      <div class="credit-sub">≈ <span id="callsRemaining">0</span> calls remaining · $0.001 / รายการ</div>
+      <div class="credit-actions">
+        <button class="btn-topup" onclick="openTopup()">+ เติม Credit</button>
+        <button class="btn btn-outline" onclick="refreshBalance()" style="color:white;border-color:rgba(255,255,255,0.2)">🔄 รีเฟรช</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">สถานะ</div>
+        <div class="value"><span class="tag tag-green">✓ Active</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Mode</div>
+        <div class="value"><span class="tag tag-yellow" id="modeTag">SANDBOX</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">ราคาต่อรายการ</div>
+        <div class="value" style="font-size:1.1rem">$0.001</div>
+      </div>
+    </div>
+
+    <!-- SANDBOX TEST -->
+    <div class="section-card">
+      <h3>🧪 ทดลอง Sandbox (ฟรี)</h3>
+      <div class="form-group">
+        <label>คำบรรยายสินค้า</label>
+        <textarea id="sandboxInput" placeholder="เช่น: iPhone 15 Pro Max 256GB smartphone with OLED display"></textarea>
+      </div>
+      <button class="btn btn-green" onclick="doSandbox()" id="sandboxBtn">จำแนก HS Code →</button>
+      <div class="result-area" id="sandboxResult"></div>
+    </div>
+
+    <!-- API KEY -->
+    <div class="section-card">
+      <h3>🔑 API Key ของคุณ</h3>
+      <div class="key-box">
+        <span id="keyDisplay"></span>
+        <button class="copy-btn" onclick="copyKey()">Copy</button>
+      </div>
+      <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem">ใช้ header: <code style="color:var(--accent)">X-API-Key: &lt;your-key&gt;</code> กับทุก production endpoint</p>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="section-card">
+      <h3>📖 Quick Start</h3>
+      <div style="color:var(--muted);font-size:0.85rem;line-height:1.8">
+        <p><strong style="color:var(--text)">Production endpoint:</strong></p>
+        <code style="color:var(--accent);display:block;margin:0.5rem 0;background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.8rem">POST https://web-production-c9da4.up.railway.app/v1/customs/classify<br>Header: X-API-Key: sk-aitai-...</code>
+        <p style="margin-top:0.75rem"><strong style="color:var(--text)">Discovery:</strong> AI ค้นพบ API นี้อัตโนมัติผ่าน <a href="/.well-known/" style="color:var(--accent)">/.well-known/</a></p>
+        <p style="margin-top:0.5rem"><a href="/docs" style="color:var(--accent)" target="_blank">ดู Full API Documentation →</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPUP MODAL -->
+<div class="modal-overlay" id="topupModal">
+  <div class="modal">
+    <h2>เติม Credit</h2>
+    <p>เลือกจำนวนที่ต้องการเติม ชำระผ่าน Stripe ปลอดภัย</p>
+    <div class="amount-grid">
+      <div class="amount-btn" onclick="selectAmount(5, this)">$5</div>
+      <div class="amount-btn" onclick="selectAmount(10, this)">$10</div>
+      <div class="amount-btn" onclick="selectAmount(20, this)">$20</div>
+      <div class="amount-btn" onclick="selectAmount(50, this)">$50</div>
+      <div class="amount-btn" onclick="selectAmount(100, this)">$100</div>
+      <div class="amount-btn" onclick="selectAmount(200, this)">$200</div>
+    </div>
+    <div id="topupError" class="error-msg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="flex:1" onclick="closeTopup()">ยกเลิก</button>
+      <button class="btn btn-primary" style="flex:2" onclick="doTopup()" id="topupBtn">ชำระเงิน →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://web-production-c9da4.up.railway.app';
+let currentKey = '';
+let selectedAmount = 5;
+
+// ── LOGIN ─────────────────────────────────────────────────────
+async function doLogin() {
+  const key = document.getElementById('keyInput').value.trim();
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+  if (!key) { err.textContent = 'กรุณาใส่ API Key'; err.style.display = 'block'; return; }
+
+  try {
+    const res = await fetch(API + '/v1/billing/balance', {
+      headers: { 'X-API-Key': key }
+    });
+    if (res.status === 401) throw new Error('API Key ไม่ถูกต้อง');
+    if (!res.ok) throw new Error('เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+    const data = await res.json();
+
+    currentKey = key;
+    localStorage.setItem('aitai_key', key);
+    localStorage.setItem('aitai_agent', data.agent_name);
+    showDashboard(data);
+  } catch (e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+  }
+}
+
+function showDashboard(data) {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('navAgent').textContent = data.agent_name || 'Agent';
+  document.getElementById('keyDisplay').textContent = currentKey;
+  updateBalance(data);
+}
+
+function updateBalance(data) {
+  document.getElementById('creditBalance').textContent = (data.credit_balance || 0).toFixed(4);
+  document.getElementById('callsRemaining').textContent = (data.estimated_calls_remaining || 0).toLocaleString();
+}
+
+async function refreshBalance() {
+  try {
+    const res = await fetch(API + '/v1/billing/balance', { headers: { 'X-API-Key': currentKey } });
+    const data = await res.json();
+    updateBalance(data);
+  } catch(e) {}
+}
+
+function doLogout() {
+  localStorage.removeItem('aitai_key');
+  localStorage.removeItem('aitai_agent');
+  currentKey = '';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('keyInput').value = '';
+}
+
+// ── SANDBOX ───────────────────────────────────────────────────
+async function doSandbox() {
+  const desc = document.getElementById('sandboxInput').value.trim();
+  const result = document.getElementById('sandboxResult');
+  const btn = document.getElementById('sandboxBtn');
+  if (!desc) return;
+
+  btn.textContent = 'กำลังจำแนก...';
+  btn.disabled = true;
+  result.style.display = 'block';
+  result.textContent = 'กำลังประมวลผล...';
+
+  try {
+    const res = await fetch(API + '/v1/sandbox/classify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: [{ description: desc, quantity: 1, unit_price: 100 }] })
+    });
+    const data = await res.json();
+    result.textContent = JSON.stringify(data, null, 2);
+  } catch(e) {
+    result.textContent = 'Error: ' + e.message;
+    result.style.color = 'var(--red)';
+  }
+  btn.textContent = 'จำแนก HS Code →';
+  btn.disabled = false;
+}
+
+// ── TOPUP ─────────────────────────────────────────────────────
+function selectAmount(amount, el) {
+  selectedAmount = amount;
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function openTopup() { document.getElementById('topupModal').classList.add('show'); }
+function closeTopup() { document.getElementById('topupModal').classList.remove('show'); }
+
+async function doTopup() {
+  const btn = document.getElementById('topupBtn');
+  const err = document.getElementById('topupError');
+  err.style.display = 'none';
+  btn.textContent = 'กำลังสร้าง checkout...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(API + '/v1/billing/topup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ api_key: currentKey, amount_usd: selectedAmount })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'เกิดข้อผิดพลาด');
+    closeTopup();
+    window.open(data.checkout_url, '_blank');
+  } catch(e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+  }
+  btn.textContent = 'ชำระเงิน →';
+  btn.disabled = false;
+}
+
+function copyKey() {
+  navigator.clipboard.writeText(currentKey);
+  event.target.textContent = 'Copied!';
+  setTimeout(() => event.target.textContent = 'Copy', 1500);
+}
+
+// ── AUTO LOGIN ────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  const saved = localStorage.getItem('aitai_key');
+  if (saved) {
+    document.getElementById('keyInput').value = saved;
+    await doLogin();
+  }
+});
+
+document.getElementById('keyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('topupModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('topupModal')) closeTopup();
+});
+</script>
+</body>
+</html>
