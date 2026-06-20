@@ -13,7 +13,6 @@
   }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
-  /* LOGIN */
   .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
   .login-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 420px; }
   .login-card h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
@@ -32,18 +31,22 @@
   .login-footer { text-align: center; margin-top: 1.5rem; color: var(--muted); font-size: 0.85rem; }
   .login-footer a { color: var(--accent); text-decoration: none; }
 
-  /* DASHBOARD */
   #dashboard { display: none; }
-  nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem; }
   .logo { font-size: 1rem; font-weight: 700; }
   .logo span { color: var(--accent); }
-  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
   .agent-badge { font-size: 0.85rem; color: var(--muted); }
   .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 0.4rem; }
 
+  /* LANG SWITCHER */
+  .lang-switcher { display: flex; gap: 0.2rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.2rem; }
+  .lang-btn { background: transparent; border: none; color: var(--muted); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+  .lang-btn:hover { color: var(--text); }
+  .lang-btn.active { background: var(--accent); color: white; }
+
   .main { max-width: 960px; margin: 0 auto; padding: 2rem; }
 
-  /* CREDIT CARD */
   .credit-card { background: linear-gradient(135deg, #1e1b4b, #312e81); border: 1px solid var(--accent); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
   .credit-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(99,102,241,0.1); border-radius: 50%; }
   .credit-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; }
@@ -53,20 +56,17 @@
   .btn-topup { background: white; color: #312e81; font-weight: 700; padding: 0.6rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.9rem; }
   .btn-topup:hover { opacity: 0.9; }
 
-  /* STATS ROW */
   .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
   .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
   .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
   .stat-card .value { font-size: 1.5rem; font-weight: 700; }
 
-  /* SANDBOX */
   .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
   .section-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
   textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.75rem; font-size: 0.85rem; font-family: monospace; resize: vertical; min-height: 80px; }
   textarea:focus { outline: none; border-color: var(--accent); }
   .result-area { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.8rem; color: var(--green); white-space: pre-wrap; word-break: break-all; min-height: 60px; margin-top: 0.75rem; display: none; }
 
-  /* TOPUP MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.show { display: flex; }
   .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 400px; margin: 1rem; }
@@ -77,7 +77,6 @@
   .amount-btn:hover, .amount-btn.active { border-color: var(--accent); color: var(--accent); }
   .modal-footer { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
 
-  /* API KEY BOX */
   .key-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-family: monospace; font-size: 0.8rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
   .key-box span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .copy-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; flex-shrink: 0; }
@@ -93,16 +92,26 @@
 <!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
-    <h1>🔑 Client Login</h1>
-    <p>ใส่ API Key ที่ได้จากการสมัครเพื่อเข้าสู่ Dashboard</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem">
+      <div>
+        <h1>🔑 <span data-i18n="login_title">Client Login</span></h1>
+        <p style="margin-bottom:0" data-i18n="login_sub">ใส่ API Key ที่ได้จากการสมัครเพื่อเข้าสู่ Dashboard</p>
+      </div>
+      <div class="lang-switcher" style="flex-shrink:0;margin-left:0.75rem">
+        <button class="lang-btn active" onclick="setLang('th')">TH</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('zh')">中</button>
+        <button class="lang-btn" onclick="setLang('ja')">日</button>
+      </div>
+    </div>
     <div class="form-group">
       <label>API Key</label>
       <input type="text" id="keyInput" placeholder="sk-aitai-..." />
     </div>
     <div id="loginError" class="error-msg"></div>
-    <button class="btn btn-primary" onclick="doLogin()" style="margin-top:0.5rem">เข้าสู่ระบบ</button>
+    <button class="btn btn-primary" onclick="doLogin()" style="margin-top:0.5rem" data-i18n="login_btn">เข้าสู่ระบบ</button>
     <div class="login-footer">
-      ยังไม่มี API Key? <a href="/">สมัครฟรีที่นี่</a>
+      <span data-i18n="login_no_key">ยังไม่มี API Key?</span> <a href="/" data-i18n="login_register">สมัครฟรีที่นี่</a>
     </div>
   </div>
 </div>
@@ -112,27 +121,31 @@
   <nav>
     <div class="logo">AI<span>TO</span>AI <span style="color:var(--muted);font-weight:400">Dashboard</span></div>
     <div class="nav-right">
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('th')">TH</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+      </div>
       <span class="agent-badge"><span class="status-dot"></span><span id="navAgent">Agent</span></span>
-      <button class="btn btn-outline" onclick="doLogout()" style="padding:0.4rem 0.9rem;font-size:0.8rem">ออกจากระบบ</button>
+      <button class="btn btn-outline" onclick="doLogout()" style="padding:0.4rem 0.9rem;font-size:0.8rem" data-i18n="logout">ออกจากระบบ</button>
     </div>
   </nav>
 
   <div class="main">
-    <!-- CREDIT CARD -->
     <div class="credit-card">
-      <div class="credit-label">Credit คงเหลือ</div>
+      <div class="credit-label" data-i18n="credit_label">Credit คงเหลือ</div>
       <div class="credit-amount">$<span id="creditBalance">0.00</span></div>
-      <div class="credit-sub">≈ <span id="callsRemaining">0</span> calls remaining · $0.001 / รายการ</div>
+      <div class="credit-sub">≈ <span id="callsRemaining">0</span> <span data-i18n="calls_remaining">calls remaining</span> · $0.001 / <span data-i18n="per_item">รายการ</span></div>
       <div class="credit-actions">
-        <button class="btn-topup" onclick="openTopup()">+ เติม Credit</button>
-        <button class="btn btn-outline" onclick="refreshBalance()" style="color:white;border-color:rgba(255,255,255,0.2)">🔄 รีเฟรช</button>
+        <button class="btn-topup" onclick="openTopup()" data-i18n="topup_btn">+ เติม Credit</button>
+        <button class="btn btn-outline" onclick="refreshBalance()" style="color:white;border-color:rgba(255,255,255,0.2)" data-i18n="refresh_btn">🔄 รีเฟรช</button>
       </div>
     </div>
 
-    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="label">สถานะ</div>
+        <div class="label" data-i18n="stat_status">สถานะ</div>
         <div class="value"><span class="tag tag-green">✓ Active</span></div>
       </div>
       <div class="stat-card">
@@ -140,40 +153,37 @@
         <div class="value"><span class="tag tag-yellow" id="modeTag">SANDBOX</span></div>
       </div>
       <div class="stat-card">
-        <div class="label">ราคาต่อรายการ</div>
+        <div class="label" data-i18n="stat_price">ราคาต่อรายการ</div>
         <div class="value" style="font-size:1.1rem">$0.001</div>
       </div>
     </div>
 
-    <!-- SANDBOX TEST -->
     <div class="section-card">
-      <h3>🧪 ทดลอง Sandbox (ฟรี)</h3>
+      <h3>🧪 <span data-i18n="sandbox_title">ทดลอง Sandbox (ฟรี)</span></h3>
       <div class="form-group">
-        <label>คำบรรยายสินค้า</label>
-        <textarea id="sandboxInput" placeholder="เช่น: iPhone 15 Pro Max 256GB smartphone with OLED display"></textarea>
+        <label data-i18n="sandbox_label">คำบรรยายสินค้า</label>
+        <textarea id="sandboxInput" data-i18n-placeholder="sandbox_ph"></textarea>
       </div>
-      <button class="btn btn-green" onclick="doSandbox()" id="sandboxBtn">จำแนก HS Code →</button>
+      <button class="btn btn-green" onclick="doSandbox()" id="sandboxBtn" data-i18n="sandbox_btn">จำแนก HS Code →</button>
       <div class="result-area" id="sandboxResult"></div>
     </div>
 
-    <!-- API KEY -->
     <div class="section-card">
-      <h3>🔑 API Key ของคุณ</h3>
+      <h3>🔑 <span data-i18n="apikey_title">API Key ของคุณ</span></h3>
       <div class="key-box">
         <span id="keyDisplay"></span>
-        <button class="copy-btn" onclick="copyKey()">Copy</button>
+        <button class="copy-btn" onclick="copyKey()" data-i18n="copy">Copy</button>
       </div>
-      <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem">ใช้ header: <code style="color:var(--accent)">X-API-Key: &lt;your-key&gt;</code> กับทุก production endpoint</p>
+      <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem"><span data-i18n="apikey_hint">ใช้ header:</span> <code style="color:var(--accent)">X-API-Key: &lt;your-key&gt;</code> <span data-i18n="apikey_hint2">กับทุก production endpoint</span></p>
     </div>
 
-    <!-- QUICK START -->
     <div class="section-card">
       <h3>📖 Quick Start</h3>
       <div style="color:var(--muted);font-size:0.85rem;line-height:1.8">
-        <p><strong style="color:var(--text)">Production endpoint:</strong></p>
+        <p><strong style="color:var(--text)" data-i18n="qs_prod">Production endpoint:</strong></p>
         <code style="color:var(--accent);display:block;margin:0.5rem 0;background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.8rem">POST https://web-production-c9da4.up.railway.app/v1/customs/classify<br>Header: X-API-Key: sk-aitai-...</code>
-        <p style="margin-top:0.75rem"><strong style="color:var(--text)">Discovery:</strong> AI ค้นพบ API นี้อัตโนมัติผ่าน <a href="/.well-known/" style="color:var(--accent)">/.well-known/</a></p>
-        <p style="margin-top:0.5rem"><a href="/docs" style="color:var(--accent)" target="_blank">ดู Full API Documentation →</a></p>
+        <p style="margin-top:0.75rem"><strong style="color:var(--text)">Discovery:</strong> <span data-i18n="qs_discovery">AI ค้นพบ API นี้อัตโนมัติผ่าน</span> <a href="/.well-known/" style="color:var(--accent)">/.well-known/</a></p>
+        <p style="margin-top:0.5rem"><a href="/docs" style="color:var(--accent)" target="_blank" data-i18n="qs_docs">ดู Full API Documentation →</a></p>
       </div>
     </div>
   </div>
@@ -182,8 +192,8 @@
 <!-- TOPUP MODAL -->
 <div class="modal-overlay" id="topupModal">
   <div class="modal">
-    <h2>เติม Credit</h2>
-    <p>เลือกจำนวนที่ต้องการเติม ชำระผ่าน Stripe ปลอดภัย</p>
+    <h2 data-i18n="topup_title">เติม Credit</h2>
+    <p data-i18n="topup_sub">เลือกจำนวนที่ต้องการเติม ชำระผ่าน Stripe ปลอดภัย</p>
     <div class="amount-grid">
       <div class="amount-btn" onclick="selectAmount(5, this)">$5</div>
       <div class="amount-btn" onclick="selectAmount(10, this)">$10</div>
@@ -194,8 +204,8 @@
     </div>
     <div id="topupError" class="error-msg"></div>
     <div class="modal-footer">
-      <button class="btn btn-outline" style="flex:1" onclick="closeTopup()">ยกเลิก</button>
-      <button class="btn btn-primary" style="flex:2" onclick="doTopup()" id="topupBtn">ชำระเงิน →</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeTopup()" data-i18n="cancel">ยกเลิก</button>
+      <button class="btn btn-primary" style="flex:2" onclick="doTopup()" id="topupBtn" data-i18n="pay_btn">ชำระเงิน →</button>
     </div>
   </div>
 </div>
@@ -205,21 +215,206 @@ const API = 'https://web-production-c9da4.up.railway.app';
 let currentKey = '';
 let selectedAmount = 5;
 
+// ── i18n ──────────────────────────────────────────────────────
+const i18n = {
+  th: {
+    login_title: 'Client Login',
+    login_sub: 'ใส่ API Key ที่ได้จากการสมัครเพื่อเข้าสู่ Dashboard',
+    login_btn: 'เข้าสู่ระบบ',
+    login_no_key: 'ยังไม่มี API Key?',
+    login_register: 'สมัครฟรีที่นี่',
+    login_err_empty: 'กรุณาใส่ API Key',
+    login_err_invalid: 'API Key ไม่ถูกต้อง',
+    login_err_generic: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง',
+    logout: 'ออกจากระบบ',
+    credit_label: 'Credit คงเหลือ',
+    calls_remaining: 'calls remaining',
+    per_item: 'รายการ',
+    topup_btn: '+ เติม Credit',
+    refresh_btn: '🔄 รีเฟรช',
+    stat_status: 'สถานะ',
+    stat_price: 'ราคาต่อรายการ',
+    sandbox_title: 'ทดลอง Sandbox (ฟรี)',
+    sandbox_label: 'คำบรรยายสินค้า',
+    sandbox_ph: 'เช่น: iPhone 15 Pro Max 256GB smartphone with OLED display',
+    sandbox_btn: 'จำแนก HS Code →',
+    sandbox_loading: 'กำลังจำแนก...',
+    sandbox_processing: 'กำลังประมวลผล...',
+    apikey_title: 'API Key ของคุณ',
+    apikey_hint: 'ใช้ header:',
+    apikey_hint2: 'กับทุก production endpoint',
+    copy: 'Copy',
+    copied: 'Copied!',
+    qs_prod: 'Production endpoint:',
+    qs_discovery: 'AI ค้นพบ API นี้อัตโนมัติผ่าน',
+    qs_docs: 'ดู Full API Documentation →',
+    topup_title: 'เติม Credit',
+    topup_sub: 'เลือกจำนวนที่ต้องการเติม ชำระผ่าน Stripe ปลอดภัย',
+    topup_creating: 'กำลังสร้าง checkout...',
+    cancel: 'ยกเลิก',
+    pay_btn: 'ชำระเงิน →',
+  },
+  en: {
+    login_title: 'Client Login',
+    login_sub: 'Enter your API Key to access the Dashboard',
+    login_btn: 'Login',
+    login_no_key: "Don't have an API Key?",
+    login_register: 'Sign up free here',
+    login_err_empty: 'Please enter your API Key',
+    login_err_invalid: 'Invalid API Key',
+    login_err_generic: 'An error occurred. Please try again.',
+    logout: 'Logout',
+    credit_label: 'Credit Balance',
+    calls_remaining: 'calls remaining',
+    per_item: 'item',
+    topup_btn: '+ Top Up Credit',
+    refresh_btn: '🔄 Refresh',
+    stat_status: 'Status',
+    stat_price: 'Price per item',
+    sandbox_title: 'Sandbox Trial (Free)',
+    sandbox_label: 'Product Description',
+    sandbox_ph: 'e.g. iPhone 15 Pro Max 256GB smartphone with OLED display',
+    sandbox_btn: 'Classify HS Code →',
+    sandbox_loading: 'Classifying...',
+    sandbox_processing: 'Processing...',
+    apikey_title: 'Your API Key',
+    apikey_hint: 'Use header:',
+    apikey_hint2: 'with all production endpoints',
+    copy: 'Copy',
+    copied: 'Copied!',
+    qs_prod: 'Production endpoint:',
+    qs_discovery: 'AI agents auto-discover this API via',
+    qs_docs: 'View Full API Documentation →',
+    topup_title: 'Top Up Credit',
+    topup_sub: 'Select an amount and pay securely via Stripe',
+    topup_creating: 'Creating checkout...',
+    cancel: 'Cancel',
+    pay_btn: 'Pay →',
+  },
+  zh: {
+    login_title: '客户登录',
+    login_sub: '输入您的API Key以访问控制台',
+    login_btn: '登录',
+    login_no_key: '还没有API Key？',
+    login_register: '在此免费注册',
+    login_err_empty: '请输入API Key',
+    login_err_invalid: 'API Key 无效',
+    login_err_generic: '发生错误，请重试',
+    logout: '退出登录',
+    credit_label: '剩余积分',
+    calls_remaining: '次调用剩余',
+    per_item: '项',
+    topup_btn: '+ 充值',
+    refresh_btn: '🔄 刷新',
+    stat_status: '状态',
+    stat_price: '每项价格',
+    sandbox_title: '沙盒试用（免费）',
+    sandbox_label: '商品描述',
+    sandbox_ph: '例如：iPhone 15 Pro Max 256GB 智能手机 OLED 显示屏',
+    sandbox_btn: '分类 HS 编码 →',
+    sandbox_loading: '分类中...',
+    sandbox_processing: '处理中...',
+    apikey_title: '您的API Key',
+    apikey_hint: '使用请求头：',
+    apikey_hint2: '用于所有生产接口',
+    copy: '复制',
+    copied: '已复制！',
+    qs_prod: '生产接口：',
+    qs_discovery: 'AI智能体通过以下路径自动发现此API：',
+    qs_docs: '查看完整API文档 →',
+    topup_title: '充值',
+    topup_sub: '选择金额，通过Stripe安全付款',
+    topup_creating: '正在创建结账...',
+    cancel: '取消',
+    pay_btn: '立即付款 →',
+  },
+  ja: {
+    login_title: 'クライアントログイン',
+    login_sub: 'APIキーを入力してダッシュボードにアクセスしてください',
+    login_btn: 'ログイン',
+    login_no_key: 'APIキーをお持ちでない方は',
+    login_register: 'こちらで無料登録',
+    login_err_empty: 'APIキーを入力してください',
+    login_err_invalid: 'APIキーが無効です',
+    login_err_generic: 'エラーが発生しました。もう一度お試しください。',
+    logout: 'ログアウト',
+    credit_label: 'クレジット残高',
+    calls_remaining: '回の呼び出し残り',
+    per_item: '件',
+    topup_btn: '+ クレジット追加',
+    refresh_btn: '🔄 更新',
+    stat_status: 'ステータス',
+    stat_price: '1件あたりの価格',
+    sandbox_title: 'サンドボックス試用（無料）',
+    sandbox_label: '商品の説明',
+    sandbox_ph: '例：iPhone 15 Pro Max 256GB スマートフォン OLEDディスプレイ',
+    sandbox_btn: 'HSコードを分類 →',
+    sandbox_loading: '分類中...',
+    sandbox_processing: '処理中...',
+    apikey_title: 'あなたのAPIキー',
+    apikey_hint: 'ヘッダーを使用：',
+    apikey_hint2: 'すべての本番エンドポイントに適用',
+    copy: 'コピー',
+    copied: 'コピー済み！',
+    qs_prod: '本番エンドポイント：',
+    qs_discovery: 'AIエージェントが以下を通じて自動検出：',
+    qs_docs: 'APIドキュメントを見る →',
+    topup_title: 'クレジット追加',
+    topup_sub: '金額を選択してStripeで安全に支払い',
+    topup_creating: 'チェックアウト作成中...',
+    cancel: 'キャンセル',
+    pay_btn: '支払う →',
+  },
+};
+
+let currentLang = 'th';
+
+function detectLang() {
+  const saved = localStorage.getItem('aitai_lang');
+  if (saved && i18n[saved]) return saved;
+  const nav = navigator.language || 'th';
+  if (nav.startsWith('zh')) return 'zh';
+  if (nav.startsWith('ja')) return 'ja';
+  if (nav.startsWith('th')) return 'th';
+  return 'en';
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('aitai_lang', lang);
+  document.documentElement.lang = lang;
+  const t = i18n[lang];
+
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    const map = { th:'TH', en:'EN', zh:'中', ja:'日' };
+    const map2 = { th:'TH', en:'EN', zh:'中文', ja:'日本語' };
+    b.classList.toggle('active', b.textContent.trim() === map[lang] || b.textContent.trim() === map2[lang]);
+  });
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
+}
+
+function t(key) { return (i18n[currentLang] || i18n.th)[key] || key; }
+
 // ── LOGIN ─────────────────────────────────────────────────────
 async function doLogin() {
   const key = document.getElementById('keyInput').value.trim();
   const err = document.getElementById('loginError');
   err.style.display = 'none';
-  if (!key) { err.textContent = 'กรุณาใส่ API Key'; err.style.display = 'block'; return; }
+  if (!key) { err.textContent = t('login_err_empty'); err.style.display = 'block'; return; }
 
   try {
-    const res = await fetch(API + '/v1/billing/balance', {
-      headers: { 'X-API-Key': key }
-    });
-    if (res.status === 401) throw new Error('API Key ไม่ถูกต้อง');
-    if (!res.ok) throw new Error('เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+    const res = await fetch(API + '/v1/billing/balance', { headers: { 'X-API-Key': key } });
+    if (res.status === 401) throw new Error(t('login_err_invalid'));
+    if (!res.ok) throw new Error(t('login_err_generic'));
     const data = await res.json();
-
     currentKey = key;
     localStorage.setItem('aitai_key', key);
     localStorage.setItem('aitai_agent', data.agent_name);
@@ -266,11 +461,10 @@ async function doSandbox() {
   const result = document.getElementById('sandboxResult');
   const btn = document.getElementById('sandboxBtn');
   if (!desc) return;
-
-  btn.textContent = 'กำลังจำแนก...';
+  btn.textContent = t('sandbox_loading');
   btn.disabled = true;
   result.style.display = 'block';
-  result.textContent = 'กำลังประมวลผล...';
+  result.textContent = t('sandbox_processing');
 
   try {
     const res = await fetch(API + '/v1/sandbox/classify', {
@@ -284,7 +478,7 @@ async function doSandbox() {
     result.textContent = 'Error: ' + e.message;
     result.style.color = 'var(--red)';
   }
-  btn.textContent = 'จำแนก HS Code →';
+  btn.textContent = t('sandbox_btn');
   btn.disabled = false;
 }
 
@@ -302,7 +496,7 @@ async function doTopup() {
   const btn = document.getElementById('topupBtn');
   const err = document.getElementById('topupError');
   err.style.display = 'none';
-  btn.textContent = 'กำลังสร้าง checkout...';
+  btn.textContent = t('topup_creating');
   btn.disabled = true;
 
   try {
@@ -312,25 +506,26 @@ async function doTopup() {
       body: JSON.stringify({ api_key: currentKey, amount_usd: selectedAmount })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'เกิดข้อผิดพลาด');
+    if (!res.ok) throw new Error(data.detail || t('login_err_generic'));
     closeTopup();
     window.open(data.checkout_url, '_blank');
   } catch(e) {
     err.textContent = e.message;
     err.style.display = 'block';
   }
-  btn.textContent = 'ชำระเงิน →';
+  btn.textContent = t('pay_btn');
   btn.disabled = false;
 }
 
 function copyKey() {
   navigator.clipboard.writeText(currentKey);
-  event.target.textContent = 'Copied!';
-  setTimeout(() => event.target.textContent = 'Copy', 1500);
+  event.target.textContent = t('copied');
+  setTimeout(() => event.target.textContent = t('copy'), 1500);
 }
 
-// ── AUTO LOGIN ────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
+  setLang(detectLang());
   const saved = localStorage.getItem('aitai_key');
   if (saved) {
     document.getElementById('keyInput').value = saved;
