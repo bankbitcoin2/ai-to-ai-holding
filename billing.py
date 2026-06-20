@@ -13,7 +13,7 @@ from typing import Optional
 import aiosqlite
 from fastapi import APIRouter, HTTPException, Request, Header
 from fastapi.responses import JSONResponse, RedirectResponse
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field
 
 from database import get_db
 from holding_config import PRICE_PER_ITEM
@@ -46,10 +46,13 @@ def _generate_api_key() -> str:
 
 async def _get_agent_by_key(db: aiosqlite.Connection, api_key: str):
     hint = api_key[-8:]
-    async with db.execute(
-        "SELECT * FROM client_agents WHERE api_key_hint = ? AND status = 'active'",
-        (hint,)
-    ) as cur:
+    async with db.execute("""
+        SELECT a.*, COALESCE(c.credit_balance, 0.0) as credit_balance,
+               COALESCE(c.credit_topup_total, 0.0) as credit_topup_total
+        FROM client_agents a
+        LEFT JOIN client_credits c ON c.agent_id = a.id
+        WHERE a.api_key_hint = ? AND a.status = 'active'
+    """, (hint,)) as cur:
         row = await cur.fetchone()
     return row
 
@@ -79,10 +82,14 @@ async def register_client(req: RegisterRequest):
         await db.execute("""
             INSERT INTO client_agents
             (id, agent_name, profession, origin_system, contact_email,
-             api_key_hint, status, registered_at, credit_balance)
-            VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0.0)
+             api_key_hint, status, registered_at)
+            VALUES (?, ?, ?, ?, ?, ?, 'active', ?)
         """, (agent_id, req.agent_name, req.profession,
               req.origin_system, req.contact_email, hint, now))
+        await db.execute("""
+            INSERT OR IGNORE INTO client_credits (agent_id, credit_balance, credit_topup_total)
+            VALUES (?, 0.0, 0.0)
+        """, (agent_id,))
         await db.commit()
 
     return {
@@ -202,11 +209,13 @@ async def stripe_webhook(request: Request):
         if agent_id and amount_usd > 0:
             async with get_db() as db:
                 await db.execute("""
-                    UPDATE client_agents
-                    SET credit_balance = credit_balance + ?,
-                        credit_topup_total = credit_topup_total + ?
-                    WHERE id = ?
-                """, (amount_usd, amount_usd, agent_id))
+                    INSERT INTO client_credits (agent_id, credit_balance, credit_topup_total)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(agent_id) DO UPDATE SET
+                        credit_balance = credit_balance + excluded.credit_balance,
+                        credit_topup_total = credit_topup_total + excluded.credit_topup_total,
+                        updated_at = strftime('%Y-%m-%dT%H:%M:%SZ','now')
+                """, (agent_id, amount_usd, amount_usd))
                 await db.execute("""
                     UPDATE credit_topups
                     SET status = 'completed',
@@ -240,16 +249,21 @@ async def deduct_credit(api_key: str, item_count: int) -> dict:
         row = await _get_agent_by_key(db, api_key)
         if not row:
             raise HTTPException(401, "API key ไม่ถูกต้อง")
-        if row["credit_balance"] < cost:
+        balance = row["credit_balance"]
+        if balance < cost:
             raise HTTPException(
                 402,
-                f"Credit ไม่พอ — ต้องการ ${cost:.2f} แต่มี ${row['credit_balance']:.2f} "
+                f"Credit ไม่พอ — ต้องการ ${cost:.2f} แต่มี ${balance:.2f} "
                 f"เติมได้ที่ POST /v1/billing/topup"
             )
-        new_balance = round(row["credit_balance"] - cost, 4)
+        new_balance = round(balance - cost, 4)
+        await db.execute("""
+            UPDATE client_credits SET credit_balance = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%SZ','now')
+            WHERE agent_id = ?
+        """, (new_balance, row["id"]))
         await db.execute(
-            "UPDATE client_agents SET credit_balance = ?, total_spend = total_spend + ? WHERE id = ?",
-            (new_balance, cost, row["id"])
+            "UPDATE client_agents SET total_spend = total_spend + ? WHERE id = ?",
+            (cost, row["id"])
         )
         await db.commit()
     return {"success": True, "cost": cost, "remaining": new_balance, "agent_id": row["id"]}
