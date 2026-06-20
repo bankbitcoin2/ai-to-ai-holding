@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "schema_version": "2.0",
+    "source": "apiservice.dtn.go.th (DTN — กรมการค้าต่างประเทศ)",
+    "tariff_year": "2024",
+    "updated_at": "2026-06-20T20:16:16.218544",
+    "total_hs_codes": 0,
+    "status": "auto-pulled"
+  },
+  "fta_agreements": {
+    "MFN": "Most Favoured Nation",
+    "AFTA": "ASEAN Free Trade Area",
+    "ACFTA": "ASEAN–China",
+    "AJCEP": "ASEAN–Japan",
+    "AKFTA": "ASEAN–Korea",
+    "AANZFTA": "ASEAN–Australia–New Zealand",
+    "AIFTA": "ASEAN–India",
+    "TAFTA": "Thailand–Australia",
+    "TNZCEP": "Thailand–New Zealand",
+    "JTEPA": "Japan–Thailand EPA",
+    "RCEP": "Regional Comprehensive Economic Partnership",
+    "TCFTA": "Thailand–Chile",
+    "TPFTA": "Thailand–Peru"
+  },
+  "rates": {}
+}
