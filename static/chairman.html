@@ -357,9 +357,17 @@ header { display:flex; align-items:center; gap:0.75rem; padding:0 1.25rem; heigh
     <!-- WALLET -->
     <div class="panel" id="panel-wallet">
       <div class="wallet-card">
-        <div class="wlbl">Chairman Credit Balance (รวมทุก client)</div>
+        <div class="wlbl">รายได้รวมทั้งระบบ (Total Revenue)</div>
         <div class="wamt" id="w-total">loading...</div>
-        <div class="wsub">credits · $0.001 per API call</div>
+        <div class="wsub" id="w-revenue-usd">$0.001 per API call</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">📊 สถิติรายได้</div>
+        <div class="info-row"><span class="k">💰 รายได้รวม (credits ที่เติมแล้ว)</span><span class="v green" id="w-total2">—</span></div>
+        <div class="info-row"><span class="k">💵 มูลค่าโดยประมาณ (USD)</span><span class="v green" id="w-usd2">—</span></div>
+        <div class="info-row"><span class="k">🔋 Credit คงเหลือทั้งระบบ</span><span class="v" id="w-balance">—</span></div>
+        <div class="info-row"><span class="k">📡 API Calls ทั้งหมด (jobs)</span><span class="v" id="w-jobs">—</span></div>
+        <div class="info-row" style="border:none"><span class="k">👥 Clients ที่ลงทะเบียนแล้ว</span><span class="v" id="w-clients2">—</span></div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;">
         <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">System Info</div>
@@ -506,20 +514,21 @@ async function fetchStatus() {
 
 async function fetchWallet() {
   try {
-    const r = await fetch(`${RAILWAY}/v1/clients/me`, {
+    const r = await fetch(`${RAILWAY}/v1/chairman/stats`, {
       headers: { 'X-API-Key': CHAIRMAN_KEY }
     });
-    if (!r.ok) {
-      document.getElementById('w-total').textContent = '(ต้องการ client key)';
-      document.getElementById('trs-credit').textContent = 'ต้องการ client key';
-      document.getElementById('cr-count').textContent = 'ต้องการ client key';
-      return;
-    }
+    if (!r.ok) return;
     const d = await r.json();
-    const bal = d.credit_balance ?? d.balance ?? '—';
-    document.getElementById('w-total').textContent = bal;
-    document.getElementById('trs-credit').textContent = `Credit: ${bal}`;
-    document.getElementById('cr-count').textContent = `client: ${d.agent_id || '—'}`;
+    // overview
+    document.getElementById('ov-clients').textContent = d.total_clients ?? '—';
+    // wallet tab
+    document.getElementById('w-total').textContent = `${d.total_revenue_credits ?? 0} credits`;
+    document.getElementById('w-revenue-usd').textContent = `~$${d.revenue_usd_estimate ?? 0} USD`;
+    document.getElementById('w-balance').textContent = `${d.total_balance_credits ?? 0} credits`;
+    document.getElementById('w-jobs').textContent = `${d.total_jobs ?? 0} calls`;
+    // org chart
+    document.getElementById('trs-credit').textContent = `รายได้รวม: ${d.total_revenue_credits ?? 0} credits`;
+    document.getElementById('cr-count').textContent = `clients: ${d.total_clients ?? 0}`;
   } catch(e) {}
 }
 

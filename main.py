@@ -38,6 +38,7 @@ from kill_switch_router import router as kill_switch_router
 from kill_switch_middleware import KillSwitchMiddleware
 from security import SecurityMiddleware
 from billing import router as billing_router
+from chairman_router import router as chairman_router
 
 
 @asynccontextmanager
@@ -145,6 +146,7 @@ app.include_router(ceo_router)
 app.include_router(wallet_router)
 app.include_router(kill_switch_router)
 app.include_router(billing_router)
+app.include_router(chairman_router)
 
 
 if __name__ == "__main__":
