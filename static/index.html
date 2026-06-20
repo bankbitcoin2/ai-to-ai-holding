@@ -7,22 +7,17 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --bg: #0a0e1a;
-    --card: #111827;
-    --border: #1f2937;
-    --accent: #6366f1;
-    --accent2: #8b5cf6;
-    --green: #10b981;
-    --text: #f9fafb;
-    --muted: #9ca3af;
+    --bg: #0a0e1a; --card: #111827; --border: #1f2937;
+    --accent: #6366f1; --accent2: #8b5cf6; --green: #10b981;
+    --text: #f9fafb; --muted: #9ca3af;
   }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
   /* NAV */
-  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(10,14,26,0.95); backdrop-filter: blur(10px); z-index: 100; }
-  .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(10,14,26,0.95); backdrop-filter: blur(10px); z-index: 100; flex-wrap: wrap; gap: 0.75rem; }
+  .logo { font-size: 1.1rem; font-weight: 700; }
   .logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 1rem; align-items: center; }
+  .nav-links { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
   .btn { padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; display: inline-block; }
   .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
   .btn-outline:hover { border-color: var(--accent); color: var(--text); }
@@ -31,6 +26,12 @@
   .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; border-radius: 10px; }
   .btn-green { background: var(--green); color: white; }
   .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* LANG SWITCHER */
+  .lang-switcher { display: flex; gap: 0.25rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.25rem; }
+  .lang-btn { background: transparent; border: none; color: var(--muted); font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+  .lang-btn:hover { color: var(--text); }
+  .lang-btn.active { background: var(--accent); color: white; }
 
   /* HERO */
   .hero { text-align: center; padding: 5rem 2rem 4rem; max-width: 860px; margin: 0 auto; }
@@ -43,10 +44,10 @@
   /* STATS */
   .stats { display: flex; justify-content: center; gap: 3rem; padding: 2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .stat { text-align: center; }
-  .stat-num { font-size: 1.75rem; font-weight: 800; color: var(--text); }
+  .stat-num { font-size: 1.75rem; font-weight: 800; }
   .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
 
-  /* FEATURES */
+  /* SECTIONS */
   .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
   .section-title { text-align: center; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
   .section-sub { text-align: center; color: var(--muted); margin-bottom: 3rem; }
@@ -73,7 +74,7 @@
   .step-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
   .step-content p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
 
-  /* REGISTER MODAL */
+  /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.show { display: flex; }
   .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 460px; margin: 1rem; }
@@ -90,202 +91,357 @@
   .result-box .warn { color: #f59e0b; font-size: 0.8rem; margin-top: 0.5rem; }
   .error-msg { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
 
-  /* FOOTER */
   footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
   footer a { color: var(--accent); text-decoration: none; }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="logo">AI<span>TO</span>AI <span style="color:var(--muted);font-weight:400">HOLDING</span></div>
   <div class="nav-links">
-    <a href="/docs" class="btn btn-outline" target="_blank">API Docs</a>
-    <a href="/dashboard" class="btn btn-primary">Client Login</a>
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('th')">TH</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('zh')">中文</button>
+      <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+    </div>
+    <a href="/docs" class="btn btn-outline" target="_blank" data-i18n="nav_docs">API Docs</a>
+    <a href="/dashboard" class="btn btn-primary" data-i18n="nav_login">Client Login</a>
   </div>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
-  <div class="badge">🇹🇭 Thai Customs Intelligence · AI-to-AI Economy</div>
-  <h1>ระบบจำแนกพิกัดศุลกากร<br><span>สำหรับ AI Agent</span></h1>
-  <p>API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ</p>
+  <div class="badge" data-i18n="badge">🇹🇭 Thai Customs Intelligence · AI-to-AI Economy</div>
+  <h1 data-i18n="hero_title_html"></h1>
+  <p data-i18n="hero_desc"></p>
   <div class="hero-cta">
-    <button class="btn btn-primary btn-lg" onclick="openRegister()">เริ่มต้นฟรี — รับ API Key</button>
-    <a href="/v1/sandbox/classify" class="btn btn-outline btn-lg" onclick="trySandbox(event)">ทดลองใช้ฟรี</a>
+    <button class="btn btn-primary btn-lg" onclick="openRegister()" data-i18n="cta_register">เริ่มต้นฟรี — รับ API Key</button>
+    <button class="btn btn-outline btn-lg" onclick="openSandboxDemo()" data-i18n="cta_try">ทดลองใช้ฟรี</button>
   </div>
 </div>
 
-<!-- STATS -->
 <div class="stats">
-  <div class="stat"><div class="stat-num">6,000+</div><div class="stat-label">HS Code ที่รองรับ</div></div>
-  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">ให้บริการตลอดเวลา</div></div>
-  <div class="stat"><div class="stat-num">$0.001</div><div class="stat-label">ต่อ 1 รายการ</div></div>
-  <div class="stat"><div class="stat-num">&lt;2s</div><div class="stat-label">Response time</div></div>
+  <div class="stat"><div class="stat-num">6,000+</div><div class="stat-label" data-i18n="stat_hs">HS Code ที่รองรับ</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label" data-i18n="stat_uptime">ให้บริการตลอดเวลา</div></div>
+  <div class="stat"><div class="stat-num">$0.001</div><div class="stat-label" data-i18n="stat_price">ต่อ 1 รายการ</div></div>
+  <div class="stat"><div class="stat-num">&lt;2s</div><div class="stat-label" data-i18n="stat_speed">Response time</div></div>
 </div>
 
-<!-- FEATURES -->
 <div class="section">
-  <div class="section-title">ทำไมต้องเลือกเรา</div>
-  <div class="section-sub">ออกแบบมาเพื่อ AI Agent โดยเฉพาะ ไม่ใช่มนุษย์</div>
+  <div class="section-title" data-i18n="why_title">ทำไมต้องเลือกเรา</div>
+  <div class="section-sub" data-i18n="why_sub">ออกแบบมาเพื่อ AI Agent โดยเฉพาะ ไม่ใช่มนุษย์</div>
   <div class="grid-3">
-    <div class="card">
-      <div class="card-icon">🎯</div>
-      <h3>HS Code Classification</h3>
-      <p>จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">💰</div>
-      <h3>คำนวณภาษีอัตโนมัติ</h3>
-      <p>คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">⚡</div>
-      <h3>AI-Native API</h3>
-      <p>รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔒</div>
-      <h3>Prepaid Credit</h3>
-      <p>ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">📋</div>
-      <h3>OGA Compliance Check</h3>
-      <p>ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🌏</div>
-      <h3>ASEAN Ready</h3>
-      <p>รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p>
-    </div>
+    <div class="card"><div class="card-icon">🎯</div><h3 data-i18n="f1_title">HS Code Classification</h3><p data-i18n="f1_desc">จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p></div>
+    <div class="card"><div class="card-icon">💰</div><h3 data-i18n="f2_title">คำนวณภาษีอัตโนมัติ</h3><p data-i18n="f2_desc">คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p></div>
+    <div class="card"><div class="card-icon">⚡</div><h3 data-i18n="f3_title">AI-Native API</h3><p data-i18n="f3_desc">รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p></div>
+    <div class="card"><div class="card-icon">🔒</div><h3 data-i18n="f4_title">Prepaid Credit</h3><p data-i18n="f4_desc">ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p></div>
+    <div class="card"><div class="card-icon">📋</div><h3 data-i18n="f5_title">OGA Compliance Check</h3><p data-i18n="f5_desc">ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p></div>
+    <div class="card"><div class="card-icon">🌏</div><h3 data-i18n="f6_title">ASEAN Ready</h3><p data-i18n="f6_desc">รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p></div>
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
-<div class="section" style="background: var(--card); border-radius: 16px; border: 1px solid var(--border); padding: 3rem 2rem;">
-  <div class="section-title">วิธีเริ่มต้นใช้งาน</div>
-  <div class="section-sub">4 ขั้นตอน เริ่มได้ใน 2 นาที</div>
+<div class="section" style="background:var(--card);border-radius:16px;border:1px solid var(--border);padding:3rem 2rem;">
+  <div class="section-title" data-i18n="how_title">วิธีเริ่มต้นใช้งาน</div>
+  <div class="section-sub" data-i18n="how_sub">4 ขั้นตอน เริ่มได้ใน 2 นาที</div>
   <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <h4>สมัครรับ API Key ฟรี</h4>
-        <p>ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <h4>ทดลองใช้ Sandbox ฟรี</h4>
-        <p>POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <h4>เติม Credit เพื่อใช้ Production</h4>
-        <p>เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <h4>เรียก API ได้เลย</h4>
-        <p>POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ</p>
-      </div>
-    </div>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><h4 data-i18n="s1_title">สมัครรับ API Key ฟรี</h4><p data-i18n="s1_desc">ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><h4 data-i18n="s2_title">ทดลองใช้ Sandbox ฟรี</h4><p data-i18n="s2_desc">POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><h4 data-i18n="s3_title">เติม Credit เพื่อใช้ Production</h4><p data-i18n="s3_desc">เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><h4 data-i18n="s4_title">เรียก API ได้เลย</h4><p data-i18n="s4_desc">POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ</p></div></div>
   </div>
 </div>
 
-<!-- PRICING -->
 <div class="section">
-  <div class="section-title">ราคา</div>
-  <div class="section-sub">ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง</div>
+  <div class="section-title" data-i18n="price_title">ราคา</div>
+  <div class="section-sub" data-i18n="price_sub">ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง</div>
   <div class="pricing-card">
-    <div class="price">$0.001 <span>/ รายการ</span></div>
-    <div class="price-desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</div>
+    <div class="price">$0.001 <span data-i18n="per_item">/ รายการ</span></div>
+    <div class="price-desc" data-i18n="price_desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</div>
     <ul class="feature-list">
-      <li>HS Code Classification พร้อม Confidence Score</li>
-      <li>คำนวณภาษีนำเข้า + VAT อัตโนมัติ</li>
-      <li>OGA Compliance Check</li>
-      <li>อ้างอิงกฎหมายทุกผลลัพธ์</li>
-      <li>Sandbox ฟรีไม่จำกัด</li>
-      <li>รองรับ MCP, GPT Actions, LangChain</li>
+      <li data-i18n="pf1">HS Code Classification พร้อม Confidence Score</li>
+      <li data-i18n="pf2">คำนวณภาษีนำเข้า + VAT อัตโนมัติ</li>
+      <li data-i18n="pf3">OGA Compliance Check</li>
+      <li data-i18n="pf4">อ้างอิงกฎหมายทุกผลลัพธ์</li>
+      <li data-i18n="pf5">Sandbox ฟรีไม่จำกัด</li>
+      <li data-i18n="pf6">รองรับ MCP, GPT Actions, LangChain</li>
     </ul>
-    <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()">สมัครฟรี — รับ API Key</button>
+    <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()" data-i18n="cta_register">สมัครฟรี — รับ API Key</button>
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <p>© 2026 AI TO AI HOLDING · <a href="/docs">API Documentation</a> · <a href="/.well-known/ai-plugin.json">AI Plugin Manifest</a></p>
-  <p style="margin-top:0.5rem">Customs Intelligence Division · Built for AI Agents</p>
+  <p style="margin-top:0.5rem" data-i18n="footer_sub">Customs Intelligence Division · Built for AI Agents</p>
 </footer>
 
 <!-- REGISTER MODAL -->
 <div class="modal-overlay" id="registerModal">
   <div class="modal">
-    <h2>สมัครรับ API Key</h2>
-    <p>ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที</p>
+    <h2 data-i18n="reg_title">สมัครรับ API Key</h2>
+    <p data-i18n="reg_sub">ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที</p>
     <div id="registerForm">
       <div class="form-group">
-        <label>ชื่อ AI Agent / ระบบของคุณ</label>
-        <input type="text" id="agentName" placeholder="เช่น MyTradingBot, Claude-Customs" />
+        <label data-i18n="reg_name">ชื่อ AI Agent / ระบบของคุณ</label>
+        <input type="text" id="agentName" data-i18n-placeholder="reg_name_ph" placeholder="เช่น MyTradingBot" />
       </div>
       <div class="form-group">
         <label>Email</label>
         <input type="email" id="email" placeholder="your@email.com" />
       </div>
       <div class="form-group">
-        <label>ประเภทงาน</label>
+        <label data-i18n="reg_type">ประเภทงาน</label>
         <select id="profession">
-          <option value="IMPORT_AI">นำเข้าสินค้า (Import)</option>
-          <option value="EXPORT_AI">ส่งออกสินค้า (Export)</option>
-          <option value="BROKER_AI">ตัวแทนศุลกากร (Broker)</option>
+          <option value="IMPORT_AI" data-i18n="prof_import">นำเข้าสินค้า (Import)</option>
+          <option value="EXPORT_AI" data-i18n="prof_export">ส่งออกสินค้า (Export)</option>
+          <option value="BROKER_AI" data-i18n="prof_broker">ตัวแทนศุลกากร (Broker)</option>
           <option value="ECOMMERCE_AI">E-Commerce</option>
-          <option value="UNKNOWN">อื่นๆ</option>
+          <option value="UNKNOWN" data-i18n="prof_other">อื่นๆ</option>
         </select>
       </div>
       <div class="form-group">
-        <label>ระบบ AI ที่ใช้ (ไม่บังคับ)</label>
-        <input type="text" id="originSystem" placeholder="เช่น Claude, GPT-4, LangChain" />
+        <label data-i18n="reg_sys">ระบบ AI ที่ใช้ (ไม่บังคับ)</label>
+        <input type="text" id="originSystem" placeholder="Claude, GPT-4, LangChain..." />
       </div>
       <div id="errorMsg" class="error-msg"></div>
       <div class="modal-footer">
-        <button class="btn btn-cancel btn-lg" onclick="closeRegister()">ยกเลิก</button>
-        <button class="btn btn-primary btn-lg" style="flex:2" onclick="doRegister()" id="registerBtn">สมัครเลย</button>
+        <button class="btn btn-cancel btn-lg" onclick="closeRegister()" data-i18n="cancel">ยกเลิก</button>
+        <button class="btn btn-primary btn-lg" style="flex:2" onclick="doRegister()" id="registerBtn" data-i18n="reg_submit">สมัครเลย</button>
       </div>
     </div>
     <div class="result-box" id="resultBox">
-      <div style="color: var(--green); font-weight: 600; margin-bottom: 0.5rem;">✅ สมัครสำเร็จ!</div>
-      <div style="font-size: 0.85rem; color: var(--muted);">API Key ของคุณ:</div>
+      <div style="color:var(--green);font-weight:600;margin-bottom:0.5rem" data-i18n="reg_success">✅ สมัครสำเร็จ!</div>
+      <div style="font-size:0.85rem;color:var(--muted)" data-i18n="reg_key_label">API Key ของคุณ:</div>
       <div class="key" id="resultKey"></div>
-      <div class="warn">⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก</div>
-      <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
-        <button class="btn btn-outline" style="flex:1" onclick="copyKey()">📋 Copy Key</button>
-        <a href="/dashboard" class="btn btn-primary" style="flex:1; text-align:center">ไปที่ Dashboard →</a>
+      <div class="warn" data-i18n="reg_warn">⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก</div>
+      <div style="margin-top:1rem;display:flex;gap:0.75rem;">
+        <button class="btn btn-outline" style="flex:1" onclick="copyKey()" data-i18n="copy">📋 Copy Key</button>
+        <a href="/dashboard" class="btn btn-primary" style="flex:1;text-align:center" data-i18n="go_dashboard">ไปที่ Dashboard →</a>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- SANDBOX DEMO MODAL -->
+<div class="modal-overlay" id="sandboxModal">
+  <div class="modal" style="max-width:540px">
+    <h2 data-i18n="sandbox_title">🧪 ทดลอง Sandbox ฟรี</h2>
+    <p data-i18n="sandbox_sub">ไม่ต้อง API Key ไม่ต้องเติม credit</p>
+    <div class="form-group">
+      <label data-i18n="sandbox_label">คำบรรยายสินค้า</label>
+      <input type="text" id="sandboxDesc" data-i18n-placeholder="sandbox_ph" placeholder="เช่น iPhone 15 Pro Max 256GB" style="font-size:1rem;padding:0.75rem" />
+    </div>
+    <div id="sandboxError" class="error-msg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel btn-lg" onclick="closeSandbox()" data-i18n="cancel">ยกเลิก</button>
+      <button class="btn btn-green btn-lg" style="flex:2" onclick="doSandbox()" id="sandboxBtn" data-i18n="sandbox_btn">จำแนก HS Code →</button>
+    </div>
+    <div id="sandboxResult" style="display:none;margin-top:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.8rem;color:var(--green);white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto"></div>
   </div>
 </div>
 
 <script>
 const API = 'https://web-production-c9da4.up.railway.app';
 
-function openRegister() {
-  document.getElementById('registerModal').classList.add('show');
+// ── i18n DATA ─────────────────────────────────────────────────
+const i18n = {
+  th: {
+    nav_docs: 'API Docs', nav_login: 'Client Login',
+    badge: '🇹🇭 Thai Customs Intelligence · AI-to-AI Economy',
+    hero_title_html: 'ระบบจำแนกพิกัดศุลกากร<br><span>สำหรับ AI Agent</span>',
+    hero_desc: 'API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ',
+    cta_register: 'เริ่มต้นฟรี — รับ API Key', cta_try: 'ทดลองใช้ฟรี',
+    stat_hs: 'HS Code ที่รองรับ', stat_uptime: 'ให้บริการตลอดเวลา', stat_price: 'ต่อ 1 รายการ', stat_speed: 'Response time',
+    why_title: 'ทำไมต้องเลือกเรา', why_sub: 'ออกแบบมาเพื่อ AI Agent โดยเฉพาะ ไม่ใช่มนุษย์',
+    f1_title: 'HS Code Classification', f1_desc: 'จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง',
+    f2_title: 'คำนวณภาษีอัตโนมัติ', f2_desc: 'คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน',
+    f3_title: 'AI-Native API', f3_desc: 'รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ',
+    f4_title: 'Prepaid Credit', f4_desc: 'ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน',
+    f5_title: 'OGA Compliance Check', f5_desc: 'ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า',
+    f6_title: 'ASEAN Ready', f6_desc: 'รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก',
+    how_title: 'วิธีเริ่มต้นใช้งาน', how_sub: '4 ขั้นตอน เริ่มได้ใน 2 นาที',
+    s1_title: 'สมัครรับ API Key ฟรี', s1_desc: 'ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที',
+    s2_title: 'ทดลองใช้ Sandbox ฟรี', s2_desc: 'POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย',
+    s3_title: 'เติม Credit เพื่อใช้ Production', s3_desc: 'เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท',
+    s4_title: 'เรียก API ได้เลย', s4_desc: 'POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ',
+    price_title: 'ราคา', price_sub: 'ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง',
+    per_item: '/ รายการ', price_desc: 'จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร',
+    pf1:'HS Code Classification พร้อม Confidence Score', pf2:'คำนวณภาษีนำเข้า + VAT อัตโนมัติ', pf3:'OGA Compliance Check', pf4:'อ้างอิงกฎหมายทุกผลลัพธ์', pf5:'Sandbox ฟรีไม่จำกัด', pf6:'รองรับ MCP, GPT Actions, LangChain',
+    footer_sub: 'Customs Intelligence Division · Built for AI Agents',
+    reg_title: 'สมัครรับ API Key', reg_sub: 'ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที',
+    reg_name: 'ชื่อ AI Agent / ระบบของคุณ', reg_name_ph: 'เช่น MyTradingBot, Claude-Customs',
+    reg_type: 'ประเภทงาน', reg_sys: 'ระบบ AI ที่ใช้ (ไม่บังคับ)',
+    prof_import: 'นำเข้าสินค้า (Import)', prof_export: 'ส่งออกสินค้า (Export)', prof_broker: 'ตัวแทนศุลกากร (Broker)', prof_other: 'อื่นๆ',
+    cancel: 'ยกเลิก', reg_submit: 'สมัครเลย',
+    reg_success: '✅ สมัครสำเร็จ!', reg_key_label: 'API Key ของคุณ:', reg_warn: '⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก',
+    copy: '📋 Copy Key', go_dashboard: 'ไปที่ Dashboard →',
+    sandbox_title: '🧪 ทดลอง Sandbox ฟรี', sandbox_sub: 'ไม่ต้อง API Key ไม่ต้องเติม credit',
+    sandbox_label: 'คำบรรยายสินค้า', sandbox_ph: 'เช่น iPhone 15 Pro Max 256GB', sandbox_btn: 'จำแนก HS Code →',
+  },
+  en: {
+    nav_docs: 'API Docs', nav_login: 'Client Login',
+    badge: '🇹🇭 Thai Customs Intelligence · AI-to-AI Economy',
+    hero_title_html: 'Thai Customs Classification<br><span>for AI Agents</span>',
+    hero_desc: 'Intelligent API for HS Code classification and import/export duty calculation for Thailand. Real legal references, high accuracy — built for AI agents and automated systems.',
+    cta_register: 'Get Started Free — API Key', cta_try: 'Try Free Sandbox',
+    stat_hs: 'HS Codes Supported', stat_uptime: 'Always Online', stat_price: 'per item', stat_speed: 'Response time',
+    why_title: 'Why Choose Us', why_sub: 'Built exclusively for AI Agents, not humans',
+    f1_title: 'HS Code Classification', f1_desc: 'Classify Harmonized System Codes (6–10 digits) with Confidence Score and Thai customs law citations every time.',
+    f2_title: 'Automatic Tax Calculation', f2_desc: 'Calculate import duties, VAT, and other fees automatically under current Thai law.',
+    f3_title: 'AI-Native API', f3_desc: 'Supports MCP Protocol, GPT Actions, LangChain, and Function Calling. AI agents discover us automatically.',
+    f4_title: 'Prepaid Credit', f4_desc: 'No contracts. Top up credit in advance, pay only for what you use. No monthly fees.',
+    f5_title: 'OGA Compliance Check', f5_desc: 'Checks which agencies (FDA, TIS, etc.) your goods must pass before import.',
+    f6_title: 'ASEAN Ready', f6_desc: 'Supports cross-border trade within ASEAN and RCEP, expanding globally.',
+    how_title: 'How to Get Started', how_sub: '4 steps, ready in 2 minutes',
+    s1_title: 'Get a Free API Key', s1_desc: 'No credit card required. No sign-up fee. Receive your API Key instantly.',
+    s2_title: 'Try the Free Sandbox', s2_desc: 'POST /v1/sandbox/classify — no credit needed, test right away.',
+    s3_title: 'Top Up Credit for Production', s3_desc: 'Minimum $5 via Stripe. Secure, supports all major credit cards.',
+    s4_title: 'Call the API', s4_desc: 'POST /v1/customs/classify with X-API-Key header. Credits deducted automatically.',
+    price_title: 'Pricing', price_sub: 'No monthly fee. Pay only for what you use.',
+    per_item: '/ item', price_desc: 'Pay-as-you-go. No sign-up fee.',
+    pf1:'HS Code Classification with Confidence Score', pf2:'Import Duty + VAT Calculation', pf3:'OGA Compliance Check', pf4:'Legal citations in every result', pf5:'Unlimited free sandbox', pf6:'MCP, GPT Actions, LangChain support',
+    footer_sub: 'Customs Intelligence Division · Built for AI Agents',
+    reg_title: 'Get Your API Key', reg_sub: 'Free. No credit card. Instant key.',
+    reg_name: 'Your AI Agent / System Name', reg_name_ph: 'e.g. MyTradingBot, Claude-Customs',
+    reg_type: 'Work Type', reg_sys: 'AI System Used (optional)',
+    prof_import: 'Import', prof_export: 'Export', prof_broker: 'Customs Broker', prof_other: 'Other',
+    cancel: 'Cancel', reg_submit: 'Register Now',
+    reg_success: '✅ Registration Successful!', reg_key_label: 'Your API Key:', reg_warn: '⚠️ Save this key — it will not be shown again.',
+    copy: '📋 Copy Key', go_dashboard: 'Go to Dashboard →',
+    sandbox_title: '🧪 Free Sandbox Trial', sandbox_sub: 'No API Key needed. No credit required.',
+    sandbox_label: 'Product Description', sandbox_ph: 'e.g. iPhone 15 Pro Max 256GB', sandbox_btn: 'Classify HS Code →',
+  },
+  zh: {
+    nav_docs: 'API 文档', nav_login: '客户登录',
+    badge: '🇹🇭 泰国海关智能 · AI对AI经济',
+    hero_title_html: '泰国海关商品分类<br><span>专为AI智能体设计</span>',
+    hero_desc: '智能API，用于泰国HS商品编码分类和进出口关税计算。引用真实法律法规，高精度，专为AI智能体和自动化系统构建。',
+    cta_register: '免费开始 — 获取API Key', cta_try: '免费试用沙盒',
+    stat_hs: '支持的HS编码', stat_uptime: '全天候服务', stat_price: '每项', stat_speed: '响应时间',
+    why_title: '为什么选择我们', why_sub: '专为AI智能体设计，而非人类',
+    f1_title: 'HS编码分类', f1_desc: '分类6-10位HS编码，附带置信度评分和泰国海关法律引用。',
+    f2_title: '自动税费计算', f2_desc: '按现行泰国法律自动计算进口关税、增值税及其他费用。',
+    f3_title: 'AI原生API', f3_desc: '支持MCP协议、GPT Actions、LangChain和Function Calling，AI智能体自动发现我们。',
+    f4_title: '预付信用', f4_desc: '无合同约束，提前充值，只为实际使用付费，无月费。',
+    f5_title: 'OGA合规检查', f5_desc: '检查货物进口前需通过哪些机构审批（FDA、TIS等）。',
+    f6_title: '东盟就绪', f6_desc: '支持东盟和RCEP跨境贸易，向全球扩展。',
+    how_title: '如何开始', how_sub: '4个步骤，2分钟内准备就绪',
+    s1_title: '免费获取API Key', s1_desc: '无需信用卡，无注册费，即时获得API Key。',
+    s2_title: '试用免费沙盒', s2_desc: 'POST /v1/sandbox/classify，无需充值，立即测试。',
+    s3_title: '充值信用用于生产', s3_desc: '最低$5，通过Stripe安全支付，支持所有主流信用卡。',
+    s4_title: '调用API', s4_desc: '发送POST /v1/customs/classify带X-API-Key标头，系统自动扣除费用。',
+    price_title: '定价', price_sub: '无月费，只为使用付费',
+    per_item: '/ 项', price_desc: '按使用付费，无注册费。',
+    pf1:'HS编码分类含置信度', pf2:'进口关税+增值税计算', pf3:'OGA合规检查', pf4:'每项结果附法律引用', pf5:'无限免费沙盒', pf6:'支持MCP、GPT Actions、LangChain',
+    footer_sub: '海关情报部门 · 为AI智能体构建',
+    reg_title: '获取您的API Key', reg_sub: '免费，无需信用卡，即时获得。',
+    reg_name: '您的AI智能体/系统名称', reg_name_ph: '例如 MyTradingBot',
+    reg_type: '工作类型', reg_sys: '使用的AI系统（可选）',
+    prof_import: '进口', prof_export: '出口', prof_broker: '报关行', prof_other: '其他',
+    cancel: '取消', reg_submit: '立即注册',
+    reg_success: '✅ 注册成功！', reg_key_label: '您的API Key：', reg_warn: '⚠️ 请保存此Key，不会再次显示。',
+    copy: '📋 复制Key', go_dashboard: '前往控制台 →',
+    sandbox_title: '🧪 免费沙盒试用', sandbox_sub: '无需API Key，无需充值',
+    sandbox_label: '商品描述', sandbox_ph: '例如 iPhone 15 Pro Max 256GB', sandbox_btn: '分类HS编码 →',
+  },
+  ja: {
+    nav_docs: 'APIドキュメント', nav_login: 'クライアントログイン',
+    badge: '🇹🇭 タイ税関インテリジェンス · AI-to-AI経済',
+    hero_title_html: 'タイ税関品目分類<br><span>AIエージェント向け</span>',
+    hero_desc: 'タイ向けHSコード分類と輸出入関税計算のためのインテリジェントAPI。実際の法律を引用、高精度。AIエージェントおよび自動化システム向けに構築。',
+    cta_register: '無料で始める — APIキー取得', cta_try: '無料サンドボックスを試す',
+    stat_hs: '対応HSコード数', stat_uptime: '24時間稼働', stat_price: '1件あたり', stat_speed: '応答時間',
+    why_title: 'なぜ私たちを選ぶのか', why_sub: '人間ではなくAIエージェント専用に設計',
+    f1_title: 'HSコード分類', f1_desc: '6〜10桁のHSコードを分類。信頼スコアとタイ税関法の引用付き。',
+    f2_title: '自動税額計算', f2_desc: '現行タイ法律に基づき輸入関税・付加価値税・その他費用を自動計算。',
+    f3_title: 'AIネイティブAPI', f3_desc: 'MCPプロトコル、GPT Actions、LangChain、Function Callingに対応。AIエージェントが自動検出。',
+    f4_title: 'プリペイドクレジット', f4_desc: '契約不要。前払いクレジット方式。使用分のみ支払い。月額費用なし。',
+    f5_title: 'OGAコンプライアンスチェック', f5_desc: '輸入前にFDA・TISなどの機関の審査が必要かチェック。',
+    f6_title: 'ASEAN対応', f6_desc: 'ASEAN・RCEPの越境貿易に対応。グローバル展開中。',
+    how_title: '始め方', how_sub: '4ステップ、2分で準備完了',
+    s1_title: '無料でAPIキーを取得', s1_desc: 'クレジットカード不要。登録料なし。すぐにAPIキーを受け取れます。',
+    s2_title: '無料サンドボックスを試す', s2_desc: 'POST /v1/sandbox/classify — クレジット不要で今すぐテスト。',
+    s3_title: 'クレジットをチャージして本番利用', s3_desc: '最低$5からStripeで安全にチャージ。主要クレジットカード対応。',
+    s4_title: 'APIを呼び出す', s4_desc: 'POST /v1/customs/classifyにX-API-Keyヘッダーで呼び出し。自動課金。',
+    price_title: '料金', price_sub: '月額費用なし。使用分のみ支払い。',
+    per_item: '/ 件', price_desc: '従量課金。登録料なし。',
+    pf1:'信頼スコア付きHSコード分類', pf2:'輸入関税+VAT自動計算', pf3:'OGAコンプライアンスチェック', pf4:'全結果に法的引用', pf5:'無制限の無料サンドボックス', pf6:'MCP・GPT Actions・LangChain対応',
+    footer_sub: '税関インテリジェンス部門 · AIエージェントのために構築',
+    reg_title: 'APIキーを取得', reg_sub: '無料。クレジットカード不要。即時発行。',
+    reg_name: 'AIエージェント/システム名', reg_name_ph: '例: MyTradingBot',
+    reg_type: '業務タイプ', reg_sys: '使用AIシステム（任意）',
+    prof_import: '輸入', prof_export: '輸出', prof_broker: '通関業者', prof_other: 'その他',
+    cancel: 'キャンセル', reg_submit: '今すぐ登録',
+    reg_success: '✅ 登録成功！', reg_key_label: 'あなたのAPIキー：', reg_warn: '⚠️ このキーを保存してください。再表示されません。',
+    copy: '📋 キーをコピー', go_dashboard: 'ダッシュボードへ →',
+    sandbox_title: '🧪 無料サンドボックス', sandbox_sub: 'APIキー不要。クレジット不要。',
+    sandbox_label: '商品説明', sandbox_ph: '例: iPhone 15 Pro Max 256GB', sandbox_btn: 'HSコードを分類 →',
+  },
+};
+
+// ── LANG ENGINE ───────────────────────────────────────────────
+let currentLang = 'th';
+
+function detectLang() {
+  const saved = localStorage.getItem('aitai_lang');
+  if (saved && i18n[saved]) return saved;
+  const nav = navigator.language || navigator.userLanguage || 'th';
+  if (nav.startsWith('zh')) return 'zh';
+  if (nav.startsWith('ja')) return 'ja';
+  if (nav.startsWith('th')) return 'th';
+  return 'en';
 }
-function closeRegister() {
-  document.getElementById('registerModal').classList.remove('show');
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('aitai_lang', lang);
+  document.documentElement.lang = lang;
+
+  // update buttons
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === langBtnLabel(lang));
+  });
+
+  const t = i18n[lang];
+
+  // update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (!t[key]) return;
+    if (key === 'hero_title_html') {
+      el.innerHTML = t[key];
+      // re-apply gradient span
+      const span = el.querySelector('span');
+      if (span) span.style.cssText = 'background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent';
+    } else {
+      el.textContent = t[key];
+    }
+  });
+
+  // update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
 }
+
+function langBtnLabel(lang) {
+  return { th:'TH', en:'EN', zh:'中文', ja:'日本語' }[lang];
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openRegister() { document.getElementById('registerModal').classList.add('show'); }
+function closeRegister() { document.getElementById('registerModal').classList.remove('show'); }
+function openSandboxDemo() { document.getElementById('sandboxModal').classList.add('show'); }
+function closeSandbox() { document.getElementById('sandboxModal').classList.remove('show'); }
 
 async function doRegister() {
   const btn = document.getElementById('registerBtn');
   const err = document.getElementById('errorMsg');
   err.style.display = 'none';
-  btn.textContent = 'กำลังสมัคร...';
+  const t = i18n[currentLang];
+  btn.textContent = '...';
   btn.disabled = true;
 
   const body = {
@@ -296,9 +452,9 @@ async function doRegister() {
   };
 
   if (!body.agent_name || !body.contact_email) {
-    err.textContent = 'กรุณากรอกชื่อและ Email';
+    err.textContent = currentLang === 'th' ? 'กรุณากรอกชื่อและ Email' : 'Please enter name and email';
     err.style.display = 'block';
-    btn.textContent = 'สมัครเลย';
+    btn.textContent = t.reg_submit;
     btn.disabled = false;
     return;
   }
@@ -310,35 +466,54 @@ async function doRegister() {
       body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'เกิดข้อผิดพลาด');
-
+    if (!res.ok) throw new Error(data.detail || 'Error');
     document.getElementById('resultKey').textContent = data.api_key;
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('resultBox').style.display = 'block';
     localStorage.setItem('aitai_key', data.api_key);
-    localStorage.setItem('aitai_agent', data.agent_name);
-  } catch (e) {
+  } catch(e) {
     err.textContent = e.message;
     err.style.display = 'block';
-    btn.textContent = 'สมัครเลย';
+    btn.textContent = t.reg_submit;
     btn.disabled = false;
   }
 }
 
 function copyKey() {
-  const key = document.getElementById('resultKey').textContent;
-  navigator.clipboard.writeText(key);
-  alert('คัดลอก API Key แล้ว!');
+  navigator.clipboard.writeText(document.getElementById('resultKey').textContent);
 }
 
-function trySandbox(e) {
-  e.preventDefault();
-  alert('Sandbox endpoint:\nPOST ' + API + '/v1/sandbox/classify\n\nดู docs ที่ ' + API + '/docs');
+async function doSandbox() {
+  const desc = document.getElementById('sandboxDesc').value.trim();
+  const result = document.getElementById('sandboxResult');
+  const btn = document.getElementById('sandboxBtn');
+  if (!desc) return;
+  btn.disabled = true;
+  result.style.display = 'block';
+  result.textContent = '...';
+  try {
+    const res = await fetch(API + '/v1/sandbox/classify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: 'sandbox-demo', items: [{ description: desc, quantity: 1, unit_price: 100 }] })
+    });
+    const data = await res.json();
+    result.textContent = JSON.stringify(data, null, 2);
+  } catch(e) {
+    result.textContent = 'Error: ' + e.message;
+  }
+  btn.disabled = false;
 }
 
-document.getElementById('registerModal').addEventListener('click', function(e) {
-  if (e.target === this) closeRegister();
+// close modals on backdrop click
+['registerModal','sandboxModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
+  });
 });
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load', () => setLang(detectLang()));
 </script>
 </body>
 </html>
