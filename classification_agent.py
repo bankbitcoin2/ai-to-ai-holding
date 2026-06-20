@@ -89,12 +89,21 @@ async def classify_item(
     clean = raw_text.replace("```json", "").replace("```", "").strip()
     parsed = json.loads(clean)
 
+    _DISCLAIMER = (
+        "ผลนี้มีความมั่นใจ 97.5–98% ยังไม่ใช่การตีความทางกฎหมาย "
+        "กรุณายืนยันกับกรมศุลกากรก่อนนำเข้า/ส่งออกจริงทุกครั้ง"
+    )
+    raw_confidence = float(parsed.get("confidence_score", 0.0))
+    capped_confidence = min(round(raw_confidence, 3), 0.980)  # cap 98% per policy
+
     return ClassificationResult(
         hs_code=parsed.get("hs_code"),
         hs_description=parsed.get("hs_description"),
-        confidence_score=float(parsed.get("confidence_score", 0.0)),
+        confidence_score=capped_confidence,
         source_reference=parsed.get("source_reference", ""),
-        reasoning_steps=parsed.get("reasoning_steps", []),
-        notes=parsed.get("notes"),
+        reasoning_steps=parsed.get("reasoning_steps", []) + [
+            f"Confidence capped at {capped_confidence:.1%} per policy (max 98%)",
+        ],
+        notes=parsed.get("notes") or _DISCLAIMER,
         raw_response=raw_text,
     )
