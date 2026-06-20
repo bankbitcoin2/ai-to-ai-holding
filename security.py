@@ -161,8 +161,13 @@ PUBLIC_PATHS: set = {
 
 # Path prefixes ที่ถือว่า public
 PUBLIC_PREFIXES: tuple = (
-    "/v1/sandbox/",      # Free trial — เรียกได้โดยไม่ต้อง key
-    "/v1/chairman/kill-switch/resume",   # emergency resume ต้องผ่าน Chairman password อยู่
+    "/v1/sandbox/",                       # Free trial — เรียกได้โดยไม่ต้อง key
+    "/v1/chairman/kill-switch/resume",    # emergency resume ต้องผ่าน Chairman password อยู่
+    "/v1/register",                       # Client signup — ต้องเข้าได้โดยไม่มี key
+    "/v1/billing/webhook",                # Stripe webhook — มี signature verify เอง
+    "/v1/billing/success",                # Stripe redirect
+    "/v1/billing/cancel",                 # Stripe redirect
+    "/.well-known/",                      # AI discovery
 )
 
 # Chairman path prefix — ต้อง IP check เพิ่ม
