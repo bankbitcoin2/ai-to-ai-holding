@@ -127,6 +127,10 @@ _STATIC = Path(__file__).parent / "static"
 async def dashboard():
     return FileResponse(_STATIC / "dashboard.html", media_type="text/html")
 
+@app.get("/chairman", include_in_schema=False)
+async def chairman_office():
+    return FileResponse(_STATIC / "chairman.html", media_type="text/html")
+
 # Override root to serve landing page
 @app.get("/", include_in_schema=False)
 async def landing():
