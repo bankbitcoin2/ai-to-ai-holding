@@ -276,7 +276,7 @@ async function doSandbox() {
     const res = await fetch(API + '/v1/sandbox/classify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: [{ description: desc, quantity: 1, unit_price: 100 }] })
+      body: JSON.stringify({ client_id: 'dashboard-user', items: [{ description: desc, quantity: 1, unit_price: 100 }] })
     });
     const data = await res.json();
     result.textContent = JSON.stringify(data, null, 2);
