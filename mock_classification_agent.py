@@ -66,11 +66,57 @@ MOCK_HS_TABLE = [
     (["bag", "backpack", "handbag", "luggage", "suitcase"],
      "4202.92", "Containers with outer surface of textile", 0.975),
 
-    (["coffee", "coffee bean", "roasted coffee", "ground coffee"],
+    (["coffee", "coffee bean", "roasted coffee", "ground coffee", "กาแฟ"],
      "0901.21", "Coffee, roasted, not decaffeinated", 0.979),
 
-    (["plastic", "plastic bottle", "container", "packaging"],
+    (["plastic", "plastic bottle", "container", "packaging", "พลาสติก"],
      "3923.30", "Carboys, bottles, flasks of plastics", 0.975),
+
+    # ── Thai keywords ──────────────────────────────────────────
+    (["ทองคำ", "ทอง", "gold", "gold bar", "bullion", "สร้อยทอง", "แหวนทอง"],
+     "7108.12", "Gold non-monetary, unwrought forms", 0.978),
+
+    (["มือถือ", "โทรศัพท์", "สมาร์ทโฟน"],
+     "8517.12", "Telephones for cellular networks", 0.977),
+
+    (["แล็ปท็อป", "โน้ตบุ๊ค", "คอมพิวเตอร์", "โน้ตบุ๊ก"],
+     "8471.30", "Portable automatic data processing machines", 0.978),
+
+    (["รถยนต์", "รถ", "กระบะ", "รถกระบะ", "รถเก๋ง"],
+     "8703.23", "Motor cars with engine 1500-3000cc", 0.976),
+
+    (["เสื้อ", "เสื้อยืด", "เสื้อผ้า", "เสื้อโปโล"],
+     "6109.10", "T-shirts of cotton, knitted", 0.975),
+
+    (["รองเท้า", "รองเท้าผ้าใบ", "รองเท้าหนัง", "รองเท้าแตะ"],
+     "6403.99", "Footwear with outer soles of rubber or plastics", 0.976),
+
+    (["กระเป๋า", "กระเป๋าถือ", "กระเป๋าเดินทาง", "กระเป๋าสะพาย"],
+     "4202.92", "Containers with outer surface of textile", 0.975),
+
+    (["นาฬิกา", "นาฬิกาข้อมือ", "นาฬิกาสมาร์ท"],
+     "9102.12", "Wrist-watches, electrically operated", 0.976),
+
+    (["ข้าว", "ข้าวหอมมะลิ", "ข้าวสาร", "ข้าวกล้อง"],
+     "1006.30", "Semi-milled or wholly milled rice", 0.979),
+
+    (["ยา", "ยารักษาโรค", "วิตามิน", "ยาเม็ด", "ยาแคปซูล"],
+     "3004.90", "Medicaments for retail sale", 0.975),
+
+    (["โซลาร์", "แผงโซลาร์", "โซลาร์เซลล์", "พลังงานแสงอาทิตย์"],
+     "8541.40", "Photosensitive semiconductor devices", 0.977),
+
+    (["ทีวี", "โทรทัศน์", "จอทีวี", "จอโทรทัศน์"],
+     "8528.72", "Colour TV receivers", 0.975),
+
+    (["น้ำมัน", "น้ำมันดิบ", "น้ำมันเชื้อเพลิง", "น้ำมันปิโตรเลียม"],
+     "2709.00", "Petroleum oils, crude", 0.976),
+
+    (["นม", "นมผง", "นมวัว", "นมกล่อง"],
+     "0402.21", "Milk powder >1.5% fat", 0.975),
+
+    (["สายไฟ", "สายชาร์จ", "สาย usb", "สายเคเบิล", "สายhdmi"],
+     "8544.42", "Electric conductors <=1000V with connectors", 0.975),
 ]
 
 
