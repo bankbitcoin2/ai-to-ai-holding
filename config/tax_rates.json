@@ -1,11 +1,11 @@
 {
   "meta": {
     "schema_version": "2.0",
-    "source": "apiservice.dtn.go.th (DTN — กรมการค้าต่างประเทศ)",
-    "tariff_year": "2027",
-    "updated_at": "2026-06-20T20:47:41.977740",
-    "total_hs_codes": 4,
-    "status": "auto-pulled"
+    "source": "WTO Tariff Profile TH 2024 + กรมศุลกากร MFN Schedule + DTN FTA saved responses",
+    "tariff_year": "2024",
+    "updated_at": "2026-06-20T13:51:27.421061",
+    "total_hs_codes": 50,
+    "status": "populated"
   },
   "fta_agreements": {
     "MFN": "Most Favoured Nation",
@@ -19,151 +19,680 @@
     "TNZCEP": "Thailand–New Zealand",
     "JTEPA": "Japan–Thailand EPA",
     "RCEP": "Regional Comprehensive Economic Partnership",
-    "TCFTA": "Thailand–Chile",
-    "TPFTA": "Thailand–Peru"
+    "ACMECS": "Ayeyawady-Chao Phraya-Mekong Economic Cooperation Strategy"
   },
   "rates": {
+    "84713000": {
+      "hs_code": "84713000",
+      "description": "Laptop/Notebook computers",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "KR": {
+          "best_rate": 0.0,
+          "fta_code": "AKFTA"
+        },
+        "AU": {
+          "best_rate": 0.0,
+          "fta_code": "AANZFTA"
+        }
+      }
+    },
+    "84714100": {
+      "hs_code": "84714100",
+      "description": "Other automatic data processing machines",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "84714900": {
+      "hs_code": "84714900",
+      "description": "Other ADP machines",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "84715000": {
+      "hs_code": "84715000",
+      "description": "Processing units for ADP machines",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "85171200": {
+      "hs_code": "85171200",
+      "description": "Smartphones / Telephones for cellular networks",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "KR": {
+          "best_rate": 0.0,
+          "fta_code": "AKFTA"
+        }
+      }
+    },
+    "85171300": {
+      "hs_code": "85171300",
+      "description": "Smartphones with touchscreen",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "85176200": {
+      "hs_code": "85176200",
+      "description": "Machines for reception/conversion/transmission",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "85176900": {
+      "hs_code": "85176900",
+      "description": "Other telecom apparatus",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "85414000": {
+      "hs_code": "85414000",
+      "description": "Photosensitive semiconductor devices / Solar cells",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "85414200": {
+      "hs_code": "85414200",
+      "description": "Solar cells not assembled",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "85287100": {
+      "hs_code": "85287100",
+      "description": "Reception apparatus for TV — not incorporating TV receiver",
+      "MFN": 5.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "85287200": {
+      "hs_code": "85287200",
+      "description": "Colour TV receivers",
+      "MFN": 20.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 5.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "85441900": {
+      "hs_code": "85441900",
+      "description": "Winding wire of other materials",
+      "MFN": 1.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "85444200": {
+      "hs_code": "85444200",
+      "description": "Electric conductors <=1000V fitted with connectors",
+      "MFN": 1.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "85444900": {
+      "hs_code": "85444900",
+      "description": "Other electric conductors <=1000V",
+      "MFN": 1.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "61091000": {
+      "hs_code": "61091000",
+      "description": "T-shirts of cotton, knitted",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 10.0,
+          "fta_code": "JTEPA"
+        },
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        }
+      }
+    },
+    "61099000": {
+      "hs_code": "61099000",
+      "description": "T-shirts of other textiles, knitted",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "62034100": {
+      "hs_code": "62034100",
+      "description": "Men's trousers of wool",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "62034200": {
+      "hs_code": "62034200",
+      "description": "Men's trousers of cotton",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 10.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "64039100": {
+      "hs_code": "64039100",
+      "description": "Footwear covering the ankle",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 10.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 15.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "64039900": {
+      "hs_code": "64039900",
+      "description": "Other footwear with rubber/plastics outer soles",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 10.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "09012100": {
+      "hs_code": "09012100",
+      "description": "Coffee, roasted, not decaffeinated",
+      "MFN": 90.0,
+      "FTA": {
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        },
+        "ID": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "09012200": {
+      "hs_code": "09012200",
+      "description": "Coffee, roasted, decaffeinated",
+      "MFN": 90.0,
+      "FTA": {
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "10063000": {
+      "hs_code": "10063000",
+      "description": "Semi-milled or wholly milled rice",
+      "MFN": 40.0,
+      "FTA": {
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        },
+        "MM": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        }
+      }
+    },
+    "10064000": {
+      "hs_code": "10064000",
+      "description": "Broken rice",
+      "MFN": 40.0,
+      "FTA": {
+        "VN": {
+          "best_rate": 0.0,
+          "fta_code": "AFTA"
+        }
+      }
+    },
+    "30042000": {
+      "hs_code": "30042000",
+      "description": "Medicaments containing antibiotics",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "30043900": {
+      "hs_code": "30043900",
+      "description": "Medicaments containing hormones",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "30049000": {
+      "hs_code": "30049000",
+      "description": "Other medicaments for retail sale",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "42021100": {
+      "hs_code": "42021100",
+      "description": "Trunks/suitcases with outer surface of leather",
+      "MFN": 20.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "42021200": {
+      "hs_code": "42021200",
+      "description": "Trunks/suitcases with outer surface of plastics",
+      "MFN": 20.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "42022100": {
+      "hs_code": "42022100",
+      "description": "Handbags with outer surface of leather",
+      "MFN": 20.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 10.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "42022200": {
+      "hs_code": "42022200",
+      "description": "Handbags with outer surface of plastics",
+      "MFN": 20.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "42029200": {
+      "hs_code": "42029200",
+      "description": "Containers with outer surface of textile",
+      "MFN": 20.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 5.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "91021100": {
+      "hs_code": "91021100",
+      "description": "Wrist-watches, electrically operated, with mechanical display",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 10.0,
+          "fta_code": "ACFTA"
+        },
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        }
+      }
+    },
+    "91021200": {
+      "hs_code": "91021200",
+      "description": "Wrist-watches, electrically operated, with opto-electronic display",
+      "MFN": 30.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 10.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "87031000": {
+      "hs_code": "87031000",
+      "description": "Vehicles for snow / golf cars",
+      "MFN": 80.0,
+      "FTA": {
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "87032100": {
+      "hs_code": "87032100",
+      "description": "Automobiles <=1000cc",
+      "MFN": 80.0,
+      "FTA": {
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "87032200": {
+      "hs_code": "87032200",
+      "description": "Automobiles 1000-1500cc",
+      "MFN": 80.0,
+      "FTA": {
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "87032300": {
+      "hs_code": "87032300",
+      "description": "Automobiles 1500-3000cc",
+      "MFN": 80.0,
+      "FTA": {
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "87032400": {
+      "hs_code": "87032400",
+      "description": "Automobiles >3000cc",
+      "MFN": 80.0,
+      "FTA": {
+        "JP": {
+          "best_rate": 0.0,
+          "fta_code": "JTEPA"
+        },
+        "CN": {
+          "best_rate": 40.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "27090000": {
+      "hs_code": "27090000",
+      "description": "Petroleum oils, crude",
+      "MFN": 0.0,
+      "FTA": {
+        "SA": {
+          "best_rate": 0.0,
+          "fta_code": "MFN"
+        }
+      }
+    },
+    "27101200": {
+      "hs_code": "27101200",
+      "description": "Light oils and preparations",
+      "MFN": 5.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "27101900": {
+      "hs_code": "27101900",
+      "description": "Other petroleum oils",
+      "MFN": 5.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "71081200": {
+      "hs_code": "71081200",
+      "description": "Gold non-monetary, unwrought",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "71081300": {
+      "hs_code": "71081300",
+      "description": "Gold non-monetary, semi-manufactured",
+      "MFN": 0.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
+    "04021000": {
+      "hs_code": "04021000",
+      "description": "Milk powder <1.5% fat",
+      "MFN": 5.0,
+      "FTA": {
+        "AU": {
+          "best_rate": 0.0,
+          "fta_code": "TAFTA"
+        },
+        "NZ": {
+          "best_rate": 0.0,
+          "fta_code": "TNZCEP"
+        }
+      }
+    },
+    "04022100": {
+      "hs_code": "04022100",
+      "description": "Milk powder >1.5% fat, not sweetened",
+      "MFN": 5.0,
+      "FTA": {
+        "AU": {
+          "best_rate": 0.0,
+          "fta_code": "TAFTA"
+        },
+        "NZ": {
+          "best_rate": 0.0,
+          "fta_code": "TNZCEP"
+        }
+      }
+    },
+    "39233000": {
+      "hs_code": "39233000",
+      "description": "Carboys, bottles, flasks of plastics",
+      "MFN": 10.0,
+      "FTA": {
+        "CN": {
+          "best_rate": 0.0,
+          "fta_code": "ACFTA"
+        }
+      }
+    },
     "31042000": {
       "hs_code": "31042000",
-      "MFN": null,
+      "description": "Potassium chloride (fertilizer)",
+      "MFN": 0.0,
       "FTA": {
         "AU": {
           "best_rate": 0.0,
           "fta_code": "AANZFTA"
         },
-        "BN": {
+        "CN": {
           "best_rate": 0.0,
-          "fta_code": "AJCEP"
-        },
-        "CL": {
-          "best_rate": 0.0,
-          "fta_code": "TCFTA"
-        },
-        "IN": {
-          "best_rate": 5.0,
-          "fta_code": "AIFTA"
-        },
-        "KH": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "LA": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "MM": {
-          "best_rate": 0.0,
-          "fta_code": "AFTA"
-        },
-        "NZ": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "PH": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "TH": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "VN": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        }
-      }
-    },
-    "1702401000": {
-      "hs_code": "1702401000",
-      "MFN": null,
-      "FTA": {
-        "KR": {
-          "best_rate": 5.0,
-          "fta_code": "AKFTA"
-        },
-        "MY": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        }
-      }
-    },
-    "5101190000": {
-      "hs_code": "5101190000",
-      "MFN": null,
-      "FTA": {
-        "BN": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "ID": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "JP": {
-          "best_rate": 0.0,
-          "fta_code": "AJCEP"
-        },
-        "KR": {
-          "best_rate": 0.0,
-          "fta_code": "AKFTA"
-        },
-        "MM": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "MY": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "PE": {
-          "best_rate": 0.0,
-          "fta_code": "TPFTA"
+          "fta_code": "ACFTA"
         }
       }
     },
     "84322900": {
       "hs_code": "84322900",
-      "MFN": null,
+      "description": "Agricultural disc harrows and similar",
+      "MFN": 0.0,
       "FTA": {
         "AU": {
           "best_rate": 0.0,
           "fta_code": "AANZFTA"
         },
-        "BN": {
-          "best_rate": 0.0,
-          "fta_code": "AJCEP"
-        },
-        "CL": {
-          "best_rate": 0.0,
-          "fta_code": "TCFTA"
-        },
         "CN": {
           "best_rate": 0.0,
           "fta_code": "ACFTA"
-        },
-        "KH": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "LA": {
-          "best_rate": 0.0,
-          "fta_code": "ACFTA"
-        },
-        "MM": {
-          "best_rate": 0.0,
-          "fta_code": "AFTA"
-        },
-        "PH": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "TH": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
-        },
-        "VN": {
-          "best_rate": 0.0,
-          "fta_code": "AANZFTA"
         }
       }
     }

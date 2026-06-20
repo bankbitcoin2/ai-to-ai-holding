@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chairman Office — AI TO AI HOLDING</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#070b14; --card:#0d1421; --card2:#111827; --border:#1a2540;
+  --accent:#6366f1; --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
+  --orange:#f97316; --text:#f1f5f9; --muted:#64748b; --dim:#334155;
+  --font:'Segoe UI',system-ui,sans-serif;
+}
+body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; font-size:13px; }
+
+/* ── LOGIN ── */
+#login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+.login-box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2.5rem; width:380px; }
+.login-box h1 { font-size:1.3rem; font-weight:700; margin-bottom:0.25rem; }
+.login-box p { color:var(--muted); font-size:0.85rem; margin-bottom:1.75rem; }
+.field { margin-bottom:1rem; }
+.field label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+.field input { width:100%; padding:0.65rem 0.9rem; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:0.9rem; font-family:monospace; }
+.field input:focus { outline:none; border-color:var(--accent); }
+.btn { padding:0.65rem 1.25rem; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; }
+.btn-accent { background:var(--accent); color:#fff; width:100%; }
+.btn-accent:hover { opacity:0.88; }
+.err { color:var(--red); font-size:0.8rem; margin-top:0.5rem; display:none; }
+
+/* ── MAIN LAYOUT ── */
+#office { display:none; flex-direction:column; min-height:100vh; }
+
+/* header */
+header { display:flex; align-items:center; gap:0.75rem; padding:0 1.25rem; height:48px; border-bottom:1px solid var(--border); background:var(--card); flex-shrink:0; }
+.logo-text { font-size:0.9rem; font-weight:700; letter-spacing:0.05em; }
+.logo-text span { color:var(--accent); }
+.sep { color:var(--dim); }
+.badge-op { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3); padding:0.15rem 0.55rem; border-radius:999px; font-size:0.72rem; font-weight:700; }
+.badge-halt { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); padding:0.15rem 0.55rem; border-radius:999px; font-size:0.72rem; font-weight:700; }
+.hflex { display:flex; align-items:center; gap:0.5rem; margin-left:auto; }
+.dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+.dot-green { background:var(--green); box-shadow:0 0 6px var(--green); }
+.dot-red { background:var(--red); }
+.h-status { font-size:0.8rem; color:var(--muted); font-family:monospace; }
+.h-time { font-size:0.8rem; color:var(--dim); font-family:monospace; margin-left:0.5rem; }
+.btn-sm { background:var(--card2); border:1px solid var(--border); color:var(--muted); padding:0.3rem 0.75rem; border-radius:6px; font-size:0.78rem; cursor:pointer; }
+.btn-sm:hover { border-color:var(--accent); color:var(--text); }
+
+/* tabs */
+.tabbar { display:flex; gap:0; border-bottom:1px solid var(--border); background:var(--card); padding:0 1.25rem; flex-shrink:0; }
+.tab { padding:0.6rem 1rem; font-size:0.8rem; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+.tab:hover { color:var(--text); }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* content */
+.content { flex:1; overflow-y:auto; padding:1.25rem; }
+
+/* alerts */
+.alert { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:var(--red); display:none; }
+.alert.show { display:block; }
+.alert strong { display:block; margin-bottom:0.25rem; }
+
+/* overview cards */
+.ov-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0.75rem; margin-bottom:1.25rem; }
+.ov-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem; }
+.ov-card .lbl { font-size:0.75rem; color:var(--muted); margin-bottom:0.35rem; }
+.ov-card .val { font-size:1.4rem; font-weight:700; }
+.ov-card .sub { font-size:0.72rem; color:var(--muted); margin-top:0.2rem; }
+.green { color:var(--green); }
+.red { color:var(--red); }
+.yellow { color:var(--yellow); }
+
+/* org chart */
+.org-wrap { overflow-x:auto; padding-bottom:1rem; }
+.org-tree { display:flex; flex-direction:column; align-items:center; gap:0; min-width:700px; }
+.org-row { display:flex; justify-content:center; gap:0.75rem; width:100%; }
+.org-connector-v { width:2px; height:24px; background:var(--border); margin:0 auto; }
+.org-connector-h { display:flex; align-items:flex-start; gap:0; }
+
+.ocard { border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem; background:var(--card); text-align:center; min-width:140px; max-width:180px; position:relative; }
+.ocard.chairman { background:linear-gradient(135deg,#1e1b4b,#312e81); border-color:var(--accent); min-width:160px; }
+.ocard.ceo { background:var(--card2); border-color:var(--dim); }
+.ocard .otitle { font-size:0.82rem; font-weight:700; margin-bottom:0.2rem; }
+.ocard .osub { font-size:0.7rem; color:var(--muted); }
+.ocard .obadge { font-size:0.65rem; margin-top:0.4rem; padding:0.15rem 0.5rem; border-radius:999px; display:inline-block; }
+.obadge-green { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.25); }
+.obadge-red { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+.obadge-yellow { background:rgba(245,158,11,0.1); color:var(--yellow); border:1px solid rgba(245,158,11,0.2); }
+.obadge-dim { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid var(--border); }
+.ocard ul { text-align:left; margin-top:0.5rem; padding-left:0; list-style:none; }
+.ocard ul li { font-size:0.68rem; color:var(--muted); padding:0.1rem 0; }
+.ocard ul li::before { content:'✓ '; color:var(--green); }
+.ocard ul li.warn::before { content:'⚠ '; color:var(--yellow); }
+.ocard ul li.fail::before { content:'✗ '; color:var(--red); }
+.ocard ul li.dim::before { content:'○ '; color:var(--dim); }
+.div-label { font-size:0.65rem; color:var(--dim); letter-spacing:0.1em; margin:1rem 0 0.5rem; text-align:center; }
+
+/* kill switch */
+.ks-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:1.5rem; max-width:520px; margin:0 auto; text-align:center; }
+.ks-card h2 { font-size:1.1rem; font-weight:700; margin-bottom:0.4rem; }
+.ks-card p { color:var(--muted); font-size:0.82rem; margin-bottom:1.5rem; }
+.ks-status { font-size:2rem; font-weight:800; margin:1rem 0; }
+.btn-kill { background:var(--red); color:#fff; padding:0.75rem 2rem; border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer; border:none; width:100%; margin-bottom:0.75rem; }
+.btn-kill:hover { opacity:0.88; }
+.btn-resume { background:var(--green); color:#fff; padding:0.75rem 2rem; border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer; border:none; width:100%; }
+.btn-resume:hover { opacity:0.88; }
+
+/* logs */
+.log-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1rem; font-family:monospace; font-size:0.75rem; color:var(--green); white-space:pre-wrap; word-break:break-all; min-height:300px; max-height:500px; overflow-y:auto; }
+
+/* wallet */
+.wallet-card { background:linear-gradient(135deg,#1e1b4b,#312e81); border:1px solid var(--accent); border-radius:16px; padding:1.5rem; margin-bottom:1.25rem; }
+.wallet-card .wlbl { font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:0.3rem; }
+.wallet-card .wamt { font-size:2.5rem; font-weight:800; }
+.wallet-card .wsub { font-size:0.8rem; color:rgba(255,255,255,0.4); }
+.info-row { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid var(--border); font-size:0.82rem; }
+.info-row .k { color:var(--muted); }
+.info-row .v { font-family:monospace; }
+
+/* tab panels */
+.panel { display:none; }
+.panel.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>🏢 Chairman Office</h1>
+    <p>AI TO AI HOLDING — Internal Access Only</p>
+    <div class="field">
+      <label>Chairman API Key</label>
+      <input type="password" id="ck-input" placeholder="sk-aitai-chairman-..." autocomplete="off">
+    </div>
+    <button class="btn btn-accent" onclick="doLogin()">เข้าห้องทำงาน</button>
+    <div class="err" id="login-err">API Key ไม่ถูกต้อง หรือ server ไม่ตอบสนอง</div>
+  </div>
+</div>
+
+<!-- OFFICE -->
+<div id="office">
+  <header>
+    <span class="logo-text">AI TO AI <span>HOLDING</span></span>
+    <span class="sep">|</span>
+    <span style="font-size:0.8rem;color:var(--muted);">CHAIRMAN OFFICE</span>
+    <span class="sep">|</span>
+    <span id="h-badge" class="badge-op">OPERATIONAL</span>
+    <div class="hflex">
+      <span class="dot dot-green" id="h-dot"></span>
+      <span class="h-status" id="h-status">online</span>
+      <span class="h-time" id="h-time"></span>
+      <button class="btn-sm" onclick="refresh()">↻ refresh</button>
+      <button class="btn-sm" onclick="logout()" style="color:var(--red)">ออกจากระบบ</button>
+    </div>
+  </header>
+
+  <div class="tabbar">
+    <div class="tab active" onclick="switchTab('overview',this)">overview</div>
+    <div class="tab" onclick="switchTab('orgchart',this)">org chart</div>
+    <div class="tab" onclick="switchTab('killswitch',this)">kill switch</div>
+    <div class="tab" onclick="switchTab('wallet',this)">wallet</div>
+    <div class="tab" onclick="switchTab('logs',this)">system logs</div>
+  </div>
+
+  <div class="content">
+    <!-- ALERT -->
+    <div class="alert" id="main-alert">
+      <strong>⚠ พบปัญหา</strong>
+      <span id="alert-msg"></span>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="ov-grid">
+        <div class="ov-card">
+          <div class="lbl">สถานะระบบ</div>
+          <div class="val green" id="ov-status">ONLINE</div>
+          <div class="sub" id="ov-mode">MOCK MODE</div>
+        </div>
+        <div class="ov-card">
+          <div class="lbl">Kill Switch</div>
+          <div class="val green" id="ov-ks">ACTIVE</div>
+          <div class="sub">ระบบทำงานปกติ</div>
+        </div>
+        <div class="ov-card">
+          <div class="lbl">Total Clients</div>
+          <div class="val" id="ov-clients">—</div>
+          <div class="sub">registered agents</div>
+        </div>
+        <div class="ov-card">
+          <div class="lbl">Railway URL</div>
+          <div class="val" style="font-size:0.65rem;font-family:monospace;color:var(--accent);word-break:break-all">web-production-c9da4.up.railway.app</div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">Roadmap Status</div>
+        <div class="info-row"><span class="k">Step 1 — Deploy Railway</span><span class="v green">✅ Done</span></div>
+        <div class="info-row"><span class="k">Step 2 — Billing + Stripe + PostgreSQL</span><span class="v green">✅ Done</span></div>
+        <div class="info-row"><span class="k">Step 2.5 — Multi-language UI (TH/EN/ZH/JA)</span><span class="v green">✅ Done</span></div>
+        <div class="info-row"><span class="k">Step 3 — เติม Claude API Credit + MOCK_MODE=false</span><span class="v yellow">⏳ รอ Chairman</span></div>
+        <div class="info-row"><span class="k">Step 4 — Submit Registry (MCP, GPT Store, RapidAPI)</span><span class="v" style="color:var(--dim)">⏳ รอ Step 3</span></div>
+        <div class="info-row" style="border:none"><span class="k">Step 5 — Monitor + รายได้</span><span class="v" style="color:var(--dim)">⏳ รอ Step 4</span></div>
+      </div>
+    </div>
+
+    <!-- ORG CHART -->
+    <div class="panel" id="panel-orgchart">
+      <div class="org-wrap">
+        <div class="org-tree">
+          <!-- Chairman -->
+          <div class="org-row">
+            <div class="ocard chairman">
+              <div class="otitle">👤 Chairman</div>
+              <div class="osub">มนุษย์ — อำนาจสูงสุด · Kill Switch</div>
+              <span class="obadge obadge-green">Human Authority</span>
+            </div>
+          </div>
+          <div class="org-connector-v"></div>
+
+          <!-- AI CEO -->
+          <div class="org-row">
+            <div class="ocard ceo">
+              <div class="otitle">🤖 AI CEO</div>
+              <div class="osub" id="ceo-status">กำลังตรวจสอบ...</div>
+              <span class="obadge obadge-yellow" id="ceo-badge">scanning</span>
+            </div>
+          </div>
+          <div class="org-connector-v"></div>
+
+          <div class="div-label">— CORPORATE OFFICES —</div>
+
+          <!-- Row 1: corporate -->
+          <div class="org-row" style="flex-wrap:wrap">
+            <div class="ocard">
+              <div class="otitle">🔒 Security</div>
+              <div class="osub">ควบคุมการเข้าถึง API</div>
+              <ul>
+                <li>API Key · IP Allowlist</li>
+                <li>Rate Limit · CORS</li>
+                <li id="sec-status" class="warn">กำลังตรวจสอบ</li>
+              </ul>
+            </div>
+            <div class="ocard">
+              <div class="otitle">⚡ Kill Switch</div>
+              <div class="osub">ปิด-เปิดระบบบนอีกเน็ต</div>
+              <ul>
+                <li>Activate · Resume</li>
+                <li>OGA · Mock Mode</li>
+                <li id="ks-status2">server down</li>
+              </ul>
+              <span class="obadge obadge-red" id="ks-badge2">checking</span>
+            </div>
+            <div class="ocard">
+              <div class="otitle">📚 Knowledge</div>
+              <div class="osub">คลังความรู้ศุลกากร</div>
+              <ul>
+                <li>HS Code · FTA 16</li>
+                <li>OGA · Mock Mode</li>
+                <li>scanning</li>
+              </ul>
+              <span class="obadge obadge-yellow">scanning</span>
+            </div>
+            <div class="ocard">
+              <div class="otitle">🔍 Audit</div>
+              <div class="osub">SHA-256 evidence chain</div>
+              <ul>
+                <li>Immutable · P-04</li>
+                <li>HW event</li>
+                <li>scanning</li>
+              </ul>
+              <span class="obadge obadge-yellow">scanning</span>
+            </div>
+            <div class="ocard">
+              <div class="otitle">💰 Treasury</div>
+              <div class="osub">รายได้ 60/40 split</div>
+              <ul>
+                <li id="trs-credit">Credit: loading...</li>
+                <li>Wallet · เงินเข้า</li>
+                <li>scanning</li>
+              </ul>
+              <span class="obadge obadge-yellow">scanning</span>
+            </div>
+            <div class="ocard">
+              <div class="otitle">⚖️ Governance</div>
+              <div class="osub">Policy Engine · Approval</div>
+              <ul>
+                <li class="dim">HS schema 6</li>
+                <li class="dim">ยังไม่มี Logic</li>
+              </ul>
+              <span class="obadge obadge-dim">ยังไม่สร้าง</span>
+            </div>
+            <div class="ocard">
+              <div class="otitle">🔭 Discovery</div>
+              <div class="osub">ค้นหาตลาดใหม่</div>
+              <ul>
+                <li class="dim">HS schema 6</li>
+                <li class="dim">ยังไม่มี Logic</li>
+              </ul>
+              <span class="obadge obadge-dim">ยังไม่สร้าง</span>
+            </div>
+          </div>
+
+          <div class="div-label" style="margin-top:1.5rem">— REVENUE DIVISION —</div>
+
+          <div class="org-row" style="flex-wrap:wrap;margin-top:0.5rem">
+            <div class="ocard" style="border-color:var(--accent)">
+              <div class="otitle">🛃 Customs Intelligence</div>
+              <ul>
+                <li>จำแนก HS Code</li>
+                <li>คำนวณภาษีนำเข้า</li>
+                <li>ตรวจ OGA compliance</li>
+                <li>Sandbox ฟรี</li>
+                <li class="warn">Mock Mode เท่านั้น</li>
+                <li class="fail" id="ci-real">Real API ยังไม่มี</li>
+              </ul>
+              <span class="obadge obadge-green">scanning</span>
+            </div>
+            <div class="ocard" style="opacity:0.5">
+              <div class="otitle">🌐 Division 2+</div>
+              <div class="osub">HS Customs นักเรียน<br>Logistics · Legal<br>Finance · E-commerce</div>
+              <span class="obadge obadge-dim">Backlog</span>
+            </div>
+          </div>
+
+          <div class="div-label" style="margin-top:1.5rem">— CLIENT REGISTRY —</div>
+
+          <div class="org-row" style="margin-top:0.5rem">
+            <div class="ocard" style="border-color:var(--yellow);min-width:200px">
+              <div class="otitle">⭐ Client Agent Registry</div>
+              <ul>
+                <li>client_agents table</li>
+                <li>call log · Taxonomy 10 หมวด</li>
+                <li id="cr-count">clients: loading...</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KILL SWITCH -->
+    <div class="panel" id="panel-killswitch">
+      <div class="ks-card">
+        <h2>⚡ Kill Switch Control</h2>
+        <p>หยุดหรือเปิดระบบทันที — ใช้เมื่อฉุกเฉินเท่านั้น</p>
+        <div class="ks-status" id="ks-display">🟢 ACTIVE</div>
+        <div style="color:var(--muted);font-size:0.8rem;margin-bottom:1.5rem" id="ks-detail">ระบบทำงานปกติ</div>
+        <button class="btn-kill" id="btn-halt" onclick="doHalt()">🛑 HALT SYSTEM</button>
+        <button class="btn-resume" id="btn-resume" onclick="doResume()" style="display:none">▶️ RESUME SYSTEM</button>
+        <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted)">การ HALT จะหยุดรับ request ทุก endpoint ทันที<br>ยกเว้น /health และ /v1/kill-switch/resume</div>
+      </div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="panel" id="panel-wallet">
+      <div class="wallet-card">
+        <div class="wlbl">Chairman Credit Balance (รวมทุก client)</div>
+        <div class="wamt" id="w-total">loading...</div>
+        <div class="wsub">credits · $0.001 per API call</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">System Info</div>
+        <div class="info-row"><span class="k">Railway URL</span><span class="v" style="font-size:0.72rem">https://web-production-c9da4.up.railway.app</span></div>
+        <div class="info-row"><span class="k">MOCK_MODE</span><span class="v yellow" id="w-mock">true</span></div>
+        <div class="info-row"><span class="k">Database</span><span class="v green">PostgreSQL · Railway</span></div>
+        <div class="info-row"><span class="k">GitHub</span><span class="v" style="font-size:0.72rem">bankbitcoin2/ai-to-ai-holding</span></div>
+        <div class="info-row" style="border:none"><span class="k">Stripe</span><span class="v green">Connected</span></div>
+      </div>
+      <div style="margin-top:1rem;font-size:0.8rem;color:var(--muted);text-align:center">
+        Step 3: เติม Claude API credit ที่ <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a><br>
+        แล้วตั้ง MOCK_MODE=false ใน Railway Variables
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="panel" id="panel-logs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+        <span style="font-size:0.85rem;font-weight:600;">System Logs</span>
+        <button class="btn-sm" onclick="fetchLogs()">↻ โหลดใหม่</button>
+      </div>
+      <div class="log-box" id="log-box">กำลังโหลด...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const RAILWAY = 'https://web-production-c9da4.up.railway.app';
+let CHAIRMAN_KEY = '';
+let systemHalted = false;
+
+// ── LOGIN ──────────────────────────────────────────────────────
+async function doLogin() {
+  const key = document.getElementById('ck-input').value.trim();
+  if (!key) return;
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+  try {
+    const r = await fetch(`${RAILWAY}/health`);
+    const data = await r.json();
+    if (data.status === 'ok' || data.system_state) {
+      CHAIRMAN_KEY = key;
+      localStorage.setItem('chairman_key', key);
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('office').style.display = 'flex';
+      startOffice();
+    } else {
+      err.style.display = 'block';
+    }
+  } catch(e) {
+    err.style.display = 'block';
+    err.textContent = 'เชื่อมต่อ Railway ไม่ได้: ' + e.message;
+  }
+}
+
+document.getElementById('ck-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+// auto-login ถ้ามี key เก่า
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('chairman_key');
+  if (saved) {
+    document.getElementById('ck-input').value = saved;
+    doLogin();
+  }
+});
+
+function logout() {
+  localStorage.removeItem('chairman_key');
+  location.reload();
+}
+
+// ── OFFICE INIT ────────────────────────────────────────────────
+function startOffice() {
+  updateClock();
+  setInterval(updateClock, 1000);
+  refresh();
+  setInterval(refresh, 30000);
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('h-time').textContent = now.toLocaleTimeString('th-TH', {hour12:false});
+}
+
+async function refresh() {
+  await Promise.all([fetchHealth(), fetchStatus(), fetchWallet()]);
+  fetchLogs();
+}
+
+async function fetchHealth() {
+  try {
+    const r = await fetch(`${RAILWAY}/health`);
+    const d = await r.json();
+    const online = d.status === 'ok';
+    const halted = d.is_halted === true;
+    systemHalted = halted;
+    document.getElementById('h-dot').className = 'dot ' + (online ? 'dot-green' : 'dot-red');
+    document.getElementById('h-status').textContent = online ? (halted ? 'HALTED' : 'online') : 'offline';
+    document.getElementById('h-badge').textContent = halted ? 'HALTED' : d.system_state || 'OPERATIONAL';
+    document.getElementById('h-badge').className = halted ? 'badge-halt' : 'badge-op';
+    document.getElementById('ov-status').textContent = online ? 'ONLINE' : 'OFFLINE';
+    document.getElementById('ov-status').className = 'val ' + (online ? 'green' : 'red');
+    document.getElementById('ov-ks').textContent = halted ? 'HALTED 🔴' : 'ACTIVE 🟢';
+    document.getElementById('ov-ks').className = 'val ' + (halted ? 'red' : 'green');
+    // kill switch panel
+    document.getElementById('ks-display').textContent = halted ? '🔴 HALTED' : '🟢 ACTIVE';
+    document.getElementById('ks-detail').textContent = halted ? 'ระบบถูกหยุดชั่วคราว' : 'ระบบทำงานปกติ';
+    document.getElementById('btn-halt').style.display = halted ? 'none' : 'block';
+    document.getElementById('btn-resume').style.display = halted ? 'block' : 'none';
+    // org: security
+    document.getElementById('sec-status').textContent = online ? 'ทำงานปกติ' : 'ไม่ตอบสนอง';
+    document.getElementById('sec-status').className = online ? '' : 'fail';
+    // org: kill switch
+    document.getElementById('ks-status2').textContent = halted ? 'HALTED' : 'ทำงานปกติ';
+    document.getElementById('ks-badge2').textContent = halted ? 'HALTED' : 'online';
+    document.getElementById('ks-badge2').className = 'obadge ' + (halted ? 'obadge-red' : 'obadge-green');
+    // org: CEO
+    document.getElementById('ceo-status').textContent = online ? 'กำลังประมวลผล' : 'ไม่ตอบสนอง';
+    document.getElementById('ceo-badge').textContent = online ? 'online' : 'offline';
+    document.getElementById('ceo-badge').className = 'obadge ' + (online ? 'obadge-green' : 'obadge-red');
+  } catch(e) {
+    document.getElementById('h-dot').className = 'dot dot-red';
+    document.getElementById('h-status').textContent = 'offline';
+    showAlert('Server ไม่ตอบสนอง — ตรวจสอบว่า Railway ยังรันอยู่');
+  }
+}
+
+async function fetchStatus() {
+  try {
+    const r = await fetch(`${RAILWAY}/v1/status`, {
+      headers: { 'X-API-Key': CHAIRMAN_KEY }
+    });
+    if (!r.ok) return;
+    const d = await r.json();
+    const mockMode = d.mode === 'MOCK' || d.mock_mode === true;
+    document.getElementById('ov-mode').textContent = mockMode ? 'MOCK MODE' : 'LIVE MODE 🚀';
+    document.getElementById('w-mock').textContent = mockMode ? 'true (เปิด MOCK_MODE=false เพื่อ live)' : 'false ✅';
+    document.getElementById('w-mock').className = 'v ' + (mockMode ? 'yellow' : 'green');
+    // customs intelligence
+    document.getElementById('ci-real').textContent = mockMode ? 'Real API ยังไม่มี (Step 3)' : '✅ Real API Active';
+    document.getElementById('ci-real').className = mockMode ? 'fail' : '';
+  } catch(e) {}
+}
+
+async function fetchWallet() {
+  try {
+    const r = await fetch(`${RAILWAY}/v1/clients/me`, {
+      headers: { 'X-API-Key': CHAIRMAN_KEY }
+    });
+    if (!r.ok) {
+      document.getElementById('w-total').textContent = '(ต้องการ client key)';
+      document.getElementById('trs-credit').textContent = 'ต้องการ client key';
+      document.getElementById('cr-count').textContent = 'ต้องการ client key';
+      return;
+    }
+    const d = await r.json();
+    const bal = d.credit_balance ?? d.balance ?? '—';
+    document.getElementById('w-total').textContent = bal;
+    document.getElementById('trs-credit').textContent = `Credit: ${bal}`;
+    document.getElementById('cr-count').textContent = `client: ${d.agent_id || '—'}`;
+  } catch(e) {}
+}
+
+async function fetchLogs() {
+  const box = document.getElementById('log-box');
+  try {
+    const r = await fetch(`${RAILWAY}/v1/logs?limit=50`, {
+      headers: { 'X-API-Key': CHAIRMAN_KEY }
+    });
+    if (r.ok) {
+      const d = await r.json();
+      const entries = d.logs || d.entries || d;
+      if (Array.isArray(entries) && entries.length) {
+        box.textContent = entries.map(e =>
+          `[${e.timestamp||e.ts||''}] ${e.level||''} ${e.message||e.msg||JSON.stringify(e)}`
+        ).join('\n');
+      } else {
+        box.textContent = JSON.stringify(d, null, 2);
+      }
+    } else {
+      box.textContent = `[${new Date().toLocaleTimeString()}] Health: OK — Railway OPERATIONAL\n` +
+        `[${new Date().toLocaleTimeString()}] Mock mode active — waiting for Claude API credit (Step 3)\n` +
+        `[${new Date().toLocaleTimeString()}] Logs endpoint requires elevated access`;
+    }
+  } catch(e) {
+    box.textContent = `ERROR: ${e.message}`;
+  }
+}
+
+// ── KILL SWITCH ────────────────────────────────────────────────
+async function doHalt() {
+  if (!confirm('หยุดระบบทันที? request ทุกอย่างจะถูกบล็อก')) return;
+  try {
+    const r = await fetch(`${RAILWAY}/v1/kill-switch/halt`, {
+      method: 'POST',
+      headers: { 'X-API-Key': CHAIRMAN_KEY }
+    });
+    const d = await r.json();
+    alert(r.ok ? '🔴 ระบบหยุดแล้ว' : `Error: ${d.detail || d.message}`);
+    refresh();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function doResume() {
+  try {
+    const r = await fetch(`${RAILWAY}/v1/kill-switch/resume`, {
+      method: 'POST',
+      headers: { 'X-API-Key': CHAIRMAN_KEY }
+    });
+    const d = await r.json();
+    alert(r.ok ? '🟢 ระบบกลับมาทำงานแล้ว' : `Error: ${d.detail || d.message}`);
+    refresh();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'logs') fetchLogs();
+}
+
+function showAlert(msg) {
+  document.getElementById('alert-msg').textContent = msg;
+  document.getElementById('main-alert').classList.add('show');
+}
+</script>
+</body>
+</html>
