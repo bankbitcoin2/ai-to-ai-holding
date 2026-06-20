@@ -68,7 +68,7 @@ async def _init_postgres():
     pool = await get_pool()
     schema_files = [
         "schema_v1.sql", "schema_comms_v1.sql", "schema_learning_v1.sql",
-        "schema_registry_v1.sql", "schema_billing_v1.sql",
+        "schema_registry_v1.sql", "schema_billing_v1.sql", "schema_cache_v1.sql",
     ]
     async with pool.acquire() as conn:
         # enable uuid extension
@@ -99,7 +99,7 @@ async def _init_postgres():
 async def _init_sqlite():
     schema_files = [
         "schema_v1.sql", "schema_comms_v1.sql", "schema_learning_v1.sql",
-        "schema_registry_v1.sql", "schema_billing_v1.sql",
+        "schema_registry_v1.sql", "schema_billing_v1.sql", "schema_cache_v1.sql",
     ]
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("PRAGMA foreign_keys = ON")
@@ -120,5 +120,4 @@ async def _init_sqlite():
                     if any(x in msg for x in ["already exists", "duplicate column"]):
                         pass
                     else:
-                        print(f"[DB WARN] {fname}: {e} | {stmt[:60]}")
-        await db.commit()
+                        print(f"[DB WARN] {fname}: {e} | {stmt[:80]}")
