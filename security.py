@@ -157,6 +157,7 @@ PUBLIC_PATHS: set = {
     "/docs",
     "/openapi.json",
     "/redoc",
+    "/dashboard",
 }
 
 # Path prefixes ที่ถือว่า public
