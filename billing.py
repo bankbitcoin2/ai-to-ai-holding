@@ -15,7 +15,7 @@ from fastapi import APIRouter, HTTPException, Request, Header
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from database import get_db
+from database import DB_PATH
 from holding_config import PRICE_PER_ITEM
 
 router = APIRouter(prefix="/v1", tags=["Billing"])
@@ -29,10 +29,7 @@ BASE_URL = os.getenv("BASE_URL", "https://web-production-c9da4.up.railway.app")
 class RegisterRequest(BaseModel):
     agent_name: str = Field(..., description="ชื่อ AI agent ของคุณ")
     contact_email: str = Field(..., description="Email สำหรับรับ API key และแจ้งเตือน")
-    profession: str = Field(
-        default="UNKNOWN",
-        description="ประเภทงาน AI",
-    )
+    profession: str = Field(default="UNKNOWN", description="ประเภทงาน AI")
     origin_system: Optional[str] = Field(None, description="ระบบที่ใช้ เช่น Claude, GPT-4, LangChain")
 
 class TopupRequest(BaseModel):
@@ -43,6 +40,14 @@ class TopupRequest(BaseModel):
 
 def _generate_api_key() -> str:
     return "sk-aitai-" + secrets.token_hex(24)
+
+async def _get_db():
+    """สร้าง DB connection พร้อม row_factory"""
+    db = await aiosqlite.connect(DB_PATH)
+    db.row_factory = aiosqlite.Row
+    await db.execute("PRAGMA foreign_keys = ON")
+    await db.execute("PRAGMA journal_mode = WAL")
+    return db
 
 async def _get_agent_by_key(db: aiosqlite.Connection, api_key: str):
     hint = api_key[-8:]
@@ -69,8 +74,8 @@ async def register_client(req: RegisterRequest):
     hint = api_key[-8:]
     now = datetime.now(timezone.utc).isoformat()
 
-    async with get_db() as db:
-        # ตรวจ email ซ้ำ
+    db = await _get_db()
+    try:
         async with db.execute(
             "SELECT id FROM client_agents WHERE contact_email = ?",
             (req.contact_email,)
@@ -91,6 +96,8 @@ async def register_client(req: RegisterRequest):
             VALUES (?, 0.0, 0.0)
         """, (agent_id,))
         await db.commit()
+    finally:
+        await db.close()
 
     return {
         "success": True,
@@ -100,7 +107,7 @@ async def register_client(req: RegisterRequest):
         "api_key_hint": f"...{hint}",
         "credit_balance": 0.0,
         "message": "ลงทะเบียนสำเร็จ เก็บ api_key ไว้ให้ดี จะไม่แสดงอีก",
-        "next_step": f"เติม credit ที่ POST /v1/billing/topup เพื่อใช้งาน production",
+        "next_step": "เติม credit ที่ POST /v1/billing/topup เพื่อใช้งาน production",
         "sandbox": "ทดลองฟรีได้ที่ POST /v1/sandbox/classify (ไม่ต้องใช้ API key)",
     }
 
@@ -108,8 +115,11 @@ async def register_client(req: RegisterRequest):
 
 @router.get("/billing/balance", summary="ตรวจสอบ credit คงเหลือ")
 async def check_balance(x_api_key: str = Header(..., alias="X-API-Key")):
-    async with get_db() as db:
+    db = await _get_db()
+    try:
         row = await _get_agent_by_key(db, x_api_key)
+    finally:
+        await db.close()
     if not row:
         raise HTTPException(401, "API key ไม่ถูกต้อง")
     return {
@@ -127,8 +137,11 @@ async def create_topup(req: TopupRequest):
         raise HTTPException(503, "ระบบชำระเงินยังไม่พร้อม — Stripe ยังไม่ได้ตั้งค่า")
 
     import httpx
-    async with get_db() as db:
+    db = await _get_db()
+    try:
         row = await _get_agent_by_key(db, req.api_key)
+    finally:
+        await db.close()
     if not row:
         raise HTTPException(401, "API key ไม่ถูกต้อง")
 
@@ -156,7 +169,8 @@ async def create_topup(req: TopupRequest):
         raise HTTPException(502, f"Stripe error: {resp.text}")
 
     stripe_data = resp.json()
-    async with get_db() as db:
+    db = await _get_db()
+    try:
         await db.execute("""
             INSERT INTO credit_topups
             (id, agent_id, amount_usd, stripe_session_id, status, created_at)
@@ -164,6 +178,8 @@ async def create_topup(req: TopupRequest):
         """, (session_id, row["id"], req.amount_usd,
               stripe_data["id"], datetime.now(timezone.utc).isoformat()))
         await db.commit()
+    finally:
+        await db.close()
 
     return {
         "checkout_url": stripe_data["url"],
@@ -180,7 +196,6 @@ async def stripe_webhook(request: Request):
     sig = request.headers.get("stripe-signature", "")
 
     if STRIPE_WEBHOOK_SECRET and not STRIPE_WEBHOOK_SECRET.startswith("whsec_xxx"):
-        # verify signature
         try:
             parts = {k: v for part in sig.split(",")
                      for k, v in [part.split("=", 1)]}
@@ -194,6 +209,8 @@ async def stripe_webhook(request: Request):
             ).hexdigest()
             if not hmac.compare_digest(expected, v1):
                 raise HTTPException(400, "Invalid signature")
+        except HTTPException:
+            raise
         except Exception:
             raise HTTPException(400, "Webhook signature verification failed")
 
@@ -207,7 +224,8 @@ async def stripe_webhook(request: Request):
         stripe_session_id = session["id"]
 
         if agent_id and amount_usd > 0:
-            async with get_db() as db:
+            db = await _get_db()
+            try:
                 await db.execute("""
                     INSERT INTO client_credits (agent_id, credit_balance, credit_topup_total)
                     VALUES (?, ?, ?)
@@ -226,6 +244,8 @@ async def stripe_webhook(request: Request):
                       session.get("payment_intent", ""),
                       stripe_session_id))
                 await db.commit()
+            finally:
+                await db.close()
 
     return {"received": True}
 
@@ -245,7 +265,8 @@ async def deduct_credit(api_key: str, item_count: int) -> dict:
     return: {"success": True, "remaining": float} หรือ raise HTTPException 402
     """
     cost = round(PRICE_PER_ITEM * item_count, 4)
-    async with get_db() as db:
+    db = await _get_db()
+    try:
         row = await _get_agent_by_key(db, api_key)
         if not row:
             raise HTTPException(401, "API key ไม่ถูกต้อง")
@@ -266,4 +287,6 @@ async def deduct_credit(api_key: str, item_count: int) -> dict:
             (cost, row["id"])
         )
         await db.commit()
+    finally:
+        await db.close()
     return {"success": True, "cost": cost, "remaining": new_balance, "agent_id": row["id"]}
