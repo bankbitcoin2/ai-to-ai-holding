@@ -56,7 +56,7 @@ async def _get_agent_by_key(db: aiosqlite.Connection, api_key: str):
                COALESCE(c.credit_topup_total, 0.0) as credit_topup_total
         FROM client_agents a
         LEFT JOIN client_credits c ON c.agent_id = a.id
-        WHERE a.api_key_hint = ? AND a.status = 'active'
+        WHERE a.api_key_hint = ? AND a.status = 'ACTIVE'
     """, (hint,)) as cur:
         row = await cur.fetchone()
     return row
@@ -88,7 +88,7 @@ async def register_client(req: RegisterRequest):
             INSERT INTO client_agents
             (id, agent_name, profession, origin_system, contact_email,
              api_key_hint, status, registered_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'active', ?)
+            VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', ?)
         """, (agent_id, req.agent_name, req.profession,
               req.origin_system, req.contact_email, hint, now))
         await db.execute("""
