@@ -17,3 +17,9 @@ pydantic==2.9.2
 
 # Security
 python-dotenv==1.0.1
+
+# Payment
+stripe>=7.0.0
+
+# Scheduling / Utilities
+python-multipart==0.0.9
