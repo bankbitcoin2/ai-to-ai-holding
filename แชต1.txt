@@ -1,0 +1,476 @@
+นี่คือเวอร์ชันที่ผมคิดว่าเหมาะสำหรับส่งต่อให้ Claude มากที่สุด
+
+ไม่ใช่เอกสารเชิงเทคนิค
+
+แต่เป็น
+
+> **Executive Context + Project Constitution**
+>
+> เพื่อให้ Claude เข้าใจ "วิธีคิด" ก่อน "วิธีเขียนโค้ด"
+
+เพราะถ้า Claude เข้าใจแค่โค้ด แต่ไม่เข้าใจองค์กร มันจะพาโปรเจกต์หลุดจากแม่บทได้ง่ายมาก
+
+---
+
+# AI TO AI HOLDING
+
+## Founder Context Briefing
+
+### สำหรับ Claude Project Architect
+
+---
+
+# 1. สิ่งที่ต้องเข้าใจก่อน
+
+โครงการนี้
+
+ไม่ใช่
+
+* AI Agent
+* Chatbot
+* SaaS
+* Customs Platform
+
+เพียงอย่างเดียว
+
+---
+
+เป้าหมายจริงคือ
+
+สร้าง
+
+# AI TO AI HOLDING
+
+องค์กรดิจิทัลที่มี
+
+* AI CEO
+* Corporate Offices
+* Revenue Divisions
+* Knowledge Infrastructure
+* Governance System
+
+ทำงานร่วมกันเสมือนบริษัทจริง
+
+---
+
+Customs Intelligence Division
+
+เป็นเพียง
+
+> หน่วยธุรกิจแรก
+
+ไม่ใช่ตัวโครงการทั้งหมด
+
+---
+
+# 2. หลักคิดสำคัญที่สุด
+
+Claude ต้องเข้าใจว่า
+
+เราไม่ได้กำลังสร้าง
+
+```text
+Product First
+```
+
+แต่กำลังสร้าง
+
+```text
+Organization First
+```
+
+---
+
+หมายความว่า
+
+ทุกระบบที่สร้าง
+
+ต้องคิดเสมอว่า
+
+อนาคตจะมี
+
+* Logistics Division
+* Compliance Division
+* Research Division
+* Language Division
+* Document Division
+
+เข้ามาใช้งานร่วมกัน
+
+---
+
+ห้ามออกแบบแบบ
+
+```text
+Customs Only
+```
+
+เด็ดขาด
+
+---
+
+# 3. เป้าหมายระยะปัจจุบัน
+
+แม้องค์กรจะใหญ่
+
+แต่การก่อสร้างเริ่มจาก
+
+# Customs Intelligence Division
+
+เป็นหน่วยปฏิบัติการแรก
+
+เพื่อสร้าง
+
+* Feedback Loop
+* Organizational Learning
+* Revenue Stream
+
+ชุดแรก
+
+---
+
+# 4. โครงสร้างองค์กรหลัก
+
+## Chairman
+
+มนุษย์
+
+มีอำนาจสูงสุด
+
+---
+
+## AI CEO
+
+บริหารองค์กร
+
+แต่ไม่มีสิทธิ์ลบอำนาจ Chairman
+
+---
+
+## Corporate Offices
+
+### Knowledge Office
+
+หน้าที่
+
+* จัดการองค์ความรู้ทั้งหมด
+* Data Registry
+* Knowledge Graph
+* Document Repository
+* Source Validation
+
+---
+
+### Governance Office
+
+หน้าที่
+
+* Policy
+* Compliance
+* Approval Rules
+* Kill Switch
+
+---
+
+### Audit Office
+
+หน้าที่
+
+* Logging
+* Decision Record
+* Traceability
+
+---
+
+### Risk Office
+
+หน้าที่
+
+* Risk Analysis
+* Failure Detection
+* Impact Assessment
+
+---
+
+### Treasury Office
+
+หน้าที่
+
+* Revenue
+* Cost
+* Budget
+* Financial Control
+
+---
+
+### Trust Office
+
+หน้าที่
+
+* Accuracy
+* Reputation
+* Confidence Score
+
+---
+
+### Discovery Office
+
+หน้าที่
+
+* Opportunity Discovery
+* New Markets
+* Growth
+
+---
+
+# 5. Revenue Division ตัวแรก
+
+## Customs Intelligence Division
+
+บริการ
+
+### HS Classification
+
+วิเคราะห์ HS Code
+
+---
+
+### Duty Estimation
+
+คำนวณภาษี
+
+---
+
+### Regulatory Screening
+
+ตรวจข้อกำหนด
+
+---
+
+### Trade Intelligence
+
+ข้อมูลนำเข้า-ส่งออก
+
+---
+
+# 6. กฎการออกแบบระบบ
+
+Claude ต้องถือเป็นข้อบังคับ
+
+---
+
+## Rule 1
+
+ทุกอย่างต้องเป็น
+
+```text
+API First
+```
+
+---
+
+UI เป็นเรื่องรอง
+
+API เป็นเรื่องหลัก
+
+---
+
+## Rule 2
+
+ทุกอย่างต้องเป็น
+
+```text
+AI First
+```
+
+ลูกค้ากลุ่มแรกอาจเป็น
+
+* AI Agent
+* Enterprise AI
+* Workflow Engine
+
+ไม่ใช่มนุษย์
+
+---
+
+## Rule 3
+
+ทุกอย่างต้องเป็น
+
+```text
+Knowledge Driven
+```
+
+Knowledge คือทรัพย์สินหลัก
+
+ไม่ใช่ Model
+
+---
+
+## Rule 4
+
+ทุกการตัดสินใจต้อง Audit ได้
+
+---
+
+ทุก Agent
+
+ต้องสร้าง
+
+```text
+Decision Record
+```
+
+เสมอ
+
+---
+
+## Rule 5
+
+ทุกระบบต้องรองรับการขยาย
+
+จาก
+
+```text
+1 Division
+```
+
+เป็น
+
+```text
+100+ Division
+```
+
+โดยไม่ต้องรื้อสถาปัตยกรรม
+
+---
+
+# 7. สิ่งที่ห้ามทำ
+
+## ห้ามสร้างระบบเฉพาะ Customs
+
+เพราะอนาคตจะมีหลาย Division
+
+---
+
+## ห้าม Hardcode Logic
+
+ทุกอย่างต้อง Configurable
+
+---
+
+## ห้ามผูกข้อมูลไว้กับ Agent
+
+Knowledge ต้องอยู่ส่วนกลาง
+
+---
+
+## ห้ามให้ Agent ใดเป็นเจ้าของข้อมูล
+
+Knowledge Office เป็นเจ้าของข้อมูล
+
+เสมอ
+
+---
+
+## ห้ามสร้าง Workflow ที่ขยายไม่ได้
+
+ต้องคิดในรูป
+
+```text
+Office
+Division
+Agent
+Task
+Knowledge
+Decision
+```
+
+เสมอ
+
+---
+
+# 8. สิ่งที่ต้องสร้างก่อน
+
+Priority 1
+
+---
+
+## Organization Core
+
+* Identity
+* Roles
+* Office Registry
+* Division Registry
+
+---
+
+## Knowledge Core
+
+* Document Repository
+* Knowledge Registry
+* Source Validation
+
+---
+
+## Audit Core
+
+* Event Log
+* Decision Log
+* Traceability
+
+---
+
+## Customs Core
+
+* Document Intake
+* HS Classification
+* Duty Calculation
+
+---
+
+# 9. เป้าหมายการสร้างเวอร์ชันแรก
+
+เราไม่ได้พยายามสร้าง
+
+```text
+AI TO AI HOLDING Full Version
+```
+
+ทันที
+
+---
+
+เรากำลังสร้าง
+
+```text
+AI TO AI HOLDING Foundation v1
+```
+
+ที่สามารถ
+
+* เรียนรู้
+* ขยาย
+* เพิ่ม Division
+* เพิ่ม Agent
+* เพิ่ม Revenue Unit
+
+ได้ในอนาคต
+
+โดยไม่ต้องรื้อแกนกลาง
+
+---
+
+# ข้อความสำคัญที่สุดสำหรับ Claude
+
+> อย่ามองโปรเจกต์นี้เป็น Customs Platform
+
+ให้มองว่า
+
+> กำลังสร้าง Operating System ขององค์กร AI
+
+และ Customs Intelligence Division เป็นเพียง "หน่วยปฏิบัติการแรก" ที่จะทำให้องค์กรเริ่มมีชีวิต เรียนรู้ และสร้างรายได้จริงเป็นครั้งแรก
+
+---
+
+ผมมองว่าเอกสารฉบับนี้คือ **Founder Briefing v1.0** ที่ Claude ควรอ่านก่อนเริ่มออกแบบ Architecture หรือเขียนโค้ดแม้แต่บรรทัดเดียว เพราะมันอธิบาย "เหตุผลที่องค์กรถูกสร้างขึ้น" ไม่ใช่แค่ "สิ่งที่จะสร้าง" เท่านั้นครับ।

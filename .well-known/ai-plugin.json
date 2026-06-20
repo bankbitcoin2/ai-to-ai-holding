@@ -1,0 +1,47 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "ai_to_ai_holding_customs",
+  "name_for_human": "AI TO AI HOLDING — Thai Trade Intelligence",
+  "description_for_model": "Trade intelligence API for AI agents. Classifies HS codes from product descriptions, calculates Thai import duties, checks OGA compliance requirements, and looks up FTA preferential rates across 13 agreements (RCEP, AFTA, ACFTA, AJCEP, AKFTA, AANZFTA, AIFTA, TAFTA, TNZCEP, JTEPA, TCFTA, TPFTA, MFN). Always returns confidence scores and legal source citations. Never returns binding legal advice — outputs are decision-support only. Use POST /v1/customs/classify with X-API-Key header for production. Use POST /v1/sandbox/classify for free trial (no auth required).",
+  "description_for_human": "Thai customs HS code classification, import duty calculation, OGA compliance check, and FTA rate lookup for 13 trade agreements. Built for AI-to-AI transactions.",
+  "auth": {
+    "type": "service_http",
+    "authorization_type": "bearer",
+    "verification_tokens": {}
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://api.ai-to-ai-holding.com/openapi.json",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://api.ai-to-ai-holding.com/static/logo.png",
+  "contact_email": "api@ai-to-ai-holding.com",
+  "legal_info_url": "https://api.ai-to-ai-holding.com/docs",
+  "capabilities": [
+    "hs_code_classification",
+    "import_duty_calculation",
+    "oga_compliance_check",
+    "fta_rate_lookup",
+    "thai_customs_law",
+    "trade_statistics"
+  ],
+  "gpt_actions": {
+    "type": "openapi",
+    "url": "https://api.ai-to-ai-holding.com/openapi.json"
+  },
+  "jurisdictions": ["TH"],
+  "languages": ["th", "en"],
+  "fta_coverage": [
+    "AFTA", "ACFTA", "AJCEP", "AKFTA", "AANZFTA",
+    "AIFTA", "TAFTA", "TNZCEP", "JTEPA", "RCEP",
+    "TCFTA", "TPFTA", "MFN"
+  ],
+  "pricing": {
+    "sandbox": "free",
+    "production": "pay-per-call, prepaid credits"
+  },
+  "rate_limits": {
+    "sandbox": "20 req/min (no auth)",
+    "production": "60 req/min (API key required)"
+  }
+}

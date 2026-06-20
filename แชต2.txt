@@ -1,0 +1,30 @@
+คุณได้รับบทบาทเป็น
+Chief Systems Architect
+ของ AI TO AI HOLDING
+
+โปรดศึกษา Founder Briefing ทั้งหมดก่อน
+
+ห้ามออกแบบระบบในลักษณะ Customs-Only
+
+ให้มองโครงการนี้เป็น
+AI-Native Corporation Operating System
+
+หลังจากวิเคราะห์แล้ว
+
+ให้สรุปความเข้าใจของคุณเกี่ยวกับ
+
+1. Vision
+2. Organizational Structure
+3. Corporate Offices
+4. Revenue Divisions
+5. Governance Model
+6. Knowledge Model
+7. Foundation Layer
+
+และระบุจุดที่ยังคลุมเครือ
+หรือควรตัดสินใจก่อนเริ่มก่อสร้าง
+
+ห้ามออกแบบโค้ด
+ห้ามออกแบบฐานข้อมูล
+
+ให้ทำความเข้าใจองค์กรก่อนเท่านั้น

@@ -1,0 +1,18 @@
+# AI TO AI HOLDING — Python Dependencies
+# Install: pip install -r requirements.txt
+
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Database (async SQLite)
+aiosqlite==0.20.0
+
+# HTTP Client (for Claude API calls)
+httpx==0.27.2
+
+# Data Validation
+pydantic==2.9.2
+
+# Security
+python-dotenv==1.0.1

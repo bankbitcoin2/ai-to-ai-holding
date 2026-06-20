@@ -1,0 +1,88 @@
+{
+  "name": "ai-to-ai-holding-customs",
+  "version": "1.0.0",
+  "description": "Thai Trade Intelligence MCP Server — HS Code classification, duty calculation, OGA compliance, FTA rates",
+  "protocol": "mcp",
+  "transport": ["http", "stdio"],
+  "server_url": "https://api.ai-to-ai-holding.com/mcp",
+  "tools": [
+    {
+      "name": "classify_hs_code",
+      "description": "Classify a product into Thai Customs HS Code. Returns top HS code candidates with confidence scores and legal citations. Output is decision-support only, not a binding classification.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_description": {
+            "type": "string",
+            "description": "Product description in any language (Thai or English)"
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code of origin (e.g. CN, US, JP)"
+          },
+          "value_usd": {
+            "type": "number",
+            "description": "CIF value in USD (optional, for duty calculation)"
+          }
+        },
+        "required": ["product_description"]
+      }
+    },
+    {
+      "name": "check_fta_rate",
+      "description": "Look up preferential import duty rate under FTA agreements between Thailand and origin country. Covers RCEP, AFTA, ACFTA, AJCEP, AKFTA, AANZFTA, AIFTA, TAFTA, TNZCEP, JTEPA, TCFTA, TPFTA, MFN.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code (6-10 digits)"
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code"
+          }
+        },
+        "required": ["hs_code", "origin_country"]
+      }
+    },
+    {
+      "name": "check_oga_compliance",
+      "description": "Check if a product requires Other Government Agency (OGA) permits or inspections before import into Thailand. Returns list of required agencies (FDA, TISI/มอก., FDA-TH, AERONAUTICS_DEPT, etc.)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code (6-10 digits)"
+          },
+          "product_description": {
+            "type": "string",
+            "description": "Product description for additional context"
+          }
+        },
+        "required": ["hs_code"]
+      }
+    },
+    {
+      "name": "sandbox_classify",
+      "description": "Free trial classification — no API key required. Rate limited to 20 req/min. Returns mock results suitable for testing integration.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_description": {
+            "type": "string",
+            "description": "Product description"
+          }
+        },
+        "required": ["product_description"]
+      }
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "X-API-Key",
+    "sandbox_bypass": true,
+    "sandbox_endpoint": "/v1/sandbox/classify"
+  }
+}

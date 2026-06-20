@@ -1,0 +1,89 @@
+{
+  "_comment": "OpenAI Function Calling / Gemini Function Declarations compatible schema",
+  "_usage": "Pass these definitions in the 'tools' array when initializing your LLM call",
+  "schema_version": "2024-01",
+  "provider": "AI TO AI HOLDING",
+  "base_url": "https://api.ai-to-ai-holding.com",
+  "auth_header": "X-API-Key",
+  "functions": [
+    {
+      "name": "classify_hs_code",
+      "description": "Classify a product into Thai Customs HS Code. Returns HS code candidates ranked by confidence score with legal citations. This is decision-support output — not a binding customs ruling.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "product_description": {
+            "type": "string",
+            "description": "Product description in Thai or English. More detail = higher accuracy."
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "2-letter ISO country code (e.g. CN, US, JP, DE)"
+          },
+          "value_usd": {
+            "type": "number",
+            "description": "CIF value in USD. Required for duty amount calculation."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantity of goods"
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement (e.g. PCS, KG, SET)"
+          }
+        },
+        "required": ["product_description"]
+      },
+      "endpoint": "POST /v1/customs/classify",
+      "sandbox_endpoint": "POST /v1/sandbox/classify"
+    },
+    {
+      "name": "check_fta_rate",
+      "description": "Get preferential import duty rate under FTA agreements. Thailand has 13 FTAs: AFTA, ACFTA (China), AJCEP (Japan), AKFTA (Korea), AANZFTA (AU/NZ), AIFTA (India), TAFTA (Australia), TNZCEP (NZ), JTEPA (Japan bilateral), RCEP, TCFTA (Chile), TPFTA (Peru), MFN.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code 6-10 digits (e.g. 8507.60)"
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "2-letter ISO country code"
+          },
+          "fta_name": {
+            "type": "string",
+            "description": "Specific FTA to check (optional). If omitted, returns all applicable rates.",
+            "enum": ["AFTA","ACFTA","AJCEP","AKFTA","AANZFTA","AIFTA","TAFTA","TNZCEP","JTEPA","RCEP","TCFTA","TPFTA","MFN"]
+          }
+        },
+        "required": ["hs_code", "origin_country"]
+      },
+      "endpoint": "POST /v1/customs/classify"
+    },
+    {
+      "name": "check_oga_compliance",
+      "description": "Check if product requires Other Government Agency permits before Thailand import. Agencies include: FDA (food/drug/cosmetic), TISI/มอก. (standards), Dept of Agriculture, Fisheries, Livestock, AERONAUTICS (drones/aircraft), CUSTOMS special lists.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code 6-10 digits"
+          },
+          "product_description": {
+            "type": "string",
+            "description": "Additional product context for accuracy"
+          }
+        },
+        "required": ["hs_code"]
+      },
+      "endpoint": "POST /v1/customs/classify"
+    }
+  ],
+  "langchain_tool_example": {
+    "_comment": "Python snippet for LangChain integration",
+    "code": "from langchain.tools import StructuredTool\nimport requests\n\ndef classify_product(product_description: str, origin_country: str = 'CN') -> dict:\n    resp = requests.post(\n        'https://api.ai-to-ai-holding.com/v1/customs/classify',\n        headers={'X-API-Key': 'YOUR_KEY', 'Content-Type': 'application/json'},\n        json={'items': [{'description': product_description, 'origin_country': origin_country}]}\n    )\n    return resp.json()\n\ncustoms_tool = StructuredTool.from_function(\n    func=classify_product,\n    name='thai_customs_classifier',\n    description='Classify products for Thai customs import. Returns HS code, duty rate, FTA rates, OGA requirements.'\n)"
+  }
+}

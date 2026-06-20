@@ -1,0 +1,23 @@
+[Unit]
+Description=AI TO AI HOLDING — Customs Intelligence API
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/ai-to-ai-holding/AI_TO_AI_HOLDING
+EnvironmentFile=/home/ubuntu/ai-to-ai-holding/AI_TO_AI_HOLDING/.env
+ExecStart=/home/ubuntu/ai-to-ai-holding/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai-to-ai-holding
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
