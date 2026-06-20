@@ -25,6 +25,8 @@ async def init_db():
         "schema_v1.sql",
         "schema_comms_v1.sql",
         "schema_learning_v1.sql",
+        "schema_registry_v1.sql",
+        "schema_billing_v1.sql",
     ]
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("PRAGMA foreign_keys = ON")
