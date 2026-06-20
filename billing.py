@@ -15,7 +15,7 @@ from fastapi import APIRouter, HTTPException, Request, Header
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from database import DB_PATH
+from database import DB_PATH, USE_POSTGRES
 from holding_config import PRICE_PER_ITEM
 
 router = APIRouter(prefix="/v1", tags=["Billing"])
@@ -42,12 +42,16 @@ def _generate_api_key() -> str:
     return "sk-aitai-" + secrets.token_hex(24)
 
 async def _get_db():
-    """สร้าง DB connection พร้อม row_factory"""
-    db = await aiosqlite.connect(DB_PATH)
-    db.row_factory = aiosqlite.Row
-    await db.execute("PRAGMA foreign_keys = ON")
-    await db.execute("PRAGMA journal_mode = WAL")
-    return db
+    """สร้าง DB connection — PostgreSQL หรือ SQLite"""
+    if USE_POSTGRES:
+        from db_adapter import connect
+        return await connect()
+    else:
+        db = await aiosqlite.connect(DB_PATH)
+        db.row_factory = aiosqlite.Row
+        await db.execute("PRAGMA foreign_keys = ON")
+        await db.execute("PRAGMA journal_mode = WAL")
+        return db
 
 async def _get_agent_by_key(db: aiosqlite.Connection, api_key: str):
     hint = api_key[-8:]
