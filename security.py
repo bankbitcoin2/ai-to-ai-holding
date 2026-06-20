@@ -167,6 +167,8 @@ PUBLIC_PREFIXES: tuple = (
     "/v1/register",                       # Client signup — ต้องเข้าได้โดยไม่มี key
     "/v1/billing/",                       # Billing — จัดการ auth เองผ่าน api_key ใน body
     "/.well-known/",                      # AI discovery
+    "/chairman",                          # Chairman Office HTML (auth ทำใน JS)
+    "/static/",                           # Static assets
 )
 
 # Chairman path prefix — ต้อง IP check เพิ่ม
