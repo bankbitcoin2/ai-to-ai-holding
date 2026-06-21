@@ -200,3 +200,30 @@ async def sandbox_classify(body: SandboxReq, req: Request):
         },
         next_step=nxt,
     )
+
+# ── Feedback Endpoint ─────────────────────────────────────────────────────────
+class FeedbackReq(BaseModel):
+    log_id: str
+    status: str     # CONFIRMED | REJECTED | AMENDED
+    amended_hs_code: Optional[str] = None
+    feedback_by: str = "client"
+
+@router.post("/feedback", summary="ส่ง feedback ผล HS Classification")
+async def sandbox_feedback(body: FeedbackReq):
+    if body.status not in ("CONFIRMED", "REJECTED", "AMENDED"):
+        raise HTTPException(400, detail={"error": "INVALID_STATUS",
+            "message": "status must be CONFIRMED | REJECTED | AMENDED"})
+    try:
+        from database import get_db
+        from cache_classification import submit_feedback
+        async with get_db() as db:
+            ok = await submit_feedback(db, body.log_id, body.status,
+                                       body.amended_hs_code, body.feedback_by)
+        if not ok:
+            raise HTTPException(404, detail={"error": "LOG_NOT_FOUND",
+                "message": f"log_id {body.log_id} not found"})
+        return {"received": True, "log_id": body.log_id, "action": body.status}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, detail={"error": "FEEDBACK_ERROR", "message": str(e)})

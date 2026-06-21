@@ -1,6 +1,6 @@
 """
-classification_agent.py
-Classification Agent - Customs Intelligence Division
+classification_agent.py - Customs Intelligence Division
+Multi-candidate HS classification with cache + CKAN 11-digit enrichment
 """
 import json
 import os
@@ -10,20 +10,22 @@ import httpx
 
 ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
 MODEL = "claude-sonnet-4-6"
+CONFIDENCE_THRESHOLD = 0.75
+CACHE_THRESHOLD = 0.85
 
 SYSTEM_PROMPT = """You are a Customs Classification Agent working for AI TO AI HOLDING.
-Your job is to classify goods under the Harmonized System (HS Code).
+Classify goods under the Harmonized System (HS Code).
 
-STRICT RULES (Non-negotiable):
-1. Always respond in valid JSON only - no prose, no markdown.
-2. Every classification must cite a real HS Chapter, Section, or Explanatory Note.
-3. If you are uncertain, lower the confidence_score - never fabricate certainty.
-4. confidence_score must be a float between 0.00 and 1.00.
-5. Return UP TO 5 candidate classifications ranked by confidence_score descending.
+STRICT RULES:
+1. Respond in valid JSON array only - no prose, no markdown.
+2. Cite real HS Chapter, Section, or Explanatory Note for every candidate.
+3. Lower confidence_score when uncertain - never fabricate certainty.
+4. confidence_score: float 0.00-1.00.
+5. Return UP TO 5 candidates ranked by confidence_score descending.
 6. Only include candidates with confidence_score >= 0.75.
-7. If no candidate reaches 0.75, return the single best candidate anyway.
+7. If none reach 0.75, return single best candidate anyway.
 
-Response format - return a JSON array (ranked best first):
+Response format (JSON array ranked best first):
 [
   {
     "hs_code": "8471.30",
@@ -32,14 +34,6 @@ Response format - return a JSON array (ranked best first):
     "source_reference": "HS 2022, Chapter 84, Note 5(A); Explanatory Note 84.71",
     "reasoning_steps": ["Step 1: ...", "Step 2: ..."],
     "notes": null
-  },
-  {
-    "hs_code": "8471.49",
-    "hs_description": "Other automatic data processing machines...",
-    "confidence_score": 0.78,
-    "source_reference": "HS 2022, Chapter 84, Heading 84.71",
-    "reasoning_steps": ["Alternative if device is not portable"],
-    "notes": "Consider if weight > 10kg"
   }
 ]"""
 
@@ -47,8 +41,6 @@ _DISCLAIMER = (
     "This is a preliminary estimate only. Not a legal determination. "
     "Please verify with customs authorities before actual import/export."
 )
-
-CONFIDENCE_THRESHOLD = 0.75
 
 
 @dataclass
@@ -122,12 +114,41 @@ async def classify_item(
     description: str,
     origin_country: Optional[str] = None,
     additional_context: Optional[str] = None,
+    db=None,
+    session_id: Optional[str] = None,
+    session_type: str = "SANDBOX",
 ) -> ClassificationResult:
-    user_content = f"Product description: {description}"
+
+    # Cache lookup first
+    if db:
+        try:
+            from cache_classification import cache_lookup
+            cached = await cache_lookup(db, description)
+            if cached:
+                best = CandidateResult(
+                    rank=1,
+                    hs_code=cached["hs_code"],
+                    hs_code_11=cached.get("hs_code_11"),
+                    hs_description=cached.get("hs_description"),
+                    hs_description_th=cached.get("hs_description_th"),
+                    confidence_score=float(cached["confidence_score"]),
+                    source_reference="Cache ({}, {} hits)".format(
+                        cached["source"], cached["hit_count"]),
+                    reasoning_steps=["Returned from cache - source: {}".format(cached["source"])],
+                    notes=_DISCLAIMER,
+                )
+                return ClassificationResult(
+                    candidates=[best], best=best,
+                    raw_response="[CACHE HIT] {}".format(cached["source"])
+                )
+        except Exception:
+            pass
+
+    user_content = "Product description: {}".format(description)
     if origin_country:
-        user_content += f"\nOrigin country: {origin_country}"
+        user_content += "\nOrigin country: {}".format(origin_country)
     if additional_context:
-        user_content += f"\nAdditional context: {additional_context}"
+        user_content += "\nAdditional context: {}".format(additional_context)
 
     payload = {
         "model": MODEL,
@@ -167,5 +188,28 @@ async def classify_item(
 
     candidates = await _enrich_with_ckan(filtered)
     best = candidates[0] if candidates else None
+
+    # Auto-save to cache if confidence >= 0.85
+    if db and best and best.confidence_score >= CACHE_THRESHOLD:
+        try:
+            from cache_classification import cache_save, log_candidates
+            await cache_save(db, description, {
+                "hs_code": best.hs_code,
+                "hs_code_11": best.hs_code_11,
+                "hs_description": best.hs_description,
+                "hs_description_th": best.hs_description_th,
+                "confidence_score": best.confidence_score,
+            }, source="CLAUDE")
+            if session_id:
+                await log_candidates(db, session_id, session_type, description, [
+                    {
+                        "rank": c.rank, "hs_code": c.hs_code, "hs_code_11": c.hs_code_11,
+                        "hs_description": c.hs_description, "confidence_score": c.confidence_score,
+                        "source_reference": c.source_reference,
+                    }
+                    for c in candidates
+                ])
+        except Exception:
+            pass
 
     return ClassificationResult(candidates=candidates, best=best, raw_response=raw_text)
