@@ -85,6 +85,16 @@
   .tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
   .tag-green { background: rgba(16,185,129,0.15); color: var(--green); }
   .tag-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+
+  /* GUIDE */
+  .guide-tab { background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .guide-tab:hover { color: var(--text); border-color: var(--accent); }
+  .guide-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .code-block { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.78rem; color: #e6edf3; white-space: pre; overflow-x: auto; line-height: 1.6; }
+  .faq-item { padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+  .faq-item:last-of-type { border-bottom: none; }
+  .faq-q { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
+  .faq-a { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -177,13 +187,128 @@
       <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem"><span data-i18n="apikey_hint">ใช้ header:</span> <code style="color:var(--accent)">X-API-Key: &lt;your-key&gt;</code> <span data-i18n="apikey_hint2">กับทุก production endpoint</span></p>
     </div>
 
+    <!-- GUIDE SECTION -->
     <div class="section-card">
-      <h3>📖 Quick Start</h3>
-      <div style="color:var(--muted);font-size:0.85rem;line-height:1.8">
-        <p><strong style="color:var(--text)" data-i18n="qs_prod">Production endpoint:</strong></p>
-        <code style="color:var(--accent);display:block;margin:0.5rem 0;background:var(--bg);padding:0.75rem;border-radius:6px;font-size:0.8rem">POST https://web-production-c9da4.up.railway.app/v1/customs/classify<br>Header: X-API-Key: sk-aitai-...</code>
-        <p style="margin-top:0.75rem"><strong style="color:var(--text)">Discovery:</strong> <span data-i18n="qs_discovery">AI ค้นพบ API นี้อัตโนมัติผ่าน</span> <a href="/.well-known/" style="color:var(--accent)">/.well-known/</a></p>
-        <p style="margin-top:0.5rem"><a href="/docs" style="color:var(--accent)" target="_blank" data-i18n="qs_docs">ดู Full API Documentation →</a></p>
+      <h3>📖 <span data-i18n="guide_title">คู่มือการใช้งาน</span></h3>
+
+      <!-- TAB NAV -->
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+        <button class="guide-tab active" onclick="showTab('curl')" id="tab-curl">cURL</button>
+        <button class="guide-tab" onclick="showTab('python')" id="tab-python">Python</button>
+        <button class="guide-tab" onclick="showTab('node')" id="tab-node">Node.js</button>
+        <button class="guide-tab" onclick="showTab('response')" id="tab-response" data-i18n="guide_tab_response">ตัวอย่าง Response</button>
+        <button class="guide-tab" onclick="showTab('faq')" id="tab-faq">FAQ</button>
+      </div>
+
+      <!-- cURL -->
+      <div id="guide-curl" class="guide-panel">
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0.6rem" data-i18n="guide_curl_desc">คัดลอกแล้ววาง Terminal ได้เลย — เปลี่ยน YOUR_KEY เป็น API Key ของคุณ</p>
+        <div class="code-block" id="code-curl">curl -X POST https://web-production-c9da4.up.railway.app/v1/customs/classify \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_KEY" \
+  -d '{
+    "client_id": "my-agent",
+    "items": [{
+      "description": "iPhone 15 Pro Max 256GB",
+      "quantity": 10,
+      "unit_price": 1200
+    }]
+  }'</div>
+        <button class="copy-btn" onclick="copyCode('code-curl',this)" style="margin-top:0.5rem">Copy</button>
+      </div>
+
+      <!-- Python -->
+      <div id="guide-python" class="guide-panel" style="display:none">
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0.6rem">pip install httpx</p>
+        <div class="code-block" id="code-python">import httpx
+
+API_KEY = "YOUR_KEY"
+BASE = "https://web-production-c9da4.up.railway.app"
+
+payload = {
+    "client_id": "my-agent",
+    "items": [{"description": "iPhone 15 Pro Max 256GB", "quantity": 10, "unit_price": 1200}]
+}
+
+r = httpx.post(
+    f"{BASE}/v1/customs/classify",
+    headers={"X-API-Key": API_KEY},
+    json=payload
+)
+print(r.json())</div>
+        <button class="copy-btn" onclick="copyCode('code-python',this)" style="margin-top:0.5rem">Copy</button>
+      </div>
+
+      <!-- Node.js -->
+      <div id="guide-node" class="guide-panel" style="display:none">
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0.6rem">Node 18+ (fetch built-in)</p>
+        <div class="code-block" id="code-node">const API_KEY = "YOUR_KEY";
+const BASE = "https://web-production-c9da4.up.railway.app";
+
+const res = await fetch(`${BASE}/v1/customs/classify`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-API-Key": API_KEY
+  },
+  body: JSON.stringify({
+    client_id: "my-agent",
+    items: [{ description: "iPhone 15 Pro Max 256GB", quantity: 10, unit_price: 1200 }]
+  })
+});
+console.log(await res.json());</div>
+        <button class="copy-btn" onclick="copyCode('code-node',this)" style="margin-top:0.5rem">Copy</button>
+      </div>
+
+      <!-- Response Example -->
+      <div id="guide-response" class="guide-panel" style="display:none">
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0.6rem" data-i18n="guide_resp_desc">ตัวอย่าง JSON response จาก production endpoint</p>
+        <div class="code-block" style="color:var(--green)">{
+  "items": [{
+    "hs_code": "8517.12",
+    "hs_description": "Telephones for cellular networks (smartphones)",
+    "confidence_score": 0.95,
+    "source_reference": "HS 2022, Chapter 85, Heading 85.17",
+    "duty_rate": 0.05,
+    "duty_amount": 600,
+    "vat_rate": 0.07,
+    "vat_amount": 882,
+    "oga_required": false
+  }],
+  "summary": {
+    "total_items": 1,
+    "avg_confidence_score": 0.95,
+    "total_duty_estimate": 600,
+    "credit_charged": 1.50
+  }
+}</div>
+      </div>
+
+      <!-- FAQ -->
+      <div id="guide-faq" class="guide-panel" style="display:none">
+        <div class="faq-item">
+          <div class="faq-q" data-i18n="faq_q1">🔑 ใส่ API Key ที่ไหน?</div>
+          <div class="faq-a" data-i18n="faq_a1">ใส่ใน HTTP header ชื่อ <code style="color:var(--accent)">X-API-Key</code> ทุก request ที่เรียก production endpoint</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" data-i18n="faq_q2">💰 ถูก charge เมื่อไหร่?</div>
+          <div class="faq-a" data-i18n="faq_a2">ถูก deduct ทันทีเมื่อ classify สำเร็จ — $1.50 / query Sandbox ฟรีไม่ถูก charge</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" data-i18n="faq_q3">⚡ Rate limit คือเท่าไหร่?</div>
+          <div class="faq-a" data-i18n="faq_a3">60 req/นาที ต่อ IP — Sandbox: 5 calls/วัน, 10 calls/นาที</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" data-i18n="faq_q4">🤖 AI Agent เรียกได้ไหม?</div>
+          <div class="faq-a" data-i18n="faq_a4">ได้เลย — รองรับ MCP Protocol, GPT Actions, LangChain ค้นพบอัตโนมัติผ่าน <a href="/.well-known/" style="color:var(--accent)">/.well-known/</a></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" data-i18n="faq_q5">🌿 Halal Check คืออะไร?</div>
+          <div class="faq-a" data-i18n="faq_a5">ตรวจสอบ Halal compliance อัตโนมัติ 21 ประเทศ ครอบคลุม GCC, SEA, Middle East รวมอยู่ในทุก query โดยไม่มีค่าใช้จ่ายเพิ่ม</div>
+        </div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <a href="/docs" target="_blank" style="color:var(--accent);font-size:0.85rem" data-i18n="qs_docs">ดู Full API Documentation →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -253,6 +378,20 @@ const i18n = {
     topup_creating: 'กำลังสร้าง checkout...',
     cancel: 'ยกเลิก',
     pay_btn: 'ชำระเงิน →',
+    guide_title: 'คู่มือการใช้งาน',
+    guide_tab_response: 'ตัวอย่าง Response',
+    guide_curl_desc: 'คัดลอกแล้ววาง Terminal ได้เลย — เปลี่ยน YOUR_KEY เป็น API Key ของคุณ',
+    guide_resp_desc: 'ตัวอย่าง JSON response จาก production endpoint',
+    faq_q1: '🔑 ใส่ API Key ที่ไหน?',
+    faq_a1: 'ใส่ใน HTTP header ชื่อ X-API-Key ทุก request ที่เรียก production endpoint',
+    faq_q2: '💰 ถูก charge เมื่อไหร่?',
+    faq_a2: 'ถูก deduct ทันทีเมื่อ classify สำเร็จ — $1.50 / query Sandbox ฟรีไม่ถูก charge',
+    faq_q3: '⚡ Rate limit คือเท่าไหร่?',
+    faq_a3: '60 req/นาที ต่อ IP — Sandbox: 5 calls/วัน, 10 calls/นาที',
+    faq_q4: '🤖 AI Agent เรียกได้ไหม?',
+    faq_a4: 'ได้เลย — รองรับ MCP Protocol, GPT Actions, LangChain ค้นพบอัตโนมัติผ่าน /.well-known/',
+    faq_q5: '🌿 Halal Check คืออะไร?',
+    faq_a5: 'ตรวจสอบ Halal compliance อัตโนมัติ 21 ประเทศ ครอบคลุม GCC, SEA, Middle East รวมอยู่ในทุก query',
   },
   en: {
     login_title: 'Client Login',
@@ -290,6 +429,20 @@ const i18n = {
     topup_creating: 'Creating checkout...',
     cancel: 'Cancel',
     pay_btn: 'Pay →',
+    guide_title: 'Developer Guide',
+    guide_tab_response: 'Response Example',
+    guide_curl_desc: 'Copy and paste into Terminal — replace YOUR_KEY with your API Key',
+    guide_resp_desc: 'Sample JSON response from the production endpoint',
+    faq_q1: '🔑 Where do I put the API Key?',
+    faq_a1: 'Add it as HTTP header X-API-Key in every production endpoint request',
+    faq_q2: '💰 When am I charged?',
+    faq_a2: 'Credit is deducted immediately upon successful classification — $1.50 / query. Sandbox is free.',
+    faq_q3: '⚡ What is the rate limit?',
+    faq_a3: '60 req/min per IP — Sandbox: 5 calls/day, 10 calls/min',
+    faq_q4: '🤖 Can AI Agents call this?',
+    faq_a4: 'Yes — supports MCP Protocol, GPT Actions, LangChain. Auto-discovered via /.well-known/',
+    faq_q5: '🌿 What is Halal Check?',
+    faq_a5: 'Automatic Halal compliance check for 21 countries: GCC, SEA, Middle East. Included in every query at no extra cost.',
   },
   zh: {
     login_title: '客户登录',
@@ -327,6 +480,20 @@ const i18n = {
     topup_creating: '正在创建结账...',
     cancel: '取消',
     pay_btn: '立即付款 →',
+    guide_title: '使用指南',
+    guide_tab_response: '响应示例',
+    guide_curl_desc: '复制并粘贴到终端 — 将 YOUR_KEY 替换为您的 API Key',
+    guide_resp_desc: '来自生产接口的 JSON 响应示例',
+    faq_q1: '🔑 API Key 放在哪里？',
+    faq_a1: '在每个生产接口请求中，以 HTTP header X-API-Key 传入',
+    faq_q2: '💰 何时扣费？',
+    faq_a2: '分类成功后立即扣除 — $1.50 / 次查询。沙盒免费。',
+    faq_q3: '⚡ 频率限制是多少？',
+    faq_a3: '每IP每分钟60次 — 沙盒：每天5次，每分钟10次',
+    faq_q4: '🤖 AI 智能体可以调用吗？',
+    faq_a4: '可以 — 支持 MCP Protocol、GPT Actions、LangChain，通过 /.well-known/ 自动发现',
+    faq_q5: '🌿 清真检查是什么？',
+    faq_a5: '自动检查21个国家的清真合规：GCC、东南亚、中东，每次查询免费包含',
   },
   ja: {
     login_title: 'クライアントログイン',
@@ -364,6 +531,20 @@ const i18n = {
     topup_creating: 'チェックアウト作成中...',
     cancel: 'キャンセル',
     pay_btn: '支払う →',
+    guide_title: '利用ガイド',
+    guide_tab_response: 'レスポンス例',
+    guide_curl_desc: 'ターミナルにコピー＆ペースト — YOUR_KEY をAPIキーに置き換えてください',
+    guide_resp_desc: '本番エンドポイントからのJSONレスポンスサンプル',
+    faq_q1: '🔑 APIキーはどこに入れますか？',
+    faq_a1: 'すべての本番リクエストのHTTPヘッダー X-API-Key に指定してください',
+    faq_q2: '💰 いつ課金されますか？',
+    faq_a2: '分類成功時に即時控除 — $1.50 / クエリ。サンドボックスは無料です。',
+    faq_q3: '⚡ レート制限は？',
+    faq_a3: 'IP毎に60回/分 — サンドボックス：5回/日、10回/分',
+    faq_q4: '🤖 AIエージェントから呼び出せますか？',
+    faq_a4: 'はい — MCP Protocol、GPT Actions、LangChainに対応。/.well-known/ で自動検出',
+    faq_q5: '🌿 ハラール確認とは何ですか？',
+    faq_a5: '21カ国のハラール適合を自動確認：GCC、東南アジア、中東。全クエリに無料で含まれます',
   },
 };
 
@@ -521,6 +702,23 @@ function copyKey() {
   navigator.clipboard.writeText(currentKey);
   event.target.textContent = t('copied');
   setTimeout(() => event.target.textContent = t('copy'), 1500);
+}
+
+// ── GUIDE TABS ────────────────────────────────────────────────
+function showTab(name) {
+  ['curl','python','node','response','faq'].forEach(n => {
+    const panel = document.getElementById('guide-' + n);
+    const tab = document.getElementById('tab-' + n);
+    if (panel) panel.style.display = n === name ? 'block' : 'none';
+    if (tab) tab.classList.toggle('active', n === name);
+  });
+}
+
+function copyCode(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text);
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 1500);
 }
 
 // ── INIT ──────────────────────────────────────────────────────
