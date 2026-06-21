@@ -502,16 +502,15 @@ tr:last-child td{border:none}
         <div class="irow" style="padding:10px 0;border:none;opacity:.4"><div><div style="font-size:12px;font-weight:500">Step 5 — Monitor Dashboard + รายได้จริง + 60/40 Settlement</div></div><span style="color:var(--dim);font-family:monospace">⏳ รอ Step 4</span></div>
       </div>
       <div class="card">
-        <div class="sec">ไฟล์ที่ต้อง PUSH ก่อน Production</div>
+        <div class="sec">Railway Variables ที่ต้องตั้งค่า</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">database.py</span>
-          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">billing.py</span>
-          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">schema_cache_v1.sql</span>
-          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">mock_classification_agent.py</span>
-          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">chairman_router.py</span>
-          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">static/chairman.html</span>
-          <span style="background:var(--card2);border:1px solid var(--dim);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--dim)">kill_switch_*.py (รอก่อน)</span>
+          <span style="background:var(--card2);border:1px solid var(--green);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--green)">✓ CHAIRMAN_API_KEY</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">⏳ ANTHROPIC_API_KEY</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">⏳ STRIPE_SECRET_KEY</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">⏳ STRIPE_WEBHOOK_SECRET</span>
+          <span style="background:var(--card2);border:1px solid var(--dim);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--dim)">kill_switch_*.py (hold)</span>
         </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--green)">✓ ไฟล์ทั้งหมด push แล้ว — รอแค่ ANTHROPIC_API_KEY เพื่อออกจาก MOCK mode</div>
       </div>
     </div>
 
@@ -890,12 +889,13 @@ async function sendMsg() {
       + '     '+BASE+'/v1/billing/webhook';
   } else if (q.includes('next')||q.includes('ถัดไป')||q.includes('ต่อไป')) {
     reply = 'ท่านประธาน — ขั้นตอนถัดไปที่ต้องทำ:\n\n'
-      + '1. ✅ Push ไฟล์ที่แก้ไปทั้งหมดขึ้น GitHub\n'
-      + '   (database.py, billing.py, schema_cache_v1.sql, mock_classification_agent.py, chairman_router.py, chairman.html)\n\n'
-      + '2. 🔑 ตั้งค่า Stripe Keys ใน Railway Variables\n\n'
+      + '1. ✅ ไฟล์ทั้งหมด push ขึ้น Railway แล้ว\n\n'
+      + '2. ✅ CHAIRMAN_API_KEY ตั้งค่าแล้ว\n\n'
       + '3. 💳 เติม Anthropic credit ที่ console.anthropic.com\n'
-      + '   แล้วตั้ง MOCK_MODE=false → เปิด real AI classification\n\n'
-      + '4. 📢 Submit API registry (MCP, GPT Store, RapidAPI)\n\n'
+      + '   → ตั้ง ANTHROPIC_API_KEY ใน Railway Variables\n'
+      + '   → ระบบออกจาก MOCK mode อัตโนมัติ ไม่ต้องตั้ง MOCK_MODE\n\n'
+      + '4. 🔑 ตั้งค่า STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET ใน Railway\n\n'
+      + '5. 📢 Submit API registry (MCP, GPT Store, RapidAPI) — Step 4\n\n'
       + 'Unlock เดียวที่เปิดทุกอย่างคือ Anthropic credit ครับ';
   } else if (q.includes('railway')||q.includes('ออนไลน์')||q.includes('server')) {
     reply = 'ท่านประธาน — Railway status:\n'
