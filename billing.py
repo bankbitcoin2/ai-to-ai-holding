@@ -53,14 +53,19 @@ async def _get_db():
         await db.execute("PRAGMA journal_mode = WAL")
         return db
 
-async def _get_agent_by_key(db: aiosqlite.Connection, api_key: str):
+def _ph(n: int) -> str:
+    """Return placeholder: $n for PostgreSQL, ? for SQLite"""
+    return f"${n}" if USE_POSTGRES else "?"
+
+async def _get_agent_by_key(db, api_key: str):
     hint = api_key[-8:]
-    async with db.execute("""
+    p1 = _ph(1)
+    async with db.execute(f"""
         SELECT a.*, COALESCE(c.credit_balance, 0.0) as credit_balance,
                COALESCE(c.credit_topup_total, 0.0) as credit_topup_total
         FROM client_agents a
         LEFT JOIN client_credits c ON c.agent_id = a.id
-        WHERE a.api_key_hint = ? AND a.status = 'ACTIVE'
+        WHERE a.api_key_hint = {p1} AND a.status = 'ACTIVE'
     """, (hint,)) as cur:
         row = await cur.fetchone()
     return row
@@ -69,36 +74,43 @@ async def _get_agent_by_key(db: aiosqlite.Connection, api_key: str):
 
 @router.post("/register", summary="ลงทะเบียน AI Client — รับ API Key")
 async def register_client(req: RegisterRequest):
-    """
-    AI client หรือเจ้าของลงทะเบียนเพื่อรับ API Key
-    ไม่มีค่าใช้จ่ายในการสมัคร — เติม credit เมื่อต้องการใช้งาน production
-    """
     api_key = _generate_api_key()
     agent_id = str(uuid.uuid4())
     hint = api_key[-8:]
     now = datetime.now(timezone.utc).isoformat()
 
+    p1, p2, p3, p4, p5, p6, p7 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5), _ph(6), _ph(7)
+
     db = await _get_db()
     try:
         async with db.execute(
-            "SELECT id FROM client_agents WHERE contact_email = ?",
+            f"SELECT id FROM client_agents WHERE contact_email = {p1}",
             (req.contact_email,)
         ) as cur:
             existing = await cur.fetchone()
         if existing:
-            raise HTTPException(400, "Email นี้ลงทะเบียนไปแล้ว")
+            raise HTTPException(400, "Email นี้ลงทะเบียนไปแล้ว กรุณาใช้ Recover Key")
 
-        await db.execute("""
+        await db.execute(f"""
             INSERT INTO client_agents
             (id, agent_name, profession, origin_system, contact_email,
              api_key_hint, status, registered_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', ?)
+            VALUES ({p1}, {p2}, {p3}, {p4}, {p5}, {p6}, 'ACTIVE', {p7})
         """, (agent_id, req.agent_name, req.profession,
               req.origin_system, req.contact_email, hint, now))
-        await db.execute("""
-            INSERT OR IGNORE INTO client_credits (agent_id, credit_balance, credit_topup_total)
-            VALUES (?, 0.0, 0.0)
-        """, (agent_id,))
+
+        on_conflict = "ON CONFLICT (agent_id) DO NOTHING" if USE_POSTGRES else "OR IGNORE"
+        if USE_POSTGRES:
+            await db.execute(f"""
+                INSERT INTO client_credits (agent_id, credit_balance, credit_topup_total)
+                VALUES ({p1}, 0.0, 0.0)
+                ON CONFLICT (agent_id) DO NOTHING
+            """, (agent_id,))
+        else:
+            await db.execute(f"""
+                INSERT OR IGNORE INTO client_credits (agent_id, credit_balance, credit_topup_total)
+                VALUES ({p1}, 0.0, 0.0)
+            """, (agent_id,))
         await db.commit()
     finally:
         await db.close()
@@ -123,18 +135,13 @@ class RecoverKeyRequest(BaseModel):
 
 @router.post("/recover-key", summary="กู้คืน API Key ด้วย email + ชื่อ Agent")
 async def recover_key(req: RecoverKeyRequest):
-    """
-    ลูกค้าลืม API Key:
-    1. ยืนยัน email + agent_name ต้องตรงกับที่สมัคร
-    2. ออก API Key ใหม่ (hint ใหม่)
-    3. Key เก่า invalidate อัตโนมัติ (hint เปลี่ยน)
-    4. บันทึก audit event
-    """
+    p1, p2, p3, p4, p5 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5)
+
     db = await _get_db()
     try:
         async with db.execute(
-            "SELECT id, agent_name, contact_email, status FROM client_agents "
-            "WHERE contact_email = $1 AND LOWER(agent_name) = LOWER($2)",
+            f"SELECT id, agent_name, contact_email, status FROM client_agents "
+            f"WHERE contact_email = {p1} AND LOWER(agent_name) = LOWER({p2})",
             (req.contact_email.strip(), req.agent_name.strip())
         ) as cur:
             row = await cur.fetchone()
@@ -151,22 +158,20 @@ async def recover_key(req: RecoverKeyRequest):
                 "message": "บัญชีนี้ถูกระงับ ติดต่อ support"
             })
 
-        # ออก key ใหม่
         new_key  = _generate_api_key()
         new_hint = new_key[-8:]
         now      = datetime.now(timezone.utc).isoformat()
 
         await db.execute(
-            "UPDATE client_agents SET api_key_hint = $1 WHERE id = $2",
+            f"UPDATE client_agents SET api_key_hint = {p1} WHERE id = {p2}",
             (new_hint, row["id"])
         )
 
-        # audit trail
         audit_detail = f"KEY_RECOVERED|agent_id={row['id']}|email={req.contact_email}|new_hint=...{new_hint}"
         audit_hash   = hashlib.sha256(audit_detail.encode()).hexdigest()
         await db.execute(
-            "INSERT INTO audit_events (id, event_type, actor_id, detail, sha256_hash, created_at) "
-            "VALUES ($1, 'KEY_RECOVERY', $2, $3, $4, $5)",
+            f"INSERT INTO audit_events (id, event_type, actor_id, detail, sha256_hash, created_at) "
+            f"VALUES ({p1}, 'KEY_RECOVERY', {p2}, {p3}, {p4}, {p5})",
             (str(uuid.uuid4()), row["id"], audit_detail, audit_hash, now)
         )
         await db.commit()
@@ -241,12 +246,13 @@ async def create_topup(req: TopupRequest):
         raise HTTPException(502, f"Stripe error: {resp.text}")
 
     stripe_data = resp.json()
+    p1, p2, p3, p4, p5 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5)
     db = await _get_db()
     try:
-        await db.execute("""
+        await db.execute(f"""
             INSERT INTO credit_topups
             (id, agent_id, amount_usd, stripe_session_id, status, created_at)
-            VALUES (?, ?, ?, ?, 'pending', ?)
+            VALUES ({p1}, {p2}, {p3}, {p4}, 'pending', {p5})
         """, (session_id, row["id"], req.amount_usd,
               stripe_data["id"], datetime.now(timezone.utc).isoformat()))
         await db.commit()
@@ -296,11 +302,11 @@ async def stripe_webhook(request: Request):
         stripe_session_id = session["id"]
 
         if agent_id and amount_usd > 0:
+            p1, p2, p3, p4, p5 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5)
             db = await _get_db()
             try:
-                # ── Idempotency check: ถ้า session นี้ completed แล้ว ข้ามทันที ──
                 async with db.execute(
-                    "SELECT status FROM credit_topups WHERE stripe_session_id = ?",
+                    f"SELECT status FROM credit_topups WHERE stripe_session_id = {p1}",
                     (stripe_session_id,)
                 ) as cur:
                     topup_row = await cur.fetchone()
@@ -309,32 +315,29 @@ async def stripe_webhook(request: Request):
                     print(f"[BILLING] Webhook duplicate ignored: {stripe_session_id}")
                     return {"received": True}
 
-                # ── Credit the agent ──────────────────────────────────
-                await db.execute("""
+                await db.execute(f"""
                     INSERT INTO client_credits (agent_id, credit_balance, credit_topup_total)
-                    VALUES (?, ?, ?)
+                    VALUES ({p1}, {p2}, {p3})
                     ON CONFLICT(agent_id) DO UPDATE SET
-                        credit_balance = credit_balance + excluded.credit_balance,
-                        credit_topup_total = credit_topup_total + excluded.credit_topup_total
+                        credit_balance = client_credits.credit_balance + {p2},
+                        credit_topup_total = client_credits.credit_topup_total + {p3}
                 """, (agent_id, amount_usd, amount_usd))
 
-                # ── Mark topup completed ───────────────────────────────
                 now = datetime.now(timezone.utc).isoformat()
-                await db.execute("""
-                    UPDATE credit_topups SET status = 'completed'
-                    WHERE stripe_session_id = ?
-                """, (stripe_session_id,))
+                await db.execute(
+                    f"UPDATE credit_topups SET status = 'completed' WHERE stripe_session_id = {p1}",
+                    (stripe_session_id,)
+                )
 
-                # ── SHA-256 audit event ────────────────────────────────
                 audit_detail = (
                     f"TOPUP_COMPLETE|agent_id={agent_id}"
                     f"|amount_usd={amount_usd}|stripe_session={stripe_session_id}"
                 )
                 audit_hash = hashlib.sha256(audit_detail.encode()).hexdigest()
                 await db.execute(
-                    "INSERT INTO audit_events "
-                    "(id, event_type, actor_id, detail, sha256_hash, created_at) "
-                    "VALUES (?, 'CREDIT_TOPUP', ?, ?, ?, ?)",
+                    f"INSERT INTO audit_events "
+                    f"(id, event_type, actor_id, detail, sha256_hash, created_at) "
+                    f"VALUES ({p1}, 'CREDIT_TOPUP', {p2}, {p3}, {p4}, {p5})",
                     (str(uuid.uuid4()), agent_id, audit_detail, audit_hash, now)
                 )
                 await db.commit()
