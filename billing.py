@@ -12,7 +12,7 @@ from typing import Optional
 
 import aiosqlite
 from fastapi import APIRouter, HTTPException, Request, Header
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from database import DB_PATH, USE_POSTGRES
@@ -36,13 +36,20 @@ class TopupRequest(BaseModel):
     api_key: str = Field(..., description="API key ที่ได้จากการ register")
     amount_usd: float = Field(..., ge=5.0, le=10000.0, description="จำนวนเงิน USD (ขั้นต่ำ $5)")
 
+class RecoverKeyRequest(BaseModel):
+    contact_email: str = Field(..., description="Email ที่ใช้สมัคร")
+    agent_name: str = Field(..., description="ชื่อ Agent ที่ใช้สมัคร (ยืนยันตัวตน)")
+
 # ── Helpers ───────────────────────────────────────────────────
 
 def _generate_api_key() -> str:
     return "sk-aitai-" + secrets.token_hex(24)
 
+def _ph(n: int) -> str:
+    """Return placeholder: $n for PostgreSQL, ? for SQLite"""
+    return f"${n}" if USE_POSTGRES else "?"
+
 async def _get_db():
-    """สร้าง DB connection — PostgreSQL หรือ SQLite"""
     if USE_POSTGRES:
         from db_adapter import connect
         return await connect()
@@ -52,10 +59,6 @@ async def _get_db():
         await db.execute("PRAGMA foreign_keys = ON")
         await db.execute("PRAGMA journal_mode = WAL")
         return db
-
-def _ph(n: int) -> str:
-    """Return placeholder: $n for PostgreSQL, ? for SQLite"""
-    return f"${n}" if USE_POSTGRES else "?"
 
 async def _get_agent_by_key(db, api_key: str):
     hint = api_key[-8:]
@@ -70,6 +73,22 @@ async def _get_agent_by_key(db, api_key: str):
         row = await cur.fetchone()
     return row
 
+async def _audit(db, event_type: str, actor_id: str, action: str, payload: str):
+    """บันทึก audit event — ใช้ column names จาก schema_v1.sql จริง"""
+    try:
+        p1, p2, p3, p4, p5, p6 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5), _ph(6)
+        ev_id = str(uuid.uuid4())
+        evidence_hash = hashlib.sha256(f"{ev_id}{actor_id}{action}{payload}".encode()).hexdigest()
+        now = datetime.now(timezone.utc).isoformat()
+        await db.execute(
+            f"INSERT INTO audit_events (id, event_type, actor_id, action, payload, evidence_hash, occurred_at) "
+            f"VALUES ({p1}, {p2}, {p3}, {p4}, {p5}, {p6}, {_ph(7)})",
+            (ev_id, event_type, actor_id, action, payload, evidence_hash, now)
+        )
+    except Exception as e:
+        # audit ไม่ควร block main flow
+        print(f"[AUDIT] Warning — could not write audit event: {e}")
+
 # ── Register ──────────────────────────────────────────────────
 
 @router.post("/register", summary="ลงทะเบียน AI Client — รับ API Key")
@@ -78,7 +97,6 @@ async def register_client(req: RegisterRequest):
     agent_id = str(uuid.uuid4())
     hint = api_key[-8:]
     now = datetime.now(timezone.utc).isoformat()
-
     p1, p2, p3, p4, p5, p6, p7 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5), _ph(6), _ph(7)
 
     db = await _get_db()
@@ -99,7 +117,6 @@ async def register_client(req: RegisterRequest):
         """, (agent_id, req.agent_name, req.profession,
               req.origin_system, req.contact_email, hint, now))
 
-        on_conflict = "ON CONFLICT (agent_id) DO NOTHING" if USE_POSTGRES else "OR IGNORE"
         if USE_POSTGRES:
             await db.execute(f"""
                 INSERT INTO client_credits (agent_id, credit_balance, credit_topup_total)
@@ -111,6 +128,9 @@ async def register_client(req: RegisterRequest):
                 INSERT OR IGNORE INTO client_credits (agent_id, credit_balance, credit_topup_total)
                 VALUES ({p1}, 0.0, 0.0)
             """, (agent_id,))
+
+        await _audit(db, 'TRANSACTION', agent_id, 'REGISTER',
+                     f'{{"agent_name":"{req.agent_name}","email":"{req.contact_email}"}}')
         await db.commit()
     finally:
         await db.close()
@@ -129,13 +149,9 @@ async def register_client(req: RegisterRequest):
 
 # ── Recover Key ───────────────────────────────────────────────
 
-class RecoverKeyRequest(BaseModel):
-    contact_email: str = Field(..., description="Email ที่ใช้สมัคร")
-    agent_name: str = Field(..., description="ชื่อ Agent ที่ใช้สมัคร (ยืนยันตัวตน)")
-
 @router.post("/recover-key", summary="กู้คืน API Key ด้วย email + ชื่อ Agent")
 async def recover_key(req: RecoverKeyRequest):
-    p1, p2, p3, p4, p5 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5)
+    p1, p2 = _ph(1), _ph(2)
 
     db = await _get_db()
     try:
@@ -160,20 +176,14 @@ async def recover_key(req: RecoverKeyRequest):
 
         new_key  = _generate_api_key()
         new_hint = new_key[-8:]
-        now      = datetime.now(timezone.utc).isoformat()
 
         await db.execute(
             f"UPDATE client_agents SET api_key_hint = {p1} WHERE id = {p2}",
             (new_hint, row["id"])
         )
 
-        audit_detail = f"KEY_RECOVERED|agent_id={row['id']}|email={req.contact_email}|new_hint=...{new_hint}"
-        audit_hash   = hashlib.sha256(audit_detail.encode()).hexdigest()
-        await db.execute(
-            f"INSERT INTO audit_events (id, event_type, actor_id, detail, sha256_hash, created_at) "
-            f"VALUES ({p1}, 'KEY_RECOVERY', {p2}, {p3}, {p4}, {p5})",
-            (str(uuid.uuid4()), row["id"], audit_detail, audit_hash, now)
-        )
+        await _audit(db, 'TRANSACTION', row["id"], 'KEY_RECOVERED',
+                     f'{{"email":"{req.contact_email}","new_hint":"...{new_hint}"}}')
         await db.commit()
 
     finally:
@@ -302,7 +312,7 @@ async def stripe_webhook(request: Request):
         stripe_session_id = session["id"]
 
         if agent_id and amount_usd > 0:
-            p1, p2, p3, p4, p5 = _ph(1), _ph(2), _ph(3), _ph(4), _ph(5)
+            p1, p2, p3 = _ph(1), _ph(2), _ph(3)
             db = await _get_db()
             try:
                 async with db.execute(
@@ -323,23 +333,13 @@ async def stripe_webhook(request: Request):
                         credit_topup_total = client_credits.credit_topup_total + {p3}
                 """, (agent_id, amount_usd, amount_usd))
 
-                now = datetime.now(timezone.utc).isoformat()
                 await db.execute(
                     f"UPDATE credit_topups SET status = 'completed' WHERE stripe_session_id = {p1}",
                     (stripe_session_id,)
                 )
 
-                audit_detail = (
-                    f"TOPUP_COMPLETE|agent_id={agent_id}"
-                    f"|amount_usd={amount_usd}|stripe_session={stripe_session_id}"
-                )
-                audit_hash = hashlib.sha256(audit_detail.encode()).hexdigest()
-                await db.execute(
-                    f"INSERT INTO audit_events "
-                    f"(id, event_type, actor_id, detail, sha256_hash, created_at) "
-                    f"VALUES ({p1}, 'CREDIT_TOPUP', {p2}, {p3}, {p4}, {p5})",
-                    (str(uuid.uuid4()), agent_id, audit_detail, audit_hash, now)
-                )
+                await _audit(db, 'TRANSACTION', agent_id, 'CREDIT_TOPUP',
+                             f'{{"amount_usd":{amount_usd},"stripe_session":"{stripe_session_id}"}}')
                 await db.commit()
                 print(f"[BILLING] Credit +{amount_usd} USD → agent {agent_id}")
 
@@ -351,7 +351,7 @@ async def stripe_webhook(request: Request):
 
     return {"received": True}
 
-# ── Stripe Success / Cancel redirect pages ────────────────────
+# ── Stripe Success / Cancel ───────────────────────────────────
 
 @router.get("/billing/success")
 async def billing_success(session_id: str = ""):
