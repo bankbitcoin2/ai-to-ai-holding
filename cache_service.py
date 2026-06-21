@@ -1,15 +1,6 @@
 """
 cache_service.py — HS Classification Cache
-ลด Claude API cost โดย cache ผล classify ไว้ใน PostgreSQL/SQLite
-
-Cache key = SHA256(normalized_description + "|" + origin_country)
-Cache hit  = คืนผลทันที ไม่เรียก Claude = $0 ต้นทุน
-Cache miss = เรียก Claude → เก็บผล → คืนผล
-
-schema: hs_classification_cache (schema_learning_v2_pg.sql)
-  PK: description_hash (TEXT UNIQUE)
-  Columns: description_sample, hs_code, hs_description, hs_description_th,
-           confidence_score, source, hit_count, created_at, last_hit_at
+schema: hs_classification_cache ใช้ cache_key (SHA256), description, origin_country
 """
 import hashlib
 import os
@@ -24,12 +15,10 @@ USE_POSTGRES = bool(DATABASE_URL)
 def _make_key(description: str, origin_country: Optional[str]) -> str:
     norm = description.lower().strip()
     origin = (origin_country or "").upper().strip()
-    raw = f"{norm}|{origin}"
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{norm}|{origin}".encode("utf-8")).hexdigest()
 
 
 async def cache_get(description: str, origin_country: Optional[str]) -> Optional[dict]:
-    """ดึง cache — คืน dict หรือ None ถ้า miss"""
     key = _make_key(description, origin_country)
     try:
         if USE_POSTGRES:
@@ -37,18 +26,16 @@ async def cache_get(description: str, origin_country: Optional[str]) -> Optional
             pool = await get_pool()
             async with pool.acquire() as conn:
                 row = await conn.fetchrow(
-                    """SELECT hs_code, hs_description, hs_description_th,
-                              confidence_score, source AS source_reference,
-                              hit_count
-                       FROM hs_classification_cache
-                       WHERE description_hash = $1""",
+                    """SELECT hs_code, hs_description, confidence_score,
+                              source_reference, notes, model_used, hit_count
+                       FROM hs_classification_cache WHERE cache_key = $1""",
                     key,
                 )
                 if row:
                     await conn.execute(
                         """UPDATE hs_classification_cache
                            SET hit_count = hit_count + 1, last_hit_at = NOW()
-                           WHERE description_hash = $1""",
+                           WHERE cache_key = $1""",
                         key,
                     )
                     return dict(row)
@@ -58,20 +45,17 @@ async def cache_get(description: str, origin_country: Optional[str]) -> Optional
             async with aiosqlite.connect(DB_PATH) as db:
                 db.row_factory = aiosqlite.Row
                 async with db.execute(
-                    """SELECT hs_code, hs_description, confidence_score,
-                              source_reference, hit_count
-                       FROM hs_classification_cache WHERE cache_key = ?""",
+                    "SELECT hs_code, hs_description, confidence_score, "
+                    "source_reference, notes, model_used, hit_count "
+                    "FROM hs_classification_cache WHERE cache_key = ?",
                     (key,),
                 ) as cur:
                     row = await cur.fetchone()
                     if row:
                         await db.execute(
-                            """UPDATE hs_classification_cache
-                               SET hit_count = hit_count + 1,
-                                   last_hit_at = datetime('now')
-                               WHERE cache_key = ?""",
-                            (key,),
-                        )
+                            "UPDATE hs_classification_cache "
+                            "SET hit_count = hit_count + 1, last_hit_at = datetime('now') "
+                            "WHERE cache_key = ?", (key,))
                         await db.commit()
                         return dict(row)
     except Exception as e:
@@ -90,10 +74,7 @@ async def cache_set(
     model_used: str = "mock",
     hs_description_th: Optional[str] = None,
 ) -> None:
-    """เก็บผล classify ลง cache"""
     key = _make_key(description, origin_country)
-    # map source → CHECK constraint values
-    src = "CLAUDE" if model_used != "CHAIRMAN_OVERRIDE" else "CHAIRMAN_OVERRIDE"
     try:
         if USE_POSTGRES:
             from db_adapter import get_pool
@@ -101,28 +82,22 @@ async def cache_set(
             async with pool.acquire() as conn:
                 await conn.execute(
                     """INSERT INTO hs_classification_cache
-                       (description_hash, description_sample, hs_code, hs_description,
-                        hs_description_th, confidence_score, source, evidence_hash)
-                       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-                       ON CONFLICT (description_hash) DO NOTHING""",
-                    key,
-                    description[:500],
-                    hs_code,
-                    hs_description,
-                    hs_description_th,
-                    confidence_score,
-                    src,
-                    hashlib.sha256(f"{key}{hs_code}{confidence_score}".encode()).hexdigest(),
+                       (cache_key, description, origin_country, hs_code, hs_description,
+                        confidence_score, source_reference, notes, model_used)
+                       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+                       ON CONFLICT (cache_key) DO NOTHING""",
+                    key, description, origin_country, hs_code, hs_description,
+                    confidence_score, source_reference, notes, model_used,
                 )
         else:
             import aiosqlite
             from database import DB_PATH
             async with aiosqlite.connect(DB_PATH) as db:
                 await db.execute(
-                    """INSERT OR IGNORE INTO hs_classification_cache
-                       (cache_key, description, origin_country, hs_code, hs_description,
-                        confidence_score, source_reference, notes, model_used)
-                       VALUES (?,?,?,?,?,?,?,?,?)""",
+                    "INSERT OR IGNORE INTO hs_classification_cache "
+                    "(cache_key, description, origin_country, hs_code, hs_description, "
+                    "confidence_score, source_reference, notes, model_used) "
+                    "VALUES (?,?,?,?,?,?,?,?,?)",
                     (key, description, origin_country, hs_code, hs_description,
                      confidence_score, source_reference, notes, model_used),
                 )
@@ -132,7 +107,6 @@ async def cache_set(
 
 
 async def cache_stats() -> dict:
-    """สถิติ cache — ใช้ใน Chairman dashboard"""
     try:
         if USE_POSTGRES:
             from db_adapter import get_pool
@@ -151,10 +125,10 @@ async def cache_stats() -> dict:
             async with aiosqlite.connect(DB_PATH) as db:
                 db.row_factory = aiosqlite.Row
                 async with db.execute(
-                    """SELECT COUNT(*) as total_entries,
-                              COALESCE(SUM(hit_count),0) as total_hits,
-                              COALESCE(SUM(hit_count)-COUNT(*),0) as cache_saves
-                       FROM hs_classification_cache"""
+                    "SELECT COUNT(*) as total_entries, "
+                    "COALESCE(SUM(hit_count),0) as total_hits, "
+                    "COALESCE(SUM(hit_count)-COUNT(*),0) as cache_saves "
+                    "FROM hs_classification_cache"
                 ) as cur:
                     row = await cur.fetchone()
                     return dict(row) if row else {}
