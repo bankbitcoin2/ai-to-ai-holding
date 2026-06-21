@@ -219,9 +219,10 @@
               <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.25rem">VAT</div>
               <div id="rcVat" style="font-size:1.1rem;font-weight:700;color:var(--yellow)">—</div>
             </div>
-            <div style="background:var(--bg);border-radius:8px;padding:0.75rem">
+            <div style="background:var(--bg);border-radius:8px;padding:0.75rem;grid-column:1/-1">
               <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.25rem" data-i18n="rc_oga">OGA / ใบอนุญาต</div>
               <div id="rcOga" style="font-size:1rem;font-weight:700">—</div>
+              <div id="rcOgaDetail" style="display:none;margin-top:0.6rem"></div>
             </div>
           </div>
           <div>
@@ -768,12 +769,38 @@ function renderCard(data) {
   document.getElementById('rcVat').textContent = item.vat_rate != null ? (item.vat_rate * 100).toFixed(0) + '%' : '—';
 
   const ogaEl = document.getElementById('rcOga');
+  const ogaDetailEl = document.getElementById('rcOgaDetail');
+  const riskColor = { CRITICAL: 'var(--red)', HIGH: 'var(--yellow)', MEDIUM: 'var(--yellow)', LOW: 'var(--green)', NONE: 'var(--green)' };
   if (item.oga_required) {
-    ogaEl.textContent = currentLang === 'th' ? '⚠️ ต้องมีใบอนุญาต' : currentLang === 'zh' ? '⚠️ 需要许可证' : currentLang === 'ja' ? '⚠️ 許可証が必要' : '⚠️ Permit required';
-    ogaEl.style.color = 'var(--yellow)';
+    const riskLabel = item.oga_risk_level || 'HIGH';
+    ogaEl.innerHTML = `<span style="color:${riskColor[riskLabel]||'var(--yellow)'}">⚠️ ต้องมีใบอนุญาต</span> <span style="font-size:0.7rem;background:rgba(245,158,11,0.15);color:var(--yellow);padding:1px 6px;border-radius:4px">${riskLabel}</span>`;
+    // note
+    if (item.oga_note_th) {
+      ogaDetailEl.style.display = 'block';
+      let html = `<div style="font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:0.5rem">${item.oga_note_th}</div>`;
+      // agency cards
+      if (item.oga_permits && item.oga_permits.length) {
+        html += '<div style="display:flex;flex-direction:column;gap:0.4rem">';
+        item.oga_permits.forEach(p => {
+          html += `<div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:6px;padding:0.5rem 0.7rem;display:flex;align-items:center;gap:0.6rem">
+            <span style="font-size:0.72rem;font-weight:700;background:rgba(245,158,11,0.2);color:var(--yellow);padding:2px 7px;border-radius:4px;white-space:nowrap">${p.agency_abbr}</span>
+            <span style="flex:1;min-width:0">
+              <div style="font-size:0.8rem;font-weight:600;color:var(--text)">${p.name_th||p.name_en||''}</div>
+              ${p.name_en ? `<div style="font-size:0.7rem;color:var(--muted)">${p.name_en}</div>` : ''}
+            </span>
+            ${p.url ? `<a href="${p.url}" target="_blank" style="font-size:0.7rem;color:var(--accent);text-decoration:none;white-space:nowrap">เว็บไซต์ →</a>` : ''}
+          </div>`;
+        });
+        html += '</div>';
+      }
+      ogaDetailEl.innerHTML = html;
+    } else {
+      ogaDetailEl.style.display = 'none';
+    }
   } else {
-    ogaEl.textContent = currentLang === 'th' ? '✅ ไม่ต้อง' : currentLang === 'zh' ? '✅ 无需' : currentLang === 'ja' ? '✅ 不要' : '✅ Not required';
+    ogaEl.innerHTML = currentLang === 'th' ? '✅ ไม่พบกฎ OGA สำหรับ HS นี้' : currentLang === 'zh' ? '✅ 无需' : currentLang === 'ja' ? '✅ 不要' : '✅ No OGA permit required';
     ogaEl.style.color = 'var(--green)';
+    ogaDetailEl.style.display = 'none';
   }
 
   document.getElementById('rcSource').textContent = item.source_reference || '—';

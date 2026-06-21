@@ -87,6 +87,13 @@ class CandidateItem(BaseModel):
     source_reference: str
     notes: Optional[str]
 
+class OGAPermit(BaseModel):
+    agency_abbr: str
+    name_th: Optional[str] = None
+    name_en: Optional[str] = None
+    url: Optional[str] = None
+    permit_type: Optional[str] = None
+
 class ResultItem(BaseModel):
     line_number: int
     description: str
@@ -103,6 +110,10 @@ class ResultItem(BaseModel):
     vat_amount: Optional[float]
     oga_required: bool = False
     oga_agencies: list[str] = []
+    oga_permits: list[OGAPermit] = []
+    oga_note_th: Optional[str] = None
+    oga_note_en: Optional[str] = None
+    oga_risk_level: Optional[str] = None
     notes: Optional[str]
     candidates: list[CandidateItem] = []   # ranked list >= 75%
     watermark: str = "[SANDBOX — NOT FOR PRODUCTION USE]"
@@ -156,6 +167,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 ) for c in cls.candidates
             ]
             best = cls.best
+            permits_raw = [p for p in oga.get("requires_permits", []) if isinstance(p, dict)]
             results.append(ResultItem(
                 line_number=i, description=item.description,
                 hs_code=best.hs_code if best else None,
@@ -166,7 +178,19 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 source_reference=cls.source_reference,
                 duty_rate=dr, duty_amount=da, vat_rate=vr, vat_amount=va,
                 oga_required=bool(oga.get("is_restricted")),
-                oga_agencies=[p.get("agency_abbr","") for p in oga.get("requires_permits",[]) if isinstance(p,dict)],
+                oga_agencies=[p.get("agency_abbr", "") for p in permits_raw],
+                oga_permits=[
+                    OGAPermit(
+                        agency_abbr=p.get("agency_abbr", ""),
+                        name_th=p.get("name_th"),
+                        name_en=p.get("name_en"),
+                        url=p.get("url"),
+                        permit_type=p.get("permit_type"),
+                    ) for p in permits_raw
+                ],
+                oga_note_th=oga.get("note_th"),
+                oga_note_en=oga.get("note_en"),
+                oga_risk_level=oga.get("risk_level"),
                 notes=cls.notes,
                 candidates=candidates_out,
             ))
@@ -217,7 +241,7 @@ async def sandbox_feedback(body: FeedbackReq):
         from database import get_db
         from cache_classification import submit_feedback
         async with get_db() as db:
-            ok = await submit_feedback(db, body.log_id, body.status,
+                        ok = await submit_feedback(db, body.log_id, body.status,
                                        body.amended_hs_code, body.feedback_by)
         if not ok:
             raise HTTPException(404, detail={"error": "LOG_NOT_FOUND",
@@ -228,7 +252,7 @@ async def sandbox_feedback(body: FeedbackReq):
     except Exception as e:
         raise HTTPException(500, detail={"error": "FEEDBACK_ERROR", "message": str(e)})
 
-# ── CKAN Probe Endpoint (debug — ดู field structure ของ tariff resource) ──────
+# ── CKAN Probe Endpoint (debug) ───────────────────────────────────────────────
 @router.get("/probe-ckan", summary="Probe CKAN tariff resource fields")
 async def probe_ckan(hs: str = "6802"):
     try:
