@@ -238,3 +238,51 @@ def status() -> dict:
         "error": _ERR if not _OK else None,
         "root": str(_ROOT) if _ROOT else "NOT_FOUND",
     }
+
+
+# ── HS Descriptions bundled (AHTN 2022, 12,247 codes) ─────────────────────────
+try:
+    import hs_descriptions_bundled as _hs_desc
+    _HS_DESC_OK = True
+except ImportError:
+    _hs_desc = None  # type: ignore
+    _HS_DESC_OK = False
+
+# ── FTA Eligibility bundled (RCEP/ATIGA/AANZFTA/JTEPA, 14 countries) ─────────
+try:
+    import fta_eligibility_bundled as _fta_elig
+    _FTA_ELIG_OK = True
+except ImportError:
+    _fta_elig = None  # type: ignore
+    _FTA_ELIG_OK = False
+
+
+def get_hs_description(hs_code: str) -> dict:
+    """Return {'th': ..., 'en': ...} from bundled AHTN 2022 data. Empty strings if not found."""
+    if _HS_DESC_OK and _hs_desc:
+        try:
+            r = _hs_desc.get_description(hs_code)
+            if r:
+                return r
+        except Exception:
+            pass
+    return {"th": None, "en": None}
+
+
+def get_fta_form(hs_code: str, origin_country: str) -> dict:
+    """
+    Return FTA form info for hs_code from origin_country.
+    {'eligible': True, 'form': 'FORM RCEP', 'all_eligible': [...]}
+    """
+    if _FTA_ELIG_OK and _fta_elig:
+        try:
+            form = _fta_elig.get_fta_form(hs_code, origin_country)
+            eligible_all = _fta_elig.get_eligible_countries(hs_code)
+            return {
+                "eligible": form is not None,
+                "form": form,
+                "all_eligible_countries": [c for c, _ in eligible_all],
+            }
+        except Exception:
+            pass
+    return {"eligible": False, "form": None, "all_eligible_countries": []}

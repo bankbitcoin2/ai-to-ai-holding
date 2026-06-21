@@ -135,6 +135,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     used, warn = _check(ip)
 
     from cache_service import cache_get, cache_set as _cache_set
+    from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta
 
     results, duties, scores = [], 0.0, []
     try:
@@ -149,6 +150,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                     hs_code_11 = None
                     hs_description = _cached.get("hs_description")
                     hs_description_th = None
+                _desc = _get_desc(_cached.get("hs_code",""))
                 class _FakeCls:
                     hs_code = _cached.get("hs_code")
                     confidence_score = float(_cached.get("confidence_score", 0.85))
@@ -156,6 +158,8 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                     notes = _cached.get("notes")
                     best = _FakeBest()
                     candidates = []
+                _FakeBest.hs_description_th = _desc.get("th")
+                _FakeBest.hs_description = _desc.get("en") or _cached.get("hs_description")
                 cls = _FakeCls()
             else:
                 cls = await classify_item(description=item.description,

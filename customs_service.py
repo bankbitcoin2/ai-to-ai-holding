@@ -86,6 +86,7 @@ async def process_invoice(
 
         # ── Cache lookup ──────────────────────────────────────
         from cache_service import cache_get as _cg, cache_set as _cs
+        from knowledge_service import get_hs_description as _get_desc
         _cached = await _cg(description, origin)
         if _cached:
             class _R:
@@ -100,6 +101,9 @@ async def process_invoice(
                     hs_code_11 = None
                     hs_description = _cached.get("hs_description")
                     hs_description_th = None
+            _d = _get_desc(_cached.get("hs_code",""))
+            _R.hs_description = _d.get("en") or _cached.get("hs_description")
+            _R.hs_description_th = _d.get("th")
             result = _R()
         else:
             # ── Classification Agent ──────────────────────────
