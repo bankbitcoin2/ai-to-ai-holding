@@ -26,6 +26,7 @@
   .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; border-radius: 10px; }
   .btn-green { background: var(--green); color: white; }
   .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* LANG SWITCHER */
   .lang-switcher { display: flex; gap: 0.25rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.25rem; }
@@ -500,10 +501,11 @@ async function doSandbox() {
   const desc = document.getElementById('sandboxDesc').value.trim();
   const result = document.getElementById('sandboxResult');
   const btn = document.getElementById('sandboxBtn');
-  if (!desc) return;
+  if (!desc) { result.style.display='block'; result.innerHTML='<span style="color:#f59e0b">⚠️ กรุณาพิมพ์ชื่อสินค้าก่อน</span>'; return; }
   btn.disabled = true;
+  btn.textContent = '⏳ กำลังค้นหา...';
   result.style.display = 'block';
-  result.textContent = '...';
+  result.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#94a3b8"><span style="font-size:1.3rem;animation:spin 1s linear infinite;display:inline-block">⏳</span> กำลังวิเคราะห์สินค้า รอสักครู่...</div>';
   try {
     const res = await fetch(API + '/v1/sandbox/classify', {
       method: 'POST',
@@ -511,11 +513,40 @@ async function doSandbox() {
       body: JSON.stringify({ client_id: 'sandbox-demo', items: [{ description: desc, quantity: 1, unit_price: 100 }] })
     });
     const data = await res.json();
-    result.textContent = JSON.stringify(data, null, 2);
+    if (!res.ok) {
+      const msg = data.detail?.message || data.message || data.error || JSON.stringify(data);
+      result.innerHTML = '<span style="color:#f87171">❌ ' + msg + '</span>';
+    } else {
+      const item = data.items && data.items[0];
+      if (!item) { result.innerHTML = '<span style="color:#f87171">❌ ไม่พบผลลัพธ์</span>'; return; }
+      const conf = Math.round((item.confidence_score||0)*100);
+      const confColor = conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
+      const ogaBadge = item.oga_required
+        ? '<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ ต้องมีใบอนุญาต: '+item.oga_agencies.join(', ')+'</span>'
+        : '<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้องขออนุญาต</span>';
+      const rem = data.summary?.free_calls_remaining ?? '';
+      result.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+            <span style="font-size:1.4rem;font-weight:700;color:#e2e8f0">🏷️ ${item.hs_code||'—'}</span>
+            <span style="font-weight:700;color:${confColor}">${conf}% ความมั่นใจ</span>
+          </div>
+          <div style="font-size:13px;color:#94a3b8">${item.hs_description||''}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            ${ogaBadge}
+            <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">ภาษี ${Math.round((item.duty_rate||0)*100)}%</span>
+            <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">VAT ${Math.round((item.vat_rate||0)*100)}%</span>
+          </div>
+          <div style="font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">${item.source_reference||''}</div>
+          <div style="font-size:11px;color:#f59e0b">${data.disclaimer||''}</div>
+          <a href="/dashboard" style="display:inline-block;background:#6366f1;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มและ Candidates → Dashboard</a>
+        </div>`;
+    }
   } catch(e) {
-    result.textContent = 'Error: ' + e.message;
+    result.innerHTML = '<span style="color:#f87171">❌ เชื่อมต่อไม่ได้: ' + e.message + '</span>';
   }
   btn.disabled = false;
+  btn.textContent = 'จำแนก HS Code →';
 }
 
 // close modals on backdrop click
