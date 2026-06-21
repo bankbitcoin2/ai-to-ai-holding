@@ -792,7 +792,7 @@ function renderCard(data) {
   if (item.hs_code_11) {
     const fmt = item.hs_code_11.replace(/(\d{4})(\d{2})(\d{2})(\d{3})/, '$1.$2.$3-$4');
     document.getElementById('rcCode').innerHTML =
-      `${item.hs_code} <span style="font-size:0.9rem;opacity:0.7">(${fmt})</span>`;
+      `${item.hs_code} <span style="font-size:0.8rem;opacity:0.6" title="11-digit estimate — verify at igtf.customs.go.th">(TH: ${fmt} ~)</span>`;
   }
   if (item.hs_description_th) {
     document.getElementById('rcDesc').innerHTML =
@@ -811,7 +811,7 @@ function renderCard(data) {
       const col = pct >= 85 ? 'var(--green)' : pct >= 75 ? 'var(--yellow)' : 'var(--red)';
       const rankCls = c.rank === 1 ? 'rank-1' : c.rank === 2 ? 'rank-2' : 'rank-other';
       const hs11 = c.hs_code_11
-        ? c.hs_code_11.replace(/(\d{4})(\d{2})(\d{2})(\d{3})/, '$1.$2.$3-$4')
+        ? c.hs_code_11.replace(/(\d{4})(\d{2})(\d{2})(\d{3})/, '$1.$2.$3-$4') + ' ~'
         : '';
       return `<div class="candidate-row">
         <div class="candidate-rank ${rankCls}">${c.rank}</div>

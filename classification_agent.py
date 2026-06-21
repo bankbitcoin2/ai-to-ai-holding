@@ -76,29 +76,54 @@ class ClassificationResult:
     def notes(self): return self.best.notes if self.best else _DISCLAIMER
 
 
+def _build_hs11_estimate(hs_code: str) -> Optional[str]:
+    """
+    สร้าง 11-digit estimate จาก HS 6-digit ของ Claude
+    Format ไทย: HHHHSS.CC.NNN
+    - 6 หลักแรกจาก HS international (Claude)
+    - หลัก 7-8: AHTN subdivision (ค่าเริ่มต้น "00" ถ้าไม่มีข้อมูล)
+    - หลัก 9-11: Thai statistical suffix (ค่าเริ่มต้น "000")
+    หมายเหตุ: ต้องยืนยันกับ igtf.customs.go.th ก่อนใช้จริง
+    """
+    if not hs_code:
+        return None
+    digits = hs_code.replace(".", "").strip()
+    if len(digits) < 4:
+        return None
+    # pad ให้ครบ 11 หลัก: 6 จาก HS + "00" AHTN + "000" Thai
+    padded = digits.ljust(11, "0")[:11]
+    return padded
+
+
 async def _enrich_with_ckan(candidates: list) -> list:
+    """Enrich candidates with Thai HS description from CKAN + 11-digit estimate"""
     from knowledge_service import fetch_hs_candidates
     enriched = []
     for rank, c in enumerate(candidates, 1):
-        hs6 = (c.get("hs_code") or "").replace(".", "")[:6]
-        hs_11 = None
+        hs_raw = c.get("hs_code") or ""
+        hs6 = hs_raw.replace(".", "")[:6]
         hs_th = None
+
+        # ดึง description ภาษาไทยจาก CKAN (4-digit heading)
         if hs6:
             try:
-                ckan = await fetch_hs_candidates([hs6[:4]], limit=3)
+                ckan = await fetch_hs_candidates([hs6[:4]], limit=5)
                 for row in ckan:
                     code = str(row.get("hs_code", "")).replace(".", "")
                     if code.startswith(hs6[:4]):
-                        hs_11 = code.ljust(11, "0")[:11]
                         hs_th = row.get("description", "")
                         break
             except Exception:
                 pass
+
+        # สร้าง 11-digit estimate (ยืนยันกับ igtf.customs.go.th ก่อนใช้จริง)
+        hs_11 = _build_hs11_estimate(hs_raw)
+
         raw_conf = float(c.get("confidence_score", 0.0))
         capped = min(round(raw_conf, 3), 0.980)
         enriched.append(CandidateResult(
             rank=rank,
-            hs_code=c.get("hs_code"),
+            hs_code=hs_raw,
             hs_code_11=hs_11,
             hs_description=c.get("hs_description"),
             hs_description_th=hs_th,
