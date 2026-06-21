@@ -160,6 +160,7 @@ PUBLIC_PREFIXES: tuple = (
     "/v1/sandbox/",
     "/v1/chairman/",
     "/v1/register",
+    "/v1/recover-key",
     "/v1/billing/",
     "/.well-known/",
     "/chairman",
