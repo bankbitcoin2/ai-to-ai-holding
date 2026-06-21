@@ -84,12 +84,46 @@ async def process_invoice(
         gloss = search_glossary(description)
         extra = f"Glossary hint: HS {gloss['hs_hint']} ({gloss.get('canonical_en','')})" if gloss else None
 
-        # ── Classification Agent ──
-        result = await classify_item(
-            description=description,
-            origin_country=origin,
-            additional_context=extra,
-        )
+        # ── Cache lookup ──────────────────────────────────────
+        from cache_service import cache_get as _cg, cache_set as _cs
+        _cached = await _cg(description, origin)
+        if _cached:
+            class _R:
+                hs_code = _cached.get("hs_code")
+                hs_description = _cached.get("hs_description")
+                confidence_score = float(_cached.get("confidence_score", 0.85))
+                source_reference = _cached.get("source_reference", "Cache")
+                notes = _cached.get("notes")
+                candidates = []
+                class best:
+                    hs_code = _cached.get("hs_code")
+                    hs_code_11 = None
+                    hs_description = _cached.get("hs_description")
+                    hs_description_th = None
+            result = _R()
+        else:
+            # ── Classification Agent ──────────────────────────
+            result = await classify_item(
+                description=description,
+                origin_country=origin,
+                additional_context=extra,
+            )
+            # ── Save to cache ─────────────────────────────────
+            if result.hs_code and result.confidence_score >= 0.75:
+                try:
+                    await _cs(
+                        description=description,
+                        origin_country=origin,
+                        hs_code=result.hs_code,
+                        hs_description=getattr(result, "hs_description", None) or
+                                       (result.best.hs_description if result.best else None),
+                        confidence_score=result.confidence_score,
+                        source_reference=result.source_reference,
+                        notes=result.notes,
+                        model_used="claude",
+                    )
+                except Exception as _ce:
+                    print(f"[CACHE] customs save warning: {_ce}")
 
         # ── Tax / FTA (IGTF จริง) ──
         tax_code   = result.hs_code or ""

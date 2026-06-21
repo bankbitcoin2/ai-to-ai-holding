@@ -134,11 +134,47 @@ async def sandbox_classify(body: SandboxReq, req: Request):
           or (req.client.host if req.client else "unknown"))
     used, warn = _check(ip)
 
+    from cache_service import cache_get, cache_set as _cache_set
+
     results, duties, scores = [], 0.0, []
     try:
         for i, item in enumerate(body.items, 1):
-            cls = await classify_item(description=item.description,
-                                       origin_country=item.origin_country)
+            # ── Cache lookup ──────────────────────────────────
+            _cached = await cache_get(item.description, item.origin_country)
+            if _cached:
+                from dataclasses import dataclass
+                @dataclass
+                class _FakeBest:
+                    hs_code = _cached.get("hs_code")
+                    hs_code_11 = None
+                    hs_description = _cached.get("hs_description")
+                    hs_description_th = None
+                class _FakeCls:
+                    hs_code = _cached.get("hs_code")
+                    confidence_score = float(_cached.get("confidence_score", 0.85))
+                    source_reference = _cached.get("source_reference", "Cache")
+                    notes = _cached.get("notes")
+                    best = _FakeBest()
+                    candidates = []
+                cls = _FakeCls()
+            else:
+                cls = await classify_item(description=item.description,
+                                           origin_country=item.origin_country)
+                # ── Save to cache ─────────────────────────────
+                if cls.hs_code and cls.confidence_score >= 0.75:
+                    try:
+                        await _cache_set(
+                            description=item.description,
+                            origin_country=item.origin_country,
+                            hs_code=cls.hs_code,
+                            hs_description=cls.hs_description if hasattr(cls, "hs_description") else (cls.best.hs_description if cls.best else None),
+                            confidence_score=cls.confidence_score,
+                            source_reference=cls.source_reference,
+                            notes=cls.notes,
+                            model_used="claude" if _HAS_REAL_API else "mock",
+                        )
+                    except Exception as _ce:
+                        print(f"[CACHE] save warning: {_ce}")
             price = ((item.quantity or 1) * item.unit_price) if item.unit_price else None
             try:
                 tax = lookup_tax_rate(cls.hs_code or "", item.origin_country)
