@@ -16,7 +16,7 @@ if not os.path.isabs(DB_PATH):
     DB_PATH = str(Path(DB_PATH).resolve())
 
 # Pricing
-PRICE_PER_ITEM: float = float(os.getenv("PRICE_PER_ITEM", "0.05"))
+PRICE_PER_ITEM: float = float(os.getenv("PRICE_PER_ITEM", "0.15"))
 ENERGY_COST_PER_CALL: float = float(os.getenv("ENERGY_COST_PER_CALL", "0.02"))
 
 # Confidence threshold
