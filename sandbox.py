@@ -77,11 +77,24 @@ class SandboxReq(BaseModel):
     destination_country: Optional[str] = "TH"
     items: list[Item] = Field(..., min_length=1, max_length=ITEM_LIMIT)
 
+class CandidateItem(BaseModel):
+    rank: int
+    hs_code: Optional[str]
+    hs_code_11: Optional[str]       # Thai 11-digit
+    hs_description: Optional[str]
+    hs_description_th: Optional[str]
+    confidence_score: float
+    source_reference: str
+    notes: Optional[str]
+
 class ResultItem(BaseModel):
     line_number: int
     description: str
+    # best candidate (backward compat)
     hs_code: Optional[str]
+    hs_code_11: Optional[str]
     hs_description: Optional[str]
+    hs_description_th: Optional[str]
     confidence_score: float
     source_reference: str
     duty_rate: float
@@ -91,6 +104,7 @@ class ResultItem(BaseModel):
     oga_required: bool = False
     oga_agencies: list[str] = []
     notes: Optional[str]
+    candidates: list[CandidateItem] = []   # ranked list >= 75%
     watermark: str = "[SANDBOX — NOT FOR PRODUCTION USE]"
 
 class SandboxResp(BaseModel):
@@ -129,15 +143,32 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 oga = {"is_restricted": False, "requires_permits": []}
             if da: duties += da
             scores.append(cls.confidence_score)
+            candidates_out = [
+                CandidateItem(
+                    rank=c.rank,
+                    hs_code=c.hs_code,
+                    hs_code_11=c.hs_code_11,
+                    hs_description=c.hs_description,
+                    hs_description_th=c.hs_description_th,
+                    confidence_score=c.confidence_score,
+                    source_reference=c.source_reference,
+                    notes=c.notes,
+                ) for c in cls.candidates
+            ]
+            best = cls.best
             results.append(ResultItem(
                 line_number=i, description=item.description,
-                hs_code=cls.hs_code, hs_description=cls.hs_description,
+                hs_code=best.hs_code if best else None,
+                hs_code_11=best.hs_code_11 if best else None,
+                hs_description=best.hs_description if best else None,
+                hs_description_th=best.hs_description_th if best else None,
                 confidence_score=cls.confidence_score,
                 source_reference=cls.source_reference,
                 duty_rate=dr, duty_amount=da, vat_rate=vr, vat_amount=va,
                 oga_required=bool(oga.get("is_restricted")),
                 oga_agencies=[p.get("agency_abbr","") for p in oga.get("requires_permits",[]) if isinstance(p,dict)],
                 notes=cls.notes,
+                candidates=candidates_out,
             ))
     except HTTPException:
         raise
@@ -146,26 +177,26 @@ async def sandbox_classify(body: SandboxReq, req: Request):
 
     avg = round(sum(scores)/len(scores), 3)
     rem = max(0, DAILY_LIMIT - used)
-    nxt = warn or ("Confidence good — register at POST /v1/register to go live."
-                   if avg >= 0.80 else "Provide more detail to improve confidence.")
+    nxt = warn or (
+        "Confidence good — register at POST /v1/register to go live."
+        if avg >= 0.75 else
+        "Low confidence — provide more product details for better results."
+    )
+    disc = f"SANDBOX only. [{used}/{DAILY_LIMIT} calls today, {rem} left] Production: POST /v1/customs/classify"
+
     return SandboxResp(
-        sandbox_session_id=str(uuid.uuid4()), client_id=body.client_id,
-        disclaimer=(f"SANDBOX only. [{used}/{DAILY_LIMIT} calls today, {rem} left] "
-                    "Production: POST /v1/customs/classify"),
+        sandbox_session_id=str(uuid.uuid4()),
+        client_id=body.client_id,
+        disclaimer=disc,
         items=results,
-        summary={"total_items": len(results), "avg_confidence_score": avg,
-                 "total_duty_estimate": round(duties,2),
-                 "oga_flagged": sum(1 for r in results if r.oga_required),
-                 "ready_for_production": avg >= 0.80,
-                 "free_calls_used_today": used, "free_calls_remaining": rem},
+        summary={
+            "total_items": len(results),
+            "avg_confidence_score": avg,
+            "total_duty_estimate": round(duties, 2),
+            "oga_flagged": sum(1 for r in results if r.oga_required),
+            "ready_for_production": avg >= 0.75,
+            "free_calls_used_today": used,
+            "free_calls_remaining": rem,
+        },
         next_step=nxt,
     )
-
-@router.get("/info", summary="Sandbox info")
-async def sandbox_info():
-    return {
-        "engine": "Claude Sonnet" if _HAS_REAL_API else "Mock",
-        "limits": {"daily_per_ip": DAILY_LIMIT, "per_minute": MINUTE_LIMIT, "items_per_request": ITEM_LIMIT},
-        "production": "POST /v1/customs/classify",
-        "register": "POST /v1/register",
-    }

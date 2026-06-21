@@ -91,6 +91,18 @@
   .guide-tab:hover { color: var(--text); border-color: var(--accent); }
   .guide-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
   .code-block { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.78rem; color: #e6edf3; white-space: pre; overflow-x: auto; line-height: 1.6; }
+  .candidate-row { display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0.75rem; border-radius:8px; margin-bottom:0.4rem; background:var(--bg); border:1px solid var(--border); }
+  .candidate-row:hover { border-color:var(--accent); }
+  .candidate-rank { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; flex-shrink:0; }
+  .rank-1 { background:var(--accent); color:white; }
+  .rank-2 { background:#374151; color:var(--muted); }
+  .rank-other { background:#1f2937; color:var(--muted); }
+  .candidate-codes { flex:1; min-width:0; }
+  .candidate-hs6 { font-size:0.95rem; font-weight:700; color:var(--text); }
+  .candidate-hs11 { font-size:0.72rem; color:var(--accent); font-family:monospace; }
+  .candidate-desc { font-size:0.78rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .candidate-conf { flex-shrink:0; text-align:right; }
+  .candidate-pct { font-size:0.9rem; font-weight:700; }
   .faq-item { padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
   .faq-item:last-of-type { border-bottom: none; }
   .faq-q { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
@@ -220,6 +232,12 @@
             <div style="font-size:0.72rem;color:var(--yellow);font-weight:600;margin-bottom:0.3rem">⚠️ <span data-i18n="rc_note">ข้อควรระวัง</span></div>
             <div id="rcNote" style="font-size:0.82rem;color:var(--muted);line-height:1.6">—</div>
           </div>
+          <!-- CANDIDATES RANKED -->
+          <div id="rcCandidatesWrap" style="display:none;border-top:1px solid var(--border);padding-top:0.85rem">
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem">🏆 <span data-i18n="rc_candidates">ตัวเลือกที่เป็นไปได้ (≥75% ทั้งหมด)</span></div>
+            <div id="rcCandidatesList"></div>
+          </div>
+
           <!-- toggle raw JSON -->
           <div style="border-top:1px solid var(--border);padding-top:0.75rem">
             <button onclick="toggleRaw()" style="background:none;border:none;color:var(--muted);font-size:0.78rem;cursor:pointer" data-i18n="rc_raw">▶ ดู Raw JSON</button>
@@ -446,6 +464,7 @@ const i18n = {
     rc_hs: 'HS Code ที่แนะนำ', rc_conf: 'ความมั่นใจ', rc_desc: 'คำอธิบาย HS',
     rc_duty: 'อัตราภาษีนำเข้า', rc_oga: 'OGA / ใบอนุญาต', rc_source: 'แหล่งอ้างอิง',
     rc_note: 'ข้อควรระวัง', rc_raw: 'ดู Raw JSON',
+    rc_candidates: 'ตัวเลือกที่เป็นไปได้ (≥75% ทั้งหมด)',
   },
   en: {
     login_title: 'Client Login',
@@ -500,6 +519,7 @@ const i18n = {
     rc_hs: 'Recommended HS Code', rc_conf: 'Confidence', rc_desc: 'HS Description',
     rc_duty: 'Import Duty', rc_oga: 'OGA / Permit', rc_source: 'Source Reference',
     rc_note: 'Note', rc_raw: 'View Raw JSON',
+    rc_candidates: 'All candidates (≥75%)',
   },
   zh: {
     login_title: '客户登录',
@@ -554,6 +574,7 @@ const i18n = {
     rc_hs: '推荐HS编码', rc_conf: '置信度', rc_desc: 'HS描述',
     rc_duty: '进口关税', rc_oga: 'OGA/许可证', rc_source: '参考来源',
     rc_note: '注意事项', rc_raw: '查看原始JSON',
+    rc_candidates: '所有候选（≥75%）',
   },
   ja: {
     login_title: 'クライアントログイン',
@@ -608,6 +629,7 @@ const i18n = {
     rc_hs: '推奨HSコード', rc_conf: '信頼度', rc_desc: 'HS説明',
     rc_duty: '輸入関税', rc_oga: 'OGA/許可証', rc_source: '参照元',
     rc_note: '注意事項', rc_raw: 'Raw JSONを見る',
+    rc_candidates: '候補一覧（≥75%）',
   },
 };
 
@@ -764,6 +786,48 @@ function renderCard(data) {
     noteEl.textContent = item.notes;
   } else {
     noteWrap.style.display = 'none';
+  }
+
+  // update HS code display with 11-digit if available
+  if (item.hs_code_11) {
+    const fmt = item.hs_code_11.replace(/(\d{4})(\d{2})(\d{2})(\d{3})/, '$1.$2.$3-$4');
+    document.getElementById('rcCode').innerHTML =
+      `${item.hs_code} <span style="font-size:0.9rem;opacity:0.7">(${fmt})</span>`;
+  }
+  if (item.hs_description_th) {
+    document.getElementById('rcDesc').innerHTML =
+      `<span style="color:var(--text)">${item.hs_description_th}</span><br>
+       <span style="font-size:0.8rem;color:var(--muted)">${item.hs_description || ''}</span>`;
+  }
+
+  // candidates ranked
+  const candidates = data.items?.[0]?.candidates || [];
+  const cWrap = document.getElementById('rcCandidatesWrap');
+  const cList = document.getElementById('rcCandidatesList');
+  if (candidates.length > 1) {
+    cWrap.style.display = 'block';
+    cList.innerHTML = candidates.map(c => {
+      const pct = Math.round(c.confidence_score * 100);
+      const col = pct >= 85 ? 'var(--green)' : pct >= 75 ? 'var(--yellow)' : 'var(--red)';
+      const rankCls = c.rank === 1 ? 'rank-1' : c.rank === 2 ? 'rank-2' : 'rank-other';
+      const hs11 = c.hs_code_11
+        ? c.hs_code_11.replace(/(\d{4})(\d{2})(\d{2})(\d{3})/, '$1.$2.$3-$4')
+        : '';
+      return `<div class="candidate-row">
+        <div class="candidate-rank ${rankCls}">${c.rank}</div>
+        <div class="candidate-codes" style="flex:1;min-width:0">
+          <div class="candidate-hs6">${c.hs_code || '—'}
+            ${hs11 ? `<span class="candidate-hs11"> → ${hs11}</span>` : ''}
+          </div>
+          <div class="candidate-desc">${c.hs_description_th || c.hs_description || ''}</div>
+        </div>
+        <div class="candidate-conf">
+          <div class="candidate-pct" style="color:${col}">${pct}%</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    cWrap.style.display = 'none';
   }
 }
 
