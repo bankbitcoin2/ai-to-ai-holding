@@ -129,9 +129,14 @@ async def register_client(req: RegisterRequest):
                 VALUES ({p1}, 0.0, 0.0)
             """, (agent_id,))
 
+        await db.commit()  # commit ก่อน audit — audit ต้องไม่ block
+
         await _audit(db, 'TRANSACTION', agent_id, 'REGISTER',
                      f'{{"agent_name":"{req.agent_name}","email":"{req.contact_email}"}}')
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception:
+            pass
     finally:
         await db.close()
 
@@ -181,10 +186,14 @@ async def recover_key(req: RecoverKeyRequest):
             f"UPDATE client_agents SET api_key_hint = {p1} WHERE id = {p2}",
             (new_hint, row["id"])
         )
+        await db.commit()  # commit UPDATE ก่อน — audit ต้องไม่ block
 
         await _audit(db, 'TRANSACTION', row["id"], 'KEY_RECOVERED',
                      f'{{"email":"{req.contact_email}","new_hint":"...{new_hint}"}}')
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception:
+            pass
 
     finally:
         await db.close()
