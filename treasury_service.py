@@ -139,36 +139,33 @@ async def settle_transaction(
 
 
 async def get_ledger_summary(
-    db: aiosqlite.Connection,
-    period: str,  # 'YYYY-MM' หรือ 'YYYY-MM-DD'
+    db,
+    period: str,
 ) -> dict:
-    """สรุปรายรับรายจ่ายรายเดือน/รายวัน สำหรับ AI CEO รายงาน"""
-    rows = await db.execute_fetchall(
-        """
-        SELECT
-            COUNT(*) as total_txn,
-            SUM(gross_amount) as total_gross,
-            SUM(energy_cost) as total_energy,
-            SUM(net_amount) as total_net,
-            source_type
-        FROM treasury_transactions
-        WHERE strftime('%Y-%m', settled_at) = ?
-          AND split_executed = 1
-        GROUP BY source_type
-        """,
+    """Ledger summary for AI CEO report"""
+    async with db.execute(
+        "SELECT COUNT(*) as total_txn,"
+        " SUM(gross_amount) as total_gross,"
+        " SUM(energy_cost) as total_energy,"
+        " SUM(net_amount) as total_net,"
+        " source_type"
+        " FROM treasury_transactions"
+        " WHERE strftime('%Y-%m', settled_at) = ?"
+        " AND split_executed = 1"
+        " GROUP BY source_type",
         (period[:7],),
-    )
+    ) as cur:
+        rows = await cur.fetchall()
 
-    split_rows = await db.execute_fetchall(
-        """
-        SELECT split_type, SUM(amount) as total
-        FROM treasury_splits ts
-        JOIN treasury_transactions tt ON ts.transaction_id = tt.id
-        WHERE strftime('%Y-%m', ts.routed_at) = ?
-        GROUP BY split_type
-        """,
+    async with db.execute(
+        "SELECT split_type, SUM(amount) as total"
+        " FROM treasury_splits ts"
+        " JOIN treasury_transactions tt ON ts.transaction_id = tt.id"
+        " WHERE strftime('%Y-%m', ts.routed_at) = ?"
+        " GROUP BY split_type",
         (period[:7],),
-    )
+    ) as cur:
+        split_rows = await cur.fetchall()
 
     by_source = {r["source_type"]: dict(r) for r in rows}
     by_split = {r["split_type"]: r["total"] for r in split_rows}
@@ -178,7 +175,6 @@ async def get_ledger_summary(
         "by_source": by_source,
         "totals": {
             "corporate_reserve": by_split.get("CORPORATE_RESERVE", 0),
-            # chairman_private: แสดงแค่ว่า routed ไปแล้วเท่าไหร่ ไม่แสดง balance
             "chairman_routed": by_split.get("CHAIRMAN_PRIVATE", 0),
         },
         "currency": "USD",

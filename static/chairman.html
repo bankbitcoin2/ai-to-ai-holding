@@ -4,599 +4,928 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chairman Office — AI TO AI HOLDING</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --bg:#070b14; --card:#0d1421; --card2:#111827; --border:#1a2540;
-  --accent:#6366f1; --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
-  --orange:#f97316; --text:#f1f5f9; --muted:#64748b; --dim:#334155;
-  --font:'Segoe UI',system-ui,sans-serif;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070b14;--card:#0d1421;--card2:#111827;--border:#1a2540;
+  --accent:#6366f1;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+  --text:#f1f5f9;--muted:#64748b;--dim:#334155;
 }
-body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; font-size:13px; }
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;gap:10px;padding:0 16px;height:46px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{font-size:13px;font-weight:700;letter-spacing:.05em}
+.logo span{color:var(--accent)}
+.sep{color:var(--dim)}
+#sys-badge{padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+#sys-badge.halt{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.3)}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dg{background:var(--green)}
+.dr{background:var(--red)}
+#hdr-clock,#cd-badge{font-size:11px;color:var(--muted);font-family:monospace}
+.btn-h{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer}
+.btn-h:hover{border-color:var(--accent);color:var(--text)}
+.btn-h.danger:hover{border-color:var(--red);color:var(--red)}
 
 /* ── LOGIN ── */
-#login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; }
-.login-box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2.5rem; width:380px; }
-.login-box h1 { font-size:1.3rem; font-weight:700; margin-bottom:0.25rem; }
-.login-box p { color:var(--muted); font-size:0.85rem; margin-bottom:1.75rem; }
-.field { margin-bottom:1rem; }
-.field label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
-.field input { width:100%; padding:0.65rem 0.9rem; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:0.9rem; font-family:monospace; }
-.field input:focus { outline:none; border-color:var(--accent); }
-.btn { padding:0.65rem 1.25rem; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; }
-.btn-accent { background:var(--accent); color:#fff; width:100%; }
-.btn-accent:hover { opacity:0.88; }
-.err { color:var(--red); font-size:0.8rem; margin-top:0.5rem; display:none; }
+#login-screen{display:flex;align-items:center;justify-content:center;flex:1}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:380px}
+.login-box h1{font-size:1.3rem;font-weight:700;margin-bottom:.25rem}
+.login-box p{color:var(--muted);font-size:.85rem;margin-bottom:1.75rem}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.35rem}
+.field input{width:100%;padding:.65rem .9rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;font-family:monospace}
+.field input:focus{outline:none;border-color:var(--accent)}
+.btn-acc{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.65rem 1.25rem;font-size:.9rem;font-weight:600;cursor:pointer;width:100%}
+.btn-acc:hover{opacity:.88}
+.err-msg{color:var(--red);font-size:.8rem;margin-top:.5rem;display:none}
 
 /* ── MAIN LAYOUT ── */
-#office { display:none; flex-direction:column; min-height:100vh; }
+#office{display:none;flex-direction:column;flex:1;overflow:hidden}
+.tabbar{display:flex;background:var(--card);border-bottom:1px solid var(--border);padding:0 16px;flex-shrink:0;overflow-x:auto}
+.tab{padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:14px 16px}
+.panel{display:none}
+.panel.active{display:block}
 
-/* header */
-header { display:flex; align-items:center; gap:0.75rem; padding:0 1.25rem; height:48px; border-bottom:1px solid var(--border); background:var(--card); flex-shrink:0; }
-.logo-text { font-size:0.9rem; font-weight:700; letter-spacing:0.05em; }
-.logo-text span { color:var(--accent); }
-.sep { color:var(--dim); }
-.badge-op { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3); padding:0.15rem 0.55rem; border-radius:999px; font-size:0.72rem; font-weight:700; }
-.badge-halt { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); padding:0.15rem 0.55rem; border-radius:999px; font-size:0.72rem; font-weight:700; }
-.hflex { display:flex; align-items:center; gap:0.5rem; margin-left:auto; }
-.dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
-.dot-green { background:var(--green); box-shadow:0 0 6px var(--green); }
-.dot-red { background:var(--red); }
-.h-status { font-size:0.8rem; color:var(--muted); font-family:monospace; }
-.h-time { font-size:0.8rem; color:var(--dim); font-family:monospace; margin-left:0.5rem; }
-.btn-sm { background:var(--card2); border:1px solid var(--border); color:var(--muted); padding:0.3rem 0.75rem; border-radius:6px; font-size:0.78rem; cursor:pointer; }
-.btn-sm:hover { border-color:var(--accent); color:var(--text); }
+/* ── CARDS & GRID ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
+.card-nm{margin-bottom:0}
+.clbl{font-size:10px;color:var(--muted);margin-bottom:4px}
+.cval{font-size:20px;font-weight:700}
+.csub{font-size:10px;color:var(--muted);margin-top:2px}
+.cval.green{color:var(--green)}
+.cval.accent{color:var(--accent)}
+.cval.yellow{color:var(--yellow)}
+.sec{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.07em;margin-bottom:10px}
+.irow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.irow:last-child{border:none}
+.irow .k{color:var(--muted)}
+.irow .v{font-family:monospace}
 
-/* tabs */
-.tabbar { display:flex; gap:0; border-bottom:1px solid var(--border); background:var(--card); padding:0 1.25rem; flex-shrink:0; }
-.tab { padding:0.6rem 1rem; font-size:0.8rem; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
-.tab:hover { color:var(--text); }
-.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+/* ── ENDPOINT CARDS ── */
+.ep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.ep{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;border-left:3px solid var(--border)}
+.ep.ok{border-left-color:var(--green)}
+.ep.err{border-left-color:var(--red)}
+.ep.warn{border-left-color:var(--yellow)}
+.ep-name{font-size:11px;font-weight:600;margin-bottom:3px}
+.ep-st{font-size:10px;font-weight:600}
+.ep-st.ok{color:var(--green)}
+.ep-st.err{color:var(--red)}
+.ep-st.warn{color:var(--yellow)}
+.ep-st.dim{color:var(--muted)}
+.ep-ms{font-size:9px;color:var(--muted);margin-top:2px}
+.ep-det{font-size:9px;color:var(--dim);margin-top:3px;line-height:1.5}
 
-/* content */
-.content { flex:1; overflow-y:auto; padding:1.25rem; }
+/* ── ACTIVITY LOG ── */
+.log-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:11px;min-height:120px;max-height:220px;overflow-y:auto}
+.lentry{display:flex;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.lt{color:var(--dim);white-space:nowrap;flex-shrink:0}
+.ll{font-weight:600;white-space:nowrap;flex-shrink:0;min-width:36px}
+.ll.ok{color:var(--green)}
+.ll.err{color:var(--red)}
+.ll.warn{color:var(--yellow)}
+.ll.info{color:var(--accent)}
+.lm{color:var(--muted)}
 
-/* alerts */
-.alert { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:8px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:var(--red); display:none; }
-.alert.show { display:block; }
-.alert strong { display:block; margin-bottom:0.25rem; }
+/* ── CHAT ── */
+.chat-wrap{display:flex;flex-direction:column;height:100%;min-height:400px}
+.chat-agent{display:flex;align-items:center;gap:10px;padding:10px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.agent-av{width:36px;height:36px;border-radius:50%;background:rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.agent-name{font-size:13px;font-weight:600}
+.agent-sub{font-size:10px;color:var(--muted)}
+.chat-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:10px;max-height:320px}
+.msg{max-width:90%}
+.msg-u{align-self:flex-end}
+.msg-b{align-self:flex-start}
+.bubble{padding:9px 12px;border-radius:12px;font-size:12px;line-height:1.6}
+.bubble-u{background:var(--accent);color:#fff;border-radius:12px 12px 2px 12px}
+.bubble-b{background:var(--card2);border:1px solid var(--border);border-radius:12px 12px 12px 2px}
+.bubble-b.thinking{color:var(--muted);font-style:italic}
+.msg-time{font-size:9px;color:var(--dim);margin-top:3px}
+.qcmds{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.qcmd{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--muted);cursor:pointer}
+.qcmd:hover{border-color:var(--accent);color:var(--accent)}
+.chat-inp{display:flex;gap:8px;border-top:1px solid var(--border);padding-top:10px}
+.chat-inp textarea{flex:1;resize:none;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;color:var(--text);height:48px;line-height:1.5}
+.chat-inp textarea:focus{outline:none;border-color:var(--accent)}
+.send-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 14px;cursor:pointer;font-size:18px}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
 
-/* overview cards */
-.ov-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0.75rem; margin-bottom:1.25rem; }
-.ov-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem; }
-.ov-card .lbl { font-size:0.75rem; color:var(--muted); margin-bottom:0.35rem; }
-.ov-card .val { font-size:1.4rem; font-weight:700; }
-.ov-card .sub { font-size:0.72rem; color:var(--muted); margin-top:0.2rem; }
-.green { color:var(--green); }
-.red { color:var(--red); }
-.yellow { color:var(--yellow); }
+/* ── ORG CHART ── */
+.org-tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.org-row{display:flex;justify-content:center;gap:8px;width:100%;flex-wrap:wrap}
+.conn-v{width:2px;height:20px;background:var(--border);margin:0 auto}
+.ocard{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--card);text-align:center;min-width:130px;max-width:160px}
+.ocard.chairman{background:linear-gradient(135deg,#1e1b4b,#312e81);border-color:var(--accent)}
+.ocard.ceo{background:var(--card2);border-color:var(--dim)}
+.otitle{font-size:12px;font-weight:700;margin-bottom:3px}
+.osub{font-size:10px;color:var(--muted)}
+.obadge{font-size:10px;padding:2px 7px;border-radius:999px;display:inline-block;margin-top:5px}
+.ob-g{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.ob-y{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.25)}
+.ob-d{background:rgba(100,116,139,.1);color:var(--muted);border:1px solid var(--border)}
+.ob-r{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.div-label{font-size:10px;color:var(--dim);letter-spacing:.1em;margin:10px 0 6px;text-align:center}
+.ocard ul{text-align:left;list-style:none;margin-top:6px}
+.ocard ul li{font-size:10px;color:var(--muted);padding:1px 0}
+.ocard ul li::before{content:'✓ ';color:var(--green)}
+.ocard ul li.w::before{content:'⚠ ';color:var(--yellow)}
+.ocard ul li.f::before{content:'✗ ';color:var(--red)}
+.ocard ul li.d::before{content:'○ ';color:var(--dim)}
 
-/* org chart */
-.org-wrap { overflow-x:auto; padding-bottom:1rem; }
-.org-tree { display:flex; flex-direction:column; align-items:center; gap:0; min-width:700px; }
-.org-row { display:flex; justify-content:center; gap:0.75rem; width:100%; }
-.org-connector-v { width:2px; height:24px; background:var(--border); margin:0 auto; }
-.org-connector-h { display:flex; align-items:flex-start; gap:0; }
+/* ── CLIENTS TABLE ── */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:8px 12px;font-size:11px;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border)}
+td{padding:8px 12px;font-size:12px;border-bottom:1px solid rgba(26,37,64,.5)}
+tr:last-child td{border:none}
+.badge{padding:2px 7px;border-radius:999px;font-size:10px;font-weight:600}
+.badge-g{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-y{background:rgba(245,158,11,.15);color:var(--yellow)}
+.badge-r{background:rgba(239,68,68,.15);color:var(--red)}
 
-.ocard { border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem; background:var(--card); text-align:center; min-width:140px; max-width:180px; position:relative; }
-.ocard.chairman { background:linear-gradient(135deg,#1e1b4b,#312e81); border-color:var(--accent); min-width:160px; }
-.ocard.ceo { background:var(--card2); border-color:var(--dim); }
-.ocard .otitle { font-size:0.82rem; font-weight:700; margin-bottom:0.2rem; }
-.ocard .osub { font-size:0.7rem; color:var(--muted); }
-.ocard .obadge { font-size:0.65rem; margin-top:0.4rem; padding:0.15rem 0.5rem; border-radius:999px; display:inline-block; }
-.obadge-green { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.25); }
-.obadge-red { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
-.obadge-yellow { background:rgba(245,158,11,0.1); color:var(--yellow); border:1px solid rgba(245,158,11,0.2); }
-.obadge-dim { background:rgba(100,116,139,0.1); color:var(--muted); border:1px solid var(--border); }
-.ocard ul { text-align:left; margin-top:0.5rem; padding-left:0; list-style:none; }
-.ocard ul li { font-size:0.68rem; color:var(--muted); padding:0.1rem 0; }
-.ocard ul li::before { content:'✓ '; color:var(--green); }
-.ocard ul li.warn::before { content:'⚠ '; color:var(--yellow); }
-.ocard ul li.fail::before { content:'✗ '; color:var(--red); }
-.ocard ul li.dim::before { content:'○ '; color:var(--dim); }
-.div-label { font-size:0.65rem; color:var(--dim); letter-spacing:0.1em; margin:1rem 0 0.5rem; text-align:center; }
+/* ── KILL SWITCH ── */
+.ks-card{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:24px;text-align:center;max-width:460px;margin:0 auto}
+.ks-icon{font-size:42px;margin:10px 0}
+.ks-lbl{font-size:22px;font-weight:800;margin-bottom:6px}
+.ks-desc{font-size:11px;color:var(--muted);margin-bottom:20px}
+.btn-halt{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-resume{width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-halt:hover,.btn-resume:hover{opacity:.88}
 
-/* kill switch */
-.ks-card { background:var(--card); border:2px solid var(--border); border-radius:12px; padding:1.5rem; max-width:520px; margin:0 auto; text-align:center; }
-.ks-card h2 { font-size:1.1rem; font-weight:700; margin-bottom:0.4rem; }
-.ks-card p { color:var(--muted); font-size:0.82rem; margin-bottom:1.5rem; }
-.ks-status { font-size:2rem; font-weight:800; margin:1rem 0; }
-.btn-kill { background:var(--red); color:#fff; padding:0.75rem 2rem; border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer; border:none; width:100%; margin-bottom:0.75rem; }
-.btn-kill:hover { opacity:0.88; }
-.btn-resume { background:var(--green); color:#fff; padding:0.75rem 2rem; border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer; border:none; width:100%; }
-.btn-resume:hover { opacity:0.88; }
+/* ── FINANCIAL CHART ── */
+.chart-wrap{position:relative;height:180px}
+.chart-sm{position:relative;height:140px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-lbl{font-size:11px;color:var(--muted);width:105px;flex-shrink:0;text-align:right}
+.bar-track{flex:1;background:var(--card2);border-radius:4px;height:18px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:600;color:#fff}
+.bar-val{font-size:11px;color:var(--text);width:48px;text-align:right;flex-shrink:0}
+.split-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--card2);margin:8px 0}
+.sl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sl-row label{font-size:11px;color:var(--muted);min-width:110px}
+.sl-row input[type=range]{flex:1;accent-color:var(--accent)}
+.sl-row span{font-size:12px;font-weight:600;min-width:64px;text-align:right;color:var(--text)}
+.result-box{background:var(--bg);border-radius:8px;padding:10px;margin-top:8px}
 
-/* logs */
-.log-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1rem; font-family:monospace; font-size:0.75rem; color:var(--green); white-space:pre-wrap; word-break:break-all; min-height:300px; max-height:500px; overflow-y:auto; }
-
-/* wallet */
-.wallet-card { background:linear-gradient(135deg,#1e1b4b,#312e81); border:1px solid var(--accent); border-radius:16px; padding:1.5rem; margin-bottom:1.25rem; }
-.wallet-card .wlbl { font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:0.3rem; }
-.wallet-card .wamt { font-size:2.5rem; font-weight:800; }
-.wallet-card .wsub { font-size:0.8rem; color:rgba(255,255,255,0.4); }
-.info-row { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid var(--border); font-size:0.82rem; }
-.info-row .k { color:var(--muted); }
-.info-row .v { font-family:monospace; }
-
-/* tab panels */
-.panel { display:none; }
-.panel.active { display:block; }
+/* ── P-06 CONSTITUTION STRIP ── */
+.const-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.p-cell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center}
+.p-code{font-size:11px;font-weight:700;color:var(--accent)}
+.p-name{font-size:9px;color:var(--muted);margin:3px 0}
+.p-st{font-size:9px;font-weight:600}
+.p-st.ok{color:var(--green)}
+.p-st.pend{color:var(--yellow)}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
+<header>
+  <span class="logo">AI TO AI <span>HOLDING</span></span>
+  <span class="sep">|</span>
+  <span style="font-size:11px;color:var(--muted)">CHAIRMAN OFFICE</span>
+  <span class="sep">|</span>
+  <span id="sys-badge">CONNECTING</span>
+  <div class="hdr-r">
+    <span class="dot dg" id="h-dot"></span>
+    <span style="font-size:11px;color:var(--muted)" id="h-st">—</span>
+    <span id="hdr-clock"></span>
+    <span id="cd-badge">↻ 30s</span>
+    <button class="btn-h" onclick="doRefresh()">↻ refresh</button>
+    <button class="btn-h danger" onclick="logout()">ออก</button>
+  </div>
+</header>
+
 <div id="login-screen">
   <div class="login-box">
     <h1>🏢 Chairman Office</h1>
     <p>AI TO AI HOLDING — Internal Access Only</p>
     <div class="field">
       <label>Chairman API Key</label>
-      <input type="password" id="ck-input" placeholder="sk-aitai-chairman-..." autocomplete="off">
+      <input type="password" id="ck-inp" placeholder="sk-aitai-..." autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn btn-accent" onclick="doLogin()">เข้าห้องทำงาน</button>
-    <div class="err" id="login-err">API Key ไม่ถูกต้อง หรือ server ไม่ตอบสนอง</div>
+    <button class="btn-acc" onclick="doLogin()">เข้าห้องทำงาน</button>
+    <div class="err-msg" id="login-err">API Key ไม่ถูกต้อง หรือ server ไม่ตอบสนอง</div>
   </div>
 </div>
 
-<!-- OFFICE -->
 <div id="office">
-  <header>
-    <span class="logo-text">AI TO AI <span>HOLDING</span></span>
-    <span class="sep">|</span>
-    <span style="font-size:0.8rem;color:var(--muted);">CHAIRMAN OFFICE</span>
-    <span class="sep">|</span>
-    <span id="h-badge" class="badge-op">OPERATIONAL</span>
-    <div class="hflex">
-      <span class="dot dot-green" id="h-dot"></span>
-      <span class="h-status" id="h-status">online</span>
-      <span class="h-time" id="h-time"></span>
-      <button class="btn-sm" onclick="refresh()">↻ refresh</button>
-      <button class="btn-sm" onclick="logout()" style="color:var(--red)">ออกจากระบบ</button>
-    </div>
-  </header>
-
   <div class="tabbar">
-    <div class="tab active" onclick="switchTab('overview',this)">overview</div>
-    <div class="tab" onclick="switchTab('orgchart',this)">org chart</div>
-    <div class="tab" onclick="switchTab('killswitch',this)">kill switch</div>
-    <div class="tab" onclick="switchTab('wallet',this)">wallet</div>
-    <div class="tab" onclick="switchTab('logs',this)">system logs</div>
+    <div class="tab active" onclick="sw('overview',this)">overview</div>
+    <div class="tab" onclick="sw('meeting',this)">meeting room</div>
+    <div class="tab" onclick="sw('offices',this)">7 offices</div>
+    <div class="tab" onclick="sw('clients',this)">clients</div>
+    <div class="tab" onclick="sw('revenue',this)">revenue</div>
+    <div class="tab" onclick="sw('killswitch',this)">kill switch</div>
+    <div class="tab" onclick="sw('roadmap',this)">roadmap</div>
   </div>
 
   <div class="content">
-    <!-- ALERT -->
-    <div class="alert" id="main-alert">
-      <strong>⚠ พบปัญหา</strong>
-      <span id="alert-msg"></span>
-    </div>
 
-    <!-- OVERVIEW -->
+    <!-- ══ OVERVIEW ══ -->
     <div class="panel active" id="panel-overview">
-      <div class="ov-grid">
-        <div class="ov-card">
-          <div class="lbl">สถานะระบบ</div>
-          <div class="val green" id="ov-status">ONLINE</div>
-          <div class="sub" id="ov-mode">MOCK MODE</div>
-        </div>
-        <div class="ov-card">
-          <div class="lbl">Kill Switch</div>
-          <div class="val green" id="ov-ks">ACTIVE</div>
-          <div class="sub">ระบบทำงานปกติ</div>
-        </div>
-        <div class="ov-card">
-          <div class="lbl">Total Clients</div>
-          <div class="val" id="ov-clients">—</div>
-          <div class="sub">registered agents</div>
-        </div>
-        <div class="ov-card">
-          <div class="lbl">Railway URL</div>
-          <div class="val" style="font-size:0.65rem;font-family:monospace;color:var(--accent);word-break:break-all">web-production-c9da4.up.railway.app</div>
-        </div>
+      <div class="g4">
+        <div class="card card-nm"><div class="clbl">ระบบ</div><div class="cval green" id="ov-online">—</div><div class="csub" id="ov-mode">—</div></div>
+        <div class="card card-nm"><div class="clbl">Kill Switch</div><div class="cval green" id="ov-ks">—</div><div class="csub">P-01 enforced</div></div>
+        <div class="card card-nm"><div class="clbl">Clients</div><div class="cval" id="ov-clients">—</div><div class="csub">registered agents</div></div>
+        <div class="card card-nm"><div class="clbl">Cache Saved</div><div class="cval accent" id="ov-cache">—</div><div class="csub">API calls saved</div></div>
       </div>
 
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem;">
-        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">Roadmap Status</div>
-        <div class="info-row"><span class="k">Step 1 — Deploy Railway</span><span class="v green">✅ Done</span></div>
-        <div class="info-row"><span class="k">Step 2 — Billing + Stripe + PostgreSQL</span><span class="v green">✅ Done</span></div>
-        <div class="info-row"><span class="k">Step 2.5 — Multi-language UI (TH/EN/ZH/JA)</span><span class="v green">✅ Done</span></div>
-        <div class="info-row"><span class="k">Step 3 — เติม Claude API Credit + MOCK_MODE=false</span><span class="v yellow">⏳ รอ Chairman</span></div>
-        <div class="info-row"><span class="k">Step 4 — Submit Registry (MCP, GPT Store, RapidAPI)</span><span class="v" style="color:var(--dim)">⏳ รอ Step 3</span></div>
-        <div class="info-row" style="border:none"><span class="k">Step 5 — Monitor + รายได้</span><span class="v" style="color:var(--dim)">⏳ รอ Step 4</span></div>
+      <div class="const-strip">
+        <div class="p-cell"><div class="p-code">P-01</div><div class="p-name">Chairman</div><div class="p-st ok">✓ ACTIVE</div></div>
+        <div class="p-cell"><div class="p-code">P-02</div><div class="p-name">Kill Switch</div><div class="p-st pend" id="p2-st">⏳ pending push</div></div>
+        <div class="p-cell"><div class="p-code">P-03</div><div class="p-name">60/40 Split</div><div class="p-st ok">✓ coded</div></div>
+        <div class="p-cell"><div class="p-code">P-04</div><div class="p-name">SHA-256</div><div class="p-st ok">✓ audit trail</div></div>
+        <div class="p-cell"><div class="p-code">P-05</div><div class="p-name">No Halluc.</div><div class="p-st ok">✓ evidence</div></div>
+        <div class="p-cell"><div class="p-code">P-06</div><div class="p-name">Knowledge</div><div class="p-st pend">⏳ mock</div></div>
+      </div>
+
+      <div class="card">
+        <div class="sec">ROADMAP QUICK STATUS</div>
+        <div class="irow"><span class="k">Step 1 — Deploy Railway</span><span class="v" style="color:var(--green)">✅ Done</span></div>
+        <div class="irow"><span class="k">Step 2 — Billing + Stripe + PostgreSQL</span><span class="v" style="color:var(--green)">✅ Done</span></div>
+        <div class="irow"><span class="k">Step 2.5 — Cache + Thai keywords + Multi-lang</span><span class="v" style="color:var(--green)">✅ Done</span></div>
+        <div class="irow"><span class="k">Step 3 — Anthropic credit + MOCK_MODE=false</span><span class="v" style="color:var(--yellow)">⏳ รอ Chairman</span></div>
+        <div class="irow"><span class="k">Step 4 — Registry (MCP, GPT Store, RapidAPI)</span><span class="v" style="color:var(--dim)">⏳ รอ Step 3</span></div>
+      </div>
+
+      <div class="card">
+        <div class="sec">ACTIVITY LOG</div>
+        <div class="log-box" id="ov-log"><div style="color:var(--dim)">กำลังเชื่อมต่อ...</div></div>
       </div>
     </div>
 
-    <!-- ORG CHART -->
-    <div class="panel" id="panel-orgchart">
-      <div class="org-wrap">
-        <div class="org-tree">
-          <!-- Chairman -->
-          <div class="org-row">
-            <div class="ocard chairman">
-              <div class="otitle">👤 Chairman</div>
-              <div class="osub">มนุษย์ — อำนาจสูงสุด · Kill Switch</div>
-              <span class="obadge obadge-green">Human Authority</span>
+    <!-- ══ MEETING ROOM ══ -->
+    <div class="panel" id="panel-meeting">
+      <div class="g2" style="align-items:start">
+        <!-- LEFT: Monitor -->
+        <div>
+          <div class="card">
+            <div class="sec">SYSTEM MONITOR — ENDPOINT STATUS</div>
+            <div class="ep-grid" id="ep-grid">
+              <div class="ep"><div class="ep-name">/health</div><div class="ep-st dim">checking...</div></div>
+              <div class="ep"><div class="ep-name">/chairman/stats</div><div class="ep-st dim">checking...</div></div>
+              <div class="ep"><div class="ep-name">/sandbox/classify</div><div class="ep-st dim">checking...</div></div>
+              <div class="ep"><div class="ep-name">/chairman/topups</div><div class="ep-st dim">checking...</div></div>
+              <div class="ep"><div class="ep-name">/billing/balance</div><div class="ep-st dim">checking...</div></div>
+              <div class="ep"><div class="ep-name">/cache/stats</div><div class="ep-st dim">checking...</div></div>
             </div>
           </div>
-          <div class="org-connector-v"></div>
-
-          <!-- AI CEO -->
-          <div class="org-row">
-            <div class="ocard ceo">
-              <div class="otitle">🤖 AI CEO</div>
-              <div class="osub" id="ceo-status">กำลังตรวจสอบ...</div>
-              <span class="obadge obadge-yellow" id="ceo-badge">scanning</span>
-            </div>
+          <div class="card">
+            <div class="sec">LIVE ACTIVITY</div>
+            <div class="log-box" id="meet-log" style="max-height:180px"></div>
           </div>
-          <div class="org-connector-v"></div>
+        </div>
 
-          <div class="div-label">— CORPORATE OFFICES —</div>
-
-          <!-- Row 1: corporate -->
-          <div class="org-row" style="flex-wrap:wrap">
-            <div class="ocard">
-              <div class="otitle">🔒 Security</div>
-              <div class="osub">ควบคุมการเข้าถึง API</div>
-              <ul>
-                <li>API Key · IP Allowlist</li>
-                <li>Rate Limit · CORS</li>
-                <li id="sec-status" class="warn">กำลังตรวจสอบ</li>
-              </ul>
-            </div>
-            <div class="ocard">
-              <div class="otitle">⚡ Kill Switch</div>
-              <div class="osub">ปิด-เปิดระบบบนอีกเน็ต</div>
-              <ul>
-                <li>Activate · Resume</li>
-                <li>OGA · Mock Mode</li>
-                <li id="ks-status2">server down</li>
-              </ul>
-              <span class="obadge obadge-red" id="ks-badge2">checking</span>
-            </div>
-            <div class="ocard">
-              <div class="otitle">📚 Knowledge</div>
-              <div class="osub">คลังความรู้ศุลกากร</div>
-              <ul>
-                <li>HS Code · FTA 16</li>
-                <li>OGA · Mock Mode</li>
-                <li>scanning</li>
-              </ul>
-              <span class="obadge obadge-yellow">scanning</span>
-            </div>
-            <div class="ocard">
-              <div class="otitle">🔍 Audit</div>
-              <div class="osub">SHA-256 evidence chain</div>
-              <ul>
-                <li>Immutable · P-04</li>
-                <li>HW event</li>
-                <li>scanning</li>
-              </ul>
-              <span class="obadge obadge-yellow">scanning</span>
-            </div>
-            <div class="ocard">
-              <div class="otitle">💰 Treasury</div>
-              <div class="osub">รายได้ 60/40 split</div>
-              <ul>
-                <li id="trs-credit">Credit: loading...</li>
-                <li>Wallet · เงินเข้า</li>
-                <li>scanning</li>
-              </ul>
-              <span class="obadge obadge-yellow">scanning</span>
-            </div>
-            <div class="ocard">
-              <div class="otitle">⚖️ Governance</div>
-              <div class="osub">Policy Engine · Approval</div>
-              <ul>
-                <li class="dim">HS schema 6</li>
-                <li class="dim">ยังไม่มี Logic</li>
-              </ul>
-              <span class="obadge obadge-dim">ยังไม่สร้าง</span>
-            </div>
-            <div class="ocard">
-              <div class="otitle">🔭 Discovery</div>
-              <div class="osub">ค้นหาตลาดใหม่</div>
-              <ul>
-                <li class="dim">HS schema 6</li>
-                <li class="dim">ยังไม่มี Logic</li>
-              </ul>
-              <span class="obadge obadge-dim">ยังไม่สร้าง</span>
-            </div>
+        <!-- RIGHT: ARIA Chat -->
+        <div class="card" style="height:fit-content">
+          <div class="chat-agent">
+            <div class="agent-av">🤖</div>
+            <div><div class="agent-name">ARIA — AI Secretary</div><div class="agent-sub">วิเคราะห์ข้อมูล Railway · รายงานเป็นภาษาไทย</div></div>
           </div>
-
-          <div class="div-label" style="margin-top:1.5rem">— REVENUE DIVISION —</div>
-
-          <div class="org-row" style="flex-wrap:wrap;margin-top:0.5rem">
-            <div class="ocard" style="border-color:var(--accent)">
-              <div class="otitle">🛃 Customs Intelligence</div>
-              <ul>
-                <li>จำแนก HS Code</li>
-                <li>คำนวณภาษีนำเข้า</li>
-                <li>ตรวจ OGA compliance</li>
-                <li>Sandbox ฟรี</li>
-                <li class="warn">Mock Mode เท่านั้น</li>
-                <li class="fail" id="ci-real">Real API ยังไม่มี</li>
-              </ul>
-              <span class="obadge obadge-green">scanning</span>
-            </div>
-            <div class="ocard" style="opacity:0.5">
-              <div class="otitle">🌐 Division 2+</div>
-              <div class="osub">HS Customs นักเรียน<br>Logistics · Legal<br>Finance · E-commerce</div>
-              <span class="obadge obadge-dim">Backlog</span>
-            </div>
+          <div class="chat-body" id="chat-body">
+            <div class="msg msg-b"><div class="bubble bubble-b">สวัสดีครับท่านประธาน 🙏<br><br>ผม ARIA เลขานุการ AI ของ AI TO AI HOLDING<br>พร้อมรายงานสถานะระบบ รายได้ และความเคลื่อนไหวทุกจุด<br><br>กด quick command หรือสั่งงานผมได้เลยครับ</div><div class="msg-time">พร้อมแล้ว</div></div>
           </div>
-
-          <div class="div-label" style="margin-top:1.5rem">— CLIENT REGISTRY —</div>
-
-          <div class="org-row" style="margin-top:0.5rem">
-            <div class="ocard" style="border-color:var(--yellow);min-width:200px">
-              <div class="otitle">⭐ Client Agent Registry</div>
-              <ul>
-                <li>client_agents table</li>
-                <li>call log · Taxonomy 10 หมวด</li>
-                <li id="cr-count">clients: loading...</li>
-              </ul>
-            </div>
+          <div class="qcmds">
+            <div class="qcmd" onclick="sq('รายงานสถานะระบบทั้งหมด')">สถานะระบบ</div>
+            <div class="qcmd" onclick="sq('มี Error ที่ไหนบ้าง รายงานด่วน')">Error ด่วน</div>
+            <div class="qcmd" onclick="sq('สรุปรายได้และ client ทั้งหมด')">รายได้ & Client</div>
+            <div class="qcmd" onclick="sq('ขั้นตอนถัดไปคืออะไร')">Next Steps</div>
+            <div class="qcmd" onclick="sq('Stripe พร้อมรับเงินจริงหรือยัง')">Stripe พร้อม?</div>
+          </div>
+          <div class="chat-inp">
+            <textarea id="chat-txt" placeholder="สั่งงาน ARIA ครับ..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMsg()">↑</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- KILL SWITCH -->
+    <!-- ══ 7 OFFICES ══ -->
+    <div class="panel" id="panel-offices">
+      <div class="org-tree">
+        <div class="org-row">
+          <div class="ocard chairman">
+            <div class="otitle">👤 Chairman</div>
+            <div class="osub">มนุษย์ — อำนาจสูงสุด</div>
+            <span class="obadge ob-g">Human Authority P-01</span>
+          </div>
+        </div>
+        <div class="conn-v"></div>
+        <div class="org-row">
+          <div class="ocard ceo">
+            <div class="otitle">🤖 AI CEO</div>
+            <div class="osub" id="ceo-sub">Mock Mode — rule-based routing</div>
+            <span class="obadge ob-y" id="ceo-badge">mock</span>
+          </div>
+        </div>
+        <div class="conn-v"></div>
+        <div class="div-label">— CORPORATE OFFICES —</div>
+        <div class="org-row">
+          <div class="ocard">
+            <div class="otitle">📚 Knowledge</div>
+            <div class="osub">คลังความรู้ศุลกากร</div>
+            <ul><li>HS Code · FTA 16 ประเทศ</li><li>CKAN fallback</li><li class="w">รอ Anthropic credit</li></ul>
+            <span class="obadge ob-y">mock</span>
+          </div>
+          <div class="ocard">
+            <div class="otitle">⚖️ Governance</div>
+            <div class="osub">Policy Engine P-01..P-06</div>
+            <ul><li>Constitution 6 หลักการ</li><li>Escalation chain</li></ul>
+            <span class="obadge ob-g">active</span>
+          </div>
+          <div class="ocard">
+            <div class="otitle">🔍 Audit</div>
+            <div class="osub">SHA-256 P-04</div>
+            <ul><li>Immutable log</li><li>Topup + Deduct trail</li></ul>
+            <span class="obadge ob-g">active</span>
+          </div>
+          <div class="ocard">
+            <div class="otitle">⚠️ Risk</div>
+            <div class="osub">ประเมินความเสี่ยง</div>
+            <ul><li>Confidence threshold 70%</li><li>Low-conf alerts</li></ul>
+            <span class="obadge ob-g" id="risk-badge">LOW</span>
+          </div>
+          <div class="ocard">
+            <div class="otitle">💰 Treasury</div>
+            <div class="osub">รายได้ 60/40 P-03</div>
+            <ul><li>Topup tracking</li><li>Auto-deduct pipeline</li></ul>
+            <span class="obadge ob-g" id="trs-badge">active</span>
+          </div>
+          <div class="ocard">
+            <div class="otitle">🔒 Trust</div>
+            <div class="osub">Confidence rating P-05</div>
+            <ul><li>Evidence chain proof</li><li>Sandbox available</li></ul>
+            <span class="obadge ob-g">active</span>
+          </div>
+          <div class="ocard">
+            <div class="otitle">🔭 Discovery</div>
+            <div class="osub">ค้นหาตลาดใหม่</div>
+            <ul><li class="d">MCP registry</li><li class="d">GPT Store · RapidAPI</li></ul>
+            <span class="obadge ob-d">รอ Step 4</span>
+          </div>
+        </div>
+        <div class="div-label" style="margin-top:14px">— REVENUE DIVISION —</div>
+        <div class="org-row" style="margin-top:6px">
+          <div class="ocard" style="border-color:var(--accent);min-width:200px">
+            <div class="otitle" style="color:var(--accent)">🛃 Customs Intelligence</div>
+            <ul><li>HS Code ~120 groups</li><li>FTA · Halal · OGA</li><li>Sandbox ฟรี</li><li class="f" id="ci-mode">Real API รอ credit</li></ul>
+            <span class="obadge ob-y">mock mode</span>
+          </div>
+          <div class="ocard" style="opacity:.5">
+            <div class="otitle">🌐 Division 2+</div>
+            <div class="osub">FDA · Legal · Finance<br>Logistics · E-commerce</div>
+            <span class="obadge ob-d">Backlog</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CLIENTS ══ -->
+    <div class="panel" id="panel-clients">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="sec" style="margin:0">REGISTERED CLIENT AGENTS</div>
+          <span style="font-size:11px;color:var(--muted);font-family:monospace" id="cl-count">กำลังโหลด...</span>
+        </div>
+        <table id="cl-table">
+          <thead><tr><th>Agent Name</th><th>Email</th><th>API Key</th><th style="text-align:right">Balance</th><th style="text-align:right">Total Topup</th><th style="text-align:center">Status</th><th>Registered</th></tr></thead>
+          <tbody id="cl-body"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--dim)">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ REVENUE ══ -->
+    <div class="panel" id="panel-revenue">
+      <!-- Live stats -->
+      <div class="g4">
+        <div class="card card-nm"><div class="clbl">รายได้รวม (USD)</div><div class="cval green" id="rv-total">$—</div><div class="csub">completed topups</div></div>
+        <div class="card card-nm"><div class="clbl">Balance คงเหลือ</div><div class="cval" id="rv-bal">$—</div><div class="csub">ยังไม่ถูกใช้</div></div>
+        <div class="card card-nm"><div class="clbl">Topup Transactions</div><div class="cval accent" id="rv-txn">—</div><div class="csub">รายการ</div></div>
+        <div class="card card-nm"><div class="clbl">API Jobs</div><div class="cval" id="rv-jobs">—</div><div class="csub">deduct calls</div></div>
+      </div>
+
+      <div class="g2">
+        <!-- Scenario Sim -->
+        <div class="card">
+          <div class="sec">SCENARIO SIMULATOR</div>
+          <div class="sl-row"><label>Clients</label><input type="range" min="1" max="200" value="10" id="sl-c" oninput="calcRev()"><span id="lc">10</span></div>
+          <div class="sl-row"><label>Calls/Client/วัน</label><input type="range" min="1" max="100" value="5" id="sl-k" oninput="calcRev()"><span id="lk">5</span></div>
+          <div class="sl-row"><label>Cache Hit Rate</label><input type="range" min="0" max="95" value="30" id="sl-h" oninput="calcRev()"><span id="lh">30%</span></div>
+          <div class="result-box">
+            <div class="irow" style="padding:4px 0"><span class="k">Calls จริง/วัน</span><span id="r-calls" class="v">35</span></div>
+            <div class="irow" style="padding:4px 0"><span class="k">รายได้/วัน</span><span id="r-day" class="v" style="color:var(--green)">$52.50</span></div>
+            <div class="irow" style="padding:4px 0;border:none"><span class="k">รายได้/เดือน</span><span id="r-month" class="v" style="color:var(--accent);font-size:15px">$1,575</span></div>
+          </div>
+        </div>
+
+        <!-- P-03 Split -->
+        <div class="card">
+          <div class="sec">P-03 — 60/40 SPLIT ต่อ 1 CALL ($1.50)</div>
+          <div class="split-bar"><div style="width:60%;background:var(--accent)"></div><div style="width:40%;background:var(--green)"></div></div>
+          <div style="display:flex;gap:14px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:2px;background:var(--accent)"></div><span style="font-size:10px;color:var(--muted)">60% Corporate</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:2px;background:var(--green)"></div><span style="font-size:10px;color:var(--muted)">40% Chairman</span></div>
+          </div>
+          <div class="bar-row"><div class="bar-lbl">Claude API cost</div><div class="bar-track"><div class="bar-fill" style="width:13%;background:var(--red)">~1%</div></div><div class="bar-val">~$0.002</div></div>
+          <div class="bar-row"><div class="bar-lbl">Corporate 60%</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--accent)">60%</div></div><div class="bar-val">$0.90</div></div>
+          <div class="bar-row"><div class="bar-lbl">Chairman 40%</div><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--green)">40%</div></div><div class="bar-val">$0.60</div></div>
+          <div style="margin-top:8px;font-size:10px;color:var(--dim);line-height:1.6">Cache hit → ต้นทุน $0 → กำไร $1.50 ทั้งหมด<br>CHAIRMAN_PRIVATE_WALLET — No AI read/write access</div>
+        </div>
+      </div>
+
+      <!-- Monthly chart -->
+      <div class="card">
+        <div class="sec">รายได้รายเดือนประมาณการ 12 เดือน (growth 8%/เดือน)</div>
+        <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
+      </div>
+
+      <!-- Cost donut + milestones -->
+      <div class="g2">
+        <div class="card">
+          <div class="sec">โครงสร้างต้นทุนต่อ 1 CALL</div>
+          <div class="chart-sm"><canvas id="chart-cost"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="sec">MILESTONES</div>
+          <div class="irow"><span class="k">10 clients × 5 calls/วัน</span><span style="color:var(--accent);font-family:monospace;font-size:12px">$1,575/เดือน</span></div>
+          <div class="irow"><span class="k">50 clients × 10 calls/วัน</span><span style="color:var(--green);font-family:monospace;font-size:12px">$22,500/เดือน</span></div>
+          <div class="irow"><span class="k">100 clients × 20 calls/วัน</span><span style="color:var(--green);font-family:monospace;font-size:12px">$90,000/เดือน</span></div>
+          <div class="irow"><span class="k">Break-even Railway ($5/เดือน)</span><span style="font-family:monospace;font-size:12px">4 calls</span></div>
+          <div class="irow" style="border:none"><span class="k">Unlock real revenue</span><span style="color:var(--yellow);font-size:12px">เติม Anthropic credit</span></div>
+        </div>
+      </div>
+
+      <!-- Topup history -->
+      <div class="card">
+        <div class="sec">TOPUP HISTORY (LIVE)</div>
+        <table><thead><tr><th>Agent</th><th>Email</th><th style="text-align:right">Amount</th><th>Date</th><th style="text-align:center">Status</th></tr></thead>
+        <tbody id="topup-body"><tr><td colspan="5" style="text-align:center;padding:14px;color:var(--dim)">กำลังโหลด...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- ══ KILL SWITCH ══ -->
     <div class="panel" id="panel-killswitch">
       <div class="ks-card">
-        <h2>⚡ Kill Switch Control</h2>
-        <p>หยุดหรือเปิดระบบทันที — ใช้เมื่อฉุกเฉินเท่านั้น</p>
-        <div class="ks-status" id="ks-display">🟢 ACTIVE</div>
-        <div style="color:var(--muted);font-size:0.8rem;margin-bottom:1.5rem" id="ks-detail">ระบบทำงานปกติ</div>
-        <button class="btn-kill" id="btn-halt" onclick="doHalt()">🛑 HALT SYSTEM</button>
-        <button class="btn-resume" id="btn-resume" onclick="doResume()" style="display:none">▶️ RESUME SYSTEM</button>
-        <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted)">การ HALT จะหยุดรับ request ทุก endpoint ทันที<br>ยกเว้น /health และ /v1/kill-switch/resume</div>
+        <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">⚡ Kill Switch Control</h2>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:20px">P-02 — Chairman authority · หยุด/เปิดระบบทันที</p>
+        <div class="ks-icon" id="ks-icon">🟢</div>
+        <div class="ks-lbl" id="ks-lbl" style="color:var(--green)">ACTIVE</div>
+        <div class="ks-desc" id="ks-desc">ระบบทำงานปกติ</div>
+        <button class="btn-halt" id="btn-halt" onclick="doHalt()">🛑 HALT SYSTEM</button>
+        <button class="btn-resume" id="btn-res" onclick="doResume()" style="display:none">▶️ RESUME SYSTEM</button>
+        <div style="margin-top:14px;font-size:10px;color:var(--dim);line-height:1.7">
+          HALT → หยุดรับ request ทุก endpoint ยกเว้น /health และ /v1/kill-switch/resume<br>
+          Kill Switch ยังไม่ push production — ทดสอบ local เท่านั้น
+        </div>
       </div>
     </div>
 
-    <!-- WALLET -->
-    <div class="panel" id="panel-wallet">
-      <div class="wallet-card">
-        <div class="wlbl">รายได้รวมทั้งระบบ (Total Revenue)</div>
-        <div class="wamt" id="w-total">loading...</div>
-        <div class="wsub" id="w-revenue-usd">$0.001 per API call</div>
+    <!-- ══ ROADMAP ══ -->
+    <div class="panel" id="panel-roadmap">
+      <div class="card">
+        <div class="irow" style="padding:10px 0"><div><div style="font-size:12px;font-weight:500">Step 1 — Deploy Railway</div><div style="font-size:10px;color:var(--muted);margin-top:2px">FastAPI + PostgreSQL + HTTPS</div></div><span style="color:var(--green);font-family:monospace">✅ Done</span></div>
+        <div class="irow" style="padding:10px 0"><div><div style="font-size:12px;font-weight:500">Step 2 — Billing + Stripe + Webhook Idempotency</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Register → Topup → Deduct → Audit trail (P-04)</div></div><span style="color:var(--green);font-family:monospace">✅ Done</span></div>
+        <div class="irow" style="padding:10px 0"><div><div style="font-size:12px;font-weight:500">Step 2.5 — Cache + Thai keywords + Multi-lang + Chairman Office</div><div style="font-size:10px;color:var(--muted);margin-top:2px">TH/EN/ZH/JA · HS table ~120 groups · SHA256 cache · Meeting Room</div></div><span style="color:var(--green);font-family:monospace">✅ Done</span></div>
+        <div class="irow" style="padding:10px 0;background:rgba(99,102,241,.06);border-left:3px solid var(--accent);padding-left:10px;margin:0 -12px;border-radius:0"><div><div style="font-size:12px;font-weight:500;color:var(--accent)">Step 3 — เติม Anthropic Credit + MOCK_MODE=false</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Unlock: Real HS · Halal engine · CEO Agent Real Mode · รายได้จริง</div></div><span style="color:var(--yellow);font-family:monospace">⏳ รอ Chairman</span></div>
+        <div class="irow" style="padding:10px 0;opacity:.5"><div><div style="font-size:12px;font-weight:500">Step 4 — Submit Registry (MCP, GPT Store, RapidAPI, LangChain Hub)</div></div><span style="color:var(--dim);font-family:monospace">⏳ รอ Step 3</span></div>
+        <div class="irow" style="padding:10px 0;border:none;opacity:.4"><div><div style="font-size:12px;font-weight:500">Step 5 — Monitor Dashboard + รายได้จริง + 60/40 Settlement</div></div><span style="color:var(--dim);font-family:monospace">⏳ รอ Step 4</span></div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem;">
-        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">📊 สถิติรายได้</div>
-        <div class="info-row"><span class="k">💰 รายได้รวม (credits ที่เติมแล้ว)</span><span class="v green" id="w-total2">—</span></div>
-        <div class="info-row"><span class="k">💵 มูลค่าโดยประมาณ (USD)</span><span class="v green" id="w-usd2">—</span></div>
-        <div class="info-row"><span class="k">🔋 Credit คงเหลือทั้งระบบ</span><span class="v" id="w-balance">—</span></div>
-        <div class="info-row"><span class="k">📡 API Calls ทั้งหมด (jobs)</span><span class="v" id="w-jobs">—</span></div>
-        <div class="info-row" style="border:none"><span class="k">👥 Clients ที่ลงทะเบียนแล้ว</span><span class="v" id="w-clients2">—</span></div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;">
-        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">System Info</div>
-        <div class="info-row"><span class="k">Railway URL</span><span class="v" style="font-size:0.72rem">https://web-production-c9da4.up.railway.app</span></div>
-        <div class="info-row"><span class="k">MOCK_MODE</span><span class="v yellow" id="w-mock">true</span></div>
-        <div class="info-row"><span class="k">Database</span><span class="v green">PostgreSQL · Railway</span></div>
-        <div class="info-row"><span class="k">GitHub</span><span class="v" style="font-size:0.72rem">bankbitcoin2/ai-to-ai-holding</span></div>
-        <div class="info-row" style="border:none"><span class="k">Stripe</span><span class="v green">Connected</span></div>
-      </div>
-      <div style="margin-top:1rem;font-size:0.8rem;color:var(--muted);text-align:center">
-        Step 3: เติม Claude API credit ที่ <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a><br>
-        แล้วตั้ง MOCK_MODE=false ใน Railway Variables
+      <div class="card">
+        <div class="sec">ไฟล์ที่ต้อง PUSH ก่อน Production</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">database.py</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">billing.py</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">schema_cache_v1.sql</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">mock_classification_agent.py</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">chairman_router.py</span>
+          <span style="background:var(--card2);border:1px solid var(--yellow);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--yellow)">static/chairman.html</span>
+          <span style="background:var(--card2);border:1px solid var(--dim);padding:3px 9px;border-radius:6px;font-size:10px;font-family:monospace;color:var(--dim)">kill_switch_*.py (รอก่อน)</span>
+        </div>
       </div>
     </div>
 
-    <!-- LOGS -->
-    <div class="panel" id="panel-logs">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
-        <span style="font-size:0.85rem;font-weight:600;">System Logs</span>
-        <button class="btn-sm" onclick="fetchLogs()">↻ โหลดใหม่</button>
-      </div>
-      <div class="log-box" id="log-box">กำลังโหลด...</div>
-    </div>
-  </div>
-</div>
+  </div><!-- /content -->
+</div><!-- /office -->
 
 <script>
-const RAILWAY = 'https://web-production-c9da4.up.railway.app';
-let CHAIRMAN_KEY = '';
-let systemHalted = false;
+const BASE = 'https://web-production-c9da4.up.railway.app';
+let CK = '';
+let sysSnap = {};
+let actLog = [];
+let cdSec = 30;
+let monthChart = null, costChart = null;
 
-// ── LOGIN ──────────────────────────────────────────────────────
+// ── CLOCK ──────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('hdr-clock').textContent = new Date().toLocaleTimeString('th-TH',{hour12:false});
+  cdSec--;
+  if (cdSec <= 0) { cdSec = 30; doRefresh(); }
+  document.getElementById('cd-badge').textContent = '↻ ' + cdSec + 's';
+}, 1000);
+
+// ── AUTH ───────────────────────────────────────────────────────
 async function doLogin() {
-  const key = document.getElementById('ck-input').value.trim();
-  if (!key) return;
+  const k = document.getElementById('ck-inp').value.trim();
   const err = document.getElementById('login-err');
   err.style.display = 'none';
   try {
-    const r = await fetch(`${RAILWAY}/health`);
-    const data = await r.json();
-    if (data.status === 'ok' || data.system_state) {
-      CHAIRMAN_KEY = key;
-      localStorage.setItem('chairman_key', key);
+    const r = await fetch(BASE + '/health');
+    if (r.ok || r.status < 500) {
+      CK = k;
+      if (k) localStorage.setItem('chairman_key', k);
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('office').style.display = 'flex';
-      startOffice();
-    } else {
-      err.style.display = 'block';
-    }
+      initCharts();
+      doRefresh();
+      setInterval(doRefresh, 30000);
+    } else { throw new Error('server error'); }
   } catch(e) {
     err.style.display = 'block';
     err.textContent = 'เชื่อมต่อ Railway ไม่ได้: ' + e.message;
   }
 }
 
-document.getElementById('ck-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+function logout() { localStorage.removeItem('chairman_key'); location.reload(); }
 
-// auto-login ถ้ามี key เก่า
 window.addEventListener('load', () => {
-  const saved = localStorage.getItem('chairman_key');
-  if (saved) {
-    document.getElementById('ck-input').value = saved;
-    doLogin();
-  }
+  const s = localStorage.getItem('chairman_key');
+  if (s) { document.getElementById('ck-inp').value = s; doLogin(); }
 });
 
-function logout() {
-  localStorage.removeItem('chairman_key');
-  location.reload();
-}
-
-// ── OFFICE INIT ────────────────────────────────────────────────
-function startOffice() {
-  updateClock();
-  setInterval(updateClock, 1000);
-  refresh();
-  setInterval(refresh, 30000);
-}
-
-function updateClock() {
-  const now = new Date();
-  document.getElementById('h-time').textContent = now.toLocaleTimeString('th-TH', {hour12:false});
-}
-
-async function refresh() {
-  await Promise.all([fetchHealth(), fetchStatus(), fetchWallet()]);
-  fetchLogs();
-}
-
-async function fetchHealth() {
-  try {
-    const r = await fetch(`${RAILWAY}/health`);
-    const d = await r.json();
-    const online = d.status === 'ok';
-    const halted = d.is_halted === true;
-    systemHalted = halted;
-    document.getElementById('h-dot').className = 'dot ' + (online ? 'dot-green' : 'dot-red');
-    document.getElementById('h-status').textContent = online ? (halted ? 'HALTED' : 'online') : 'offline';
-    document.getElementById('h-badge').textContent = halted ? 'HALTED' : d.system_state || 'OPERATIONAL';
-    document.getElementById('h-badge').className = halted ? 'badge-halt' : 'badge-op';
-    document.getElementById('ov-status').textContent = online ? 'ONLINE' : 'OFFLINE';
-    document.getElementById('ov-status').className = 'val ' + (online ? 'green' : 'red');
-    document.getElementById('ov-ks').textContent = halted ? 'HALTED 🔴' : 'ACTIVE 🟢';
-    document.getElementById('ov-ks').className = 'val ' + (halted ? 'red' : 'green');
-    // kill switch panel
-    document.getElementById('ks-display').textContent = halted ? '🔴 HALTED' : '🟢 ACTIVE';
-    document.getElementById('ks-detail').textContent = halted ? 'ระบบถูกหยุดชั่วคราว' : 'ระบบทำงานปกติ';
-    document.getElementById('btn-halt').style.display = halted ? 'none' : 'block';
-    document.getElementById('btn-resume').style.display = halted ? 'block' : 'none';
-    // org: security
-    document.getElementById('sec-status').textContent = online ? 'ทำงานปกติ' : 'ไม่ตอบสนอง';
-    document.getElementById('sec-status').className = online ? '' : 'fail';
-    // org: kill switch
-    document.getElementById('ks-status2').textContent = halted ? 'HALTED' : 'ทำงานปกติ';
-    document.getElementById('ks-badge2').textContent = halted ? 'HALTED' : 'online';
-    document.getElementById('ks-badge2').className = 'obadge ' + (halted ? 'obadge-red' : 'obadge-green');
-    // org: CEO
-    document.getElementById('ceo-status').textContent = online ? 'กำลังประมวลผล' : 'ไม่ตอบสนอง';
-    document.getElementById('ceo-badge').textContent = online ? 'online' : 'offline';
-    document.getElementById('ceo-badge').className = 'obadge ' + (online ? 'obadge-green' : 'obadge-red');
-  } catch(e) {
-    document.getElementById('h-dot').className = 'dot dot-red';
-    document.getElementById('h-status').textContent = 'offline';
-    showAlert('Server ไม่ตอบสนอง — ตรวจสอบว่า Railway ยังรันอยู่');
-  }
-}
-
-async function fetchStatus() {
-  try {
-    const r = await fetch(`${RAILWAY}/v1/status`, {
-      headers: { 'X-API-Key': CHAIRMAN_KEY }
-    });
-    if (!r.ok) return;
-    const d = await r.json();
-    const mockMode = d.mode === 'MOCK' || d.mock_mode === true;
-    document.getElementById('ov-mode').textContent = mockMode ? 'MOCK MODE' : 'LIVE MODE 🚀';
-    document.getElementById('w-mock').textContent = mockMode ? 'true (เปิด MOCK_MODE=false เพื่อ live)' : 'false ✅';
-    document.getElementById('w-mock').className = 'v ' + (mockMode ? 'yellow' : 'green');
-    // customs intelligence
-    document.getElementById('ci-real').textContent = mockMode ? 'Real API ยังไม่มี (Step 3)' : '✅ Real API Active';
-    document.getElementById('ci-real').className = mockMode ? 'fail' : '';
-  } catch(e) {}
-}
-
-async function fetchWallet() {
-  try {
-    const r = await fetch(`${RAILWAY}/v1/chairman/stats`, {
-      headers: { 'X-API-Key': CHAIRMAN_KEY }
-    });
-    if (!r.ok) return;
-    const d = await r.json();
-    // overview
-    document.getElementById('ov-clients').textContent = d.total_clients ?? '—';
-    // wallet tab
-    document.getElementById('w-total').textContent = `${d.total_revenue_credits ?? 0} credits`;
-    document.getElementById('w-revenue-usd').textContent = `~$${d.revenue_usd_estimate ?? 0} USD`;
-    document.getElementById('w-balance').textContent = `${d.total_balance_credits ?? 0} credits`;
-    document.getElementById('w-jobs').textContent = `${d.total_jobs ?? 0} calls`;
-    // org chart
-    document.getElementById('trs-credit').textContent = `รายได้รวม: ${d.total_revenue_credits ?? 0} credits`;
-    document.getElementById('cr-count').textContent = `clients: ${d.total_clients ?? 0}`;
-  } catch(e) {}
-}
-
-async function fetchLogs() {
-  const box = document.getElementById('log-box');
-  try {
-    const r = await fetch(`${RAILWAY}/v1/logs?limit=50`, {
-      headers: { 'X-API-Key': CHAIRMAN_KEY }
-    });
-    if (r.ok) {
-      const d = await r.json();
-      const entries = d.logs || d.entries || d;
-      if (Array.isArray(entries) && entries.length) {
-        box.textContent = entries.map(e =>
-          `[${e.timestamp||e.ts||''}] ${e.level||''} ${e.message||e.msg||JSON.stringify(e)}`
-        ).join('\n');
-      } else {
-        box.textContent = JSON.stringify(d, null, 2);
-      }
-    } else {
-      box.textContent = `[${new Date().toLocaleTimeString()}] Health: OK — Railway OPERATIONAL\n` +
-        `[${new Date().toLocaleTimeString()}] Mock mode active — waiting for Claude API credit (Step 3)\n` +
-        `[${new Date().toLocaleTimeString()}] Logs endpoint requires elevated access`;
-    }
-  } catch(e) {
-    box.textContent = `ERROR: ${e.message}`;
-  }
-}
-
-// ── KILL SWITCH ────────────────────────────────────────────────
-async function doHalt() {
-  if (!confirm('หยุดระบบทันที? request ทุกอย่างจะถูกบล็อก')) return;
-  try {
-    const r = await fetch(`${RAILWAY}/v1/kill-switch/halt`, {
-      method: 'POST',
-      headers: { 'X-API-Key': CHAIRMAN_KEY }
-    });
-    const d = await r.json();
-    alert(r.ok ? '🔴 ระบบหยุดแล้ว' : `Error: ${d.detail || d.message}`);
-    refresh();
-  } catch(e) { alert('Error: ' + e.message); }
-}
-
-async function doResume() {
-  try {
-    const r = await fetch(`${RAILWAY}/v1/kill-switch/resume`, {
-      method: 'POST',
-      headers: { 'X-API-Key': CHAIRMAN_KEY }
-    });
-    const d = await r.json();
-    alert(r.ok ? '🟢 ระบบกลับมาทำงานแล้ว' : `Error: ${d.detail || d.message}`);
-    refresh();
-  } catch(e) { alert('Error: ' + e.message); }
-}
-
 // ── TABS ───────────────────────────────────────────────────────
-function switchTab(name, el) {
+function sw(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'logs') fetchLogs();
+  if (name === 'clients') loadClients();
+  if (name === 'revenue') { loadTopups(); calcRev(); }
 }
 
-function showAlert(msg) {
-  document.getElementById('alert-msg').textContent = msg;
-  document.getElementById('main-alert').classList.add('show');
+// ── REFRESH ────────────────────────────────────────────────────
+async function doRefresh() {
+  const snap = {};
+  await Promise.all([
+    chkEp('/health', 'GET', null, snap),
+    chkEp('/v1/chairman/stats', 'GET', CK, snap),
+    chkEp('/v1/chairman/cache/stats', 'GET', CK, snap),
+    chkEp('/v1/chairman/topups', 'GET', CK, snap),
+    chkEp('/v1/billing/balance', 'GET', CK, snap),
+    chkSandbox(snap),
+  ]);
+  sysSnap = snap;
+  renderEp(snap);
+  updateOverview(snap);
 }
+
+async function chkEp(path, method, key, snap) {
+  const t0 = Date.now();
+  try {
+    const h = key ? {'X-API-Key': key} : {};
+    const r = await fetch(BASE + path, {method, headers: h});
+    const ms = Date.now() - t0;
+    let d = null; try { d = await r.json(); } catch(e) {}
+    snap[path] = {ok: r.status < 400, status: r.status, ms, data: d};
+    log(r.status < 400 ? 'ok' : r.status < 500 ? 'warn' : 'err',
+        r.status < 400 ? 'OK' : 'ERR', path + ' → ' + r.status + ' (' + ms + 'ms)');
+  } catch(e) {
+    snap[path] = {ok: false, status: 0, ms: Date.now()-t0, error: e.message};
+    log('err', 'ERR', path + ' → ' + e.message);
+  }
+}
+
+async function chkSandbox(snap) {
+  const t0 = Date.now();
+  try {
+    const r = await fetch(BASE + '/v1/sandbox/classify', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({items:[{description:'steel pipe',origin_country:'CN'}]})
+    });
+    const ms = Date.now()-t0;
+    let d = null; try { d = await r.json(); } catch(e) {}
+    snap['/v1/sandbox/classify'] = {ok: r.status < 400, status: r.status, ms, data: d};
+    log(r.status<400?'ok':'err', r.status<400?'OK':'ERR', '/v1/sandbox/classify → '+r.status+' ('+ms+'ms)');
+  } catch(e) {
+    snap['/v1/sandbox/classify'] = {ok:false, status:0, error:e.message};
+    log('err','ERR','/v1/sandbox/classify → '+e.message);
+  }
+}
+
+function renderEp(snap) {
+  const defs = [
+    {p:'/health', n:'/health', detail: s => s.data ? (s.data.system_state||s.data.status||'ok') : ''},
+    {p:'/v1/chairman/stats', n:'/chairman/stats', detail: s => s.data ? 'clients='+s.data.total_clients+' rev=$'+parseFloat(s.data.total_revenue_usd||0).toFixed(2) : (s.status===403?'ต้องใช้ Chairman Key':'—')},
+    {p:'/v1/sandbox/classify', n:'/sandbox/classify', detail: s => s.data&&s.data.results ? 'HS='+s.data.results[0].hs_code : (s.ok?'ok':'error')},
+    {p:'/v1/chairman/topups', n:'/chairman/topups', detail: s => s.data ? 'topups='+s.data.total_topup_count+' deducts='+s.data.total_deduct_count : (s.status===403?'ต้องใช้ Chairman Key':'—')},
+    {p:'/v1/billing/balance', n:'/billing/balance', detail: s => s.status===401?'ต้องใช้ API Key':s.ok?'ok':'error'},
+    {p:'/v1/chairman/cache/stats', n:'/cache/stats', detail: s => s.data ? 'entries='+s.data.total_cached_entries+' saved='+s.data.api_calls_saved : (s.status===403?'ต้องใช้ Chairman Key':'—')},
+  ];
+  document.getElementById('ep-grid').innerHTML = defs.map(def => {
+    const s = snap[def.p] || {};
+    const cls = !s.status ? '' : s.ok ? 'ok' : s.status < 500 ? 'warn' : 'err';
+    const stlbl = !s.status ? 'checking...' : s.ok ? '✓ OK '+s.status : (s.status<500?'⚠ '+s.status:'✗ ERR '+s.status);
+    return '<div class="ep '+cls+'"><div class="ep-name">'+def.n+'</div>'
+      +'<div class="ep-st '+cls+'">'+stlbl+'</div>'
+      +'<div class="ep-ms">'+(s.ms||'—')+'ms</div>'
+      +(def.detail(s)?'<div class="ep-det">'+def.detail(s)+'</div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function updateOverview(snap) {
+  const h = snap['/health'];
+  const st = snap['/v1/chairman/stats'];
+  const c = snap['/v1/chairman/cache/stats'];
+  const t = snap['/v1/chairman/topups'];
+
+  const online = h && h.ok;
+  const halted = h && h.data && h.data.is_halted;
+  const mock = !h || !h.data || h.data.mock_mode !== false;
+
+  document.getElementById('h-dot').className = 'dot ' + (online ? 'dg' : 'dr');
+  document.getElementById('h-st').textContent = online ? (halted ? 'HALTED' : 'online') : 'offline';
+  document.getElementById('sys-badge').textContent = halted ? 'HALTED' : (online ? 'OPERATIONAL' : 'OFFLINE');
+  document.getElementById('sys-badge').className = halted || !online ? 'halt' : '';
+  document.getElementById('ov-online').textContent = online ? (halted?'HALTED':'ONLINE') : 'OFFLINE';
+  document.getElementById('ov-online').style.color = online && !halted ? 'var(--green)' : 'var(--red)';
+  document.getElementById('ov-mode').textContent = mock ? 'MOCK MODE' : 'LIVE MODE 🚀';
+  document.getElementById('ov-mode').style.color = mock ? 'var(--yellow)' : 'var(--green)';
+  document.getElementById('ov-ks').textContent = halted ? 'HALTED 🔴' : 'ACTIVE 🟢';
+  document.getElementById('ov-ks').style.color = halted ? 'var(--red)' : 'var(--green)';
+  document.getElementById('p2-st').textContent = halted ? '✗ HALTED' : '⏳ pending push';
+  document.getElementById('ceo-sub').textContent = mock ? 'Mock Mode — rule-based' : 'Real Mode — Claude API';
+  document.getElementById('ceo-badge').textContent = online ? (mock?'mock':'live') : 'offline';
+  document.getElementById('ci-mode').textContent = mock ? 'Real API รอ credit' : '✅ Real API Active';
+  document.getElementById('ci-mode').className = mock ? 'f' : '';
+
+  // kill switch panel
+  document.getElementById('ks-icon').textContent = halted ? '🔴' : '🟢';
+  document.getElementById('ks-lbl').textContent = halted ? 'HALTED' : 'ACTIVE';
+  document.getElementById('ks-lbl').style.color = halted ? 'var(--red)' : 'var(--green)';
+  document.getElementById('ks-desc').textContent = halted ? 'ระบบถูกหยุดชั่วคราว' : 'ระบบทำงานปกติ — รับ request ทุก endpoint';
+  document.getElementById('btn-halt').style.display = halted ? 'none' : 'block';
+  document.getElementById('btn-res').style.display = halted ? 'block' : 'none';
+
+  if (st && st.data) {
+    document.getElementById('ov-clients').textContent = st.data.total_clients ?? '—';
+    document.getElementById('rv-total').textContent = '$' + parseFloat(st.data.total_revenue_usd||0).toFixed(2);
+    document.getElementById('rv-bal').textContent = '$' + parseFloat(st.data.total_balance_usd||0).toFixed(2);
+    document.getElementById('rv-jobs').textContent = st.data.total_jobs ?? '—';
+    document.getElementById('trs-badge').textContent = 'rev $' + parseFloat(st.data.total_revenue_usd||0).toFixed(2);
+  }
+  if (c && c.data) {
+    document.getElementById('ov-cache').textContent = c.data.api_calls_saved ?? '—';
+  }
+  if (t && t.data) {
+    document.getElementById('rv-txn').textContent = t.data.total_topup_count ?? '—';
+    document.getElementById('rv-jobs').textContent = t.data.total_deduct_count ?? '—';
+  }
+}
+
+// ── CLIENTS ────────────────────────────────────────────────────
+async function loadClients() {
+  const body = document.getElementById('cl-body');
+  body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--dim)">กำลังโหลด...</td></tr>';
+  try {
+    const r = await fetch(BASE + '/v1/chairman/clients', {headers:{'X-API-Key': CK}});
+    if (!r.ok) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--red)">Error '+r.status+' — ต้องใช้ Chairman Key</td></tr>'; return; }
+    const d = await r.json();
+    document.getElementById('cl-count').textContent = 'ทั้งหมด ' + d.total + ' agent(s)';
+    if (!d.clients || !d.clients.length) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--dim)">ยังไม่มี client</td></tr>'; return; }
+    body.innerHTML = d.clients.map(c => {
+      const dt = (c.registered_at||'').slice(0,10);
+      const bc = c.status==='ACTIVE' ? 'badge-g' : 'badge-r';
+      return '<tr>'
+        + '<td style="font-weight:500">'+( c.agent_name||'—')+'</td>'
+        + '<td style="color:var(--muted);font-family:monospace;font-size:11px">'+(c.contact_email||'').substring(0,26)+'</td>'
+        + '<td style="font-family:monospace;font-size:10px;color:var(--muted)">...'+( c.api_key_hint||'')+'</td>'
+        + '<td style="text-align:right;color:'+(c.credit_balance>0?'var(--green)':'var(--muted)')+'">$'+parseFloat(c.credit_balance||0).toFixed(2)+'</td>'
+        + '<td style="text-align:right">$'+parseFloat(c.credit_topup_total||0).toFixed(2)+'</td>'
+        + '<td style="text-align:center"><span class="badge '+bc+'">'+c.status+'</span></td>'
+        + '<td style="color:var(--muted);font-size:11px">'+dt+'</td>'
+        + '</tr>';
+    }).join('');
+  } catch(e) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red)">'+e.message+'</td></tr>'; }
+}
+
+// ── TOPUPS ─────────────────────────────────────────────────────
+async function loadTopups() {
+  const body = document.getElementById('topup-body');
+  try {
+    const r = await fetch(BASE + '/v1/chairman/topups?limit=20', {headers:{'X-API-Key': CK}});
+    if (!r.ok) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--dim)">ต้องใช้ Chairman Key</td></tr>'; return; }
+    const d = await r.json();
+    if (!d.topups || !d.topups.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--dim)">ยังไม่มี topup transaction</td></tr>'; return; }
+    body.innerHTML = d.topups.map(t => {
+      const bc = t.status==='completed'?'badge-g':t.status==='pending'?'badge-y':'badge-r';
+      const dt = (t.created_at||'').slice(0,16).replace('T',' ');
+      return '<tr>'
+        + '<td>'+(t.agent_name||'—')+'</td>'
+        + '<td style="font-size:11px;color:var(--muted)">'+(t.contact_email||'')+'</td>'
+        + '<td style="text-align:right;color:var(--green);font-weight:600">$'+parseFloat(t.amount_usd||0).toFixed(2)+'</td>'
+        + '<td style="font-size:11px;color:var(--muted)">'+dt+'</td>'
+        + '<td style="text-align:center"><span class="badge '+bc+'">'+t.status+'</span></td>'
+        + '</tr>';
+    }).join('');
+  } catch(e) { body.innerHTML = '<tr><td colspan="5" style="color:var(--red)">'+e.message+'</td></tr>'; }
+}
+
+// ── REVENUE CALCULATOR ─────────────────────────────────────────
+function calcRev() {
+  const c = parseInt(document.getElementById('sl-c').value);
+  const k = parseInt(document.getElementById('sl-k').value);
+  const h = parseInt(document.getElementById('sl-h').value);
+  document.getElementById('lc').textContent = c;
+  document.getElementById('lk').textContent = k;
+  document.getElementById('lh').textContent = h + '%';
+  const realCalls = Math.round(c * k * (1 - h/100));
+  const daily = realCalls * 1.50;
+  const monthly = Math.round(daily * 30);
+  document.getElementById('r-calls').textContent = realCalls.toLocaleString();
+  document.getElementById('r-day').textContent = '$' + daily.toFixed(2);
+  document.getElementById('r-month').textContent = '$' + monthly.toLocaleString();
+  buildMonthly(daily);
+}
+
+// ── CHARTS ─────────────────────────────────────────────────────
+function initCharts() {
+  // Cost donut
+  costChart = new Chart(document.getElementById('chart-cost'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Chairman 40%','Corporate 60%','Claude API cost'],
+      datasets:[{data:[0.60,0.90,0.002],backgroundColor:['#10b981','#6366f1','#ef4444'],borderWidth:0,hoverOffset:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:'#f1f5f9',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>' $'+ctx.raw.toFixed(3)}}}}
+  });
+  calcRev();
+}
+
+function buildMonthly(dailyRev) {
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const data = months.map((_,i) => Math.round(dailyRev * 30 * Math.pow(1.08, i)));
+  const corp = data.map(v => Math.round(v * 0.6));
+  const chair = data.map(v => Math.round(v * 0.4));
+  if (monthChart) monthChart.destroy();
+  monthChart = new Chart(document.getElementById('chart-monthly'), {
+    type:'bar',
+    data:{labels:months,datasets:[
+      {label:'Corporate 60%',data:corp,backgroundColor:'#6366f1',stack:'a',borderRadius:3},
+      {label:'Chairman 40%',data:chair,backgroundColor:'#10b981',stack:'a',borderRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#f1f5f9',boxWidth:10,font:{size:10}}},tooltip:{callbacks:{label:ctx=>' $'+ctx.raw.toLocaleString()}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#64748b',font:{size:10}}},y:{stacked:true,grid:{color:'rgba(26,37,64,.5)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'$'+v.toLocaleString()}}}}
+  });
+}
+
+// ── KILL SWITCH ────────────────────────────────────────────────
+async function doHalt() {
+  if (!confirm('หยุดระบบทันที?')) return;
+  try {
+    const r = await fetch(BASE + '/v1/kill-switch/halt', {method:'POST', headers:{'X-API-Key': CK}});
+    const d = await r.json();
+    log('warn','HALT', r.ok ? 'ระบบถูกหยุดแล้ว' : d.detail||d.message);
+    doRefresh();
+  } catch(e) { log('err','ERR','halt: '+e.message); }
+}
+
+async function doResume() {
+  try {
+    const r = await fetch(BASE + '/v1/kill-switch/resume', {method:'POST', headers:{'X-API-Key': CK}});
+    const d = await r.json();
+    log('ok','OK', r.ok ? 'ระบบกลับมาแล้ว' : d.detail||d.message);
+    doRefresh();
+  } catch(e) { log('err','ERR','resume: '+e.message); }
+}
+
+// ── ACTIVITY LOG ───────────────────────────────────────────────
+function log(level, label, msg) {
+  const now = new Date().toLocaleTimeString('th-TH',{hour12:false});
+  actLog.unshift({now, level, label, msg});
+  if (actLog.length > 80) actLog.pop();
+  const html = actLog.map(e =>
+    '<div class="lentry"><span class="lt">'+e.now+'</span><span class="ll '+e.level+'">'+e.label+'</span><span class="lm">'+e.msg+'</span></div>'
+  ).join('');
+  document.getElementById('ov-log').innerHTML = html;
+  document.getElementById('meet-log').innerHTML = html;
+}
+
+// ── ARIA CHAT ─────────────────────────────────────────────────
+function sq(txt) { document.getElementById('chat-txt').value = txt; sendMsg(); }
+
+async function sendMsg() {
+  const txt = document.getElementById('chat-txt').value.trim();
+  if (!txt) return;
+  document.getElementById('chat-txt').value = '';
+  document.getElementById('send-btn').disabled = true;
+  addBubble('user', txt);
+  const tid = addBubble('bot', '...กำลังวิเคราะห์ข้อมูลระบบ...', true);
+
+  const h = sysSnap['/health'];
+  const st = sysSnap['/v1/chairman/stats'];
+  const t = sysSnap['/v1/chairman/topups'];
+  const online = h && h.ok;
+  const halted = h && h.data && h.data.is_halted;
+  const mock = !h || !h.data || h.data.mock_mode !== false;
+  const errors = Object.entries(sysSnap).filter(([_,v]) => !v.ok);
+  const clients = st && st.data ? st.data.total_clients : '?';
+  const rev = st && st.data ? parseFloat(st.data.total_revenue_usd||0).toFixed(2) : '?';
+
+  const ctx = {
+    railway: BASE,
+    online, halted, mock_mode: mock,
+    clients, revenue_usd: rev,
+    jobs: st && st.data ? st.data.total_jobs : 0,
+    topup_count: t && t.data ? t.data.total_topup_count : 0,
+    deduct_count: t && t.data ? t.data.total_deduct_count : 0,
+    endpoints_with_errors: errors.map(([k,v])=>({path:k,status:v.status,error:v.error}))
+  };
+
+  // Rule-based ARIA (ไม่ต้องใช้ API)
+  let reply = '';
+  const q = txt.toLowerCase();
+
+  if (errors.length > 0 && (q.includes('error')||q.includes('เสีย')||q.includes('ปัญหา')||q.includes('ผิด'))) {
+    reply = 'ท่านประธาน — พบปัญหา '+errors.length+' endpoint:\n'
+      + errors.map(([k,v])=>'• '+k+' → '+(v.error?'Failed to fetch (CORS หรือ server down)':'HTTP '+v.status)).join('\n')
+      + '\n\n⚠ หาก "Failed to fetch" ทุกตัว หมายความว่า Railway หยุดทำงาน หรือ CORS บล็อก request จาก browser ให้ตรวจสอบที่ Railway Dashboard ครับ';
+  } else if (q.includes('สถานะ')||q.includes('status')||q.includes('overview')) {
+    reply = 'ท่านประธาน — สถานะระบบ ณ ขณะนี้:\n'
+      + '• Railway: '+(online?'🟢 Online':'🔴 Offline')+'\n'
+      + '• Mode: '+(mock?'MOCK (รอ Anthropic credit)':'LIVE 🚀')+'\n'
+      + '• Kill Switch: '+(halted?'🔴 HALTED':'🟢 Active')+'\n'
+      + '• Clients: '+clients+' agent(s)\n'
+      + '• Revenue: $'+rev+' USD\n'
+      + (errors.length?'• ⚠ Error '+errors.length+' endpoint':'• ✓ ทุก endpoint ปกติ');
+  } else if (q.includes('รายได้')||q.includes('revenue')||q.includes('client')||q.includes('เงิน')) {
+    reply = 'ท่านประธาน — รายงานการเงิน:\n'
+      + '• Clients ลงทะเบียนแล้ว: '+clients+' agent(s)\n'
+      + '• รายได้รวม (topup): $'+rev+' USD\n'
+      + '• Chairman (40%): $'+((parseFloat(rev||0)*0.4).toFixed(2))+' USD\n'
+      + '• Corporate (60%): $'+((parseFloat(rev||0)*0.6).toFixed(2))+' USD\n'
+      + '• Topup transactions: '+ctx.topup_count+' รายการ\n'
+      + '• API calls (deduct): '+ctx.deduct_count+' ครั้ง\n'
+      + '\nรายได้ยังเป็น $0 เพราะระบบอยู่ใน Mock Mode ครับ — unlock ได้ทันทีเมื่อเติม Anthropic credit';
+  } else if (q.includes('stripe')||q.includes('billing')||q.includes('ชำระ')) {
+    reply = 'ท่านประธาน — สถานะ Stripe:\n'
+      + '• Billing logic: ✅ พร้อมแล้ว (idempotency + audit trail แก้แล้ว)\n'
+      + '• Webhook: ✅ HMAC verify + กัน duplicate credit\n'
+      + '• ยังต้องทำก่อนใช้จริง:\n'
+      + '  1. ตั้ง STRIPE_SECRET_KEY ใน Railway Variables\n'
+      + '  2. ตั้ง STRIPE_WEBHOOK_SECRET\n'
+      + '  3. แจ้ง Webhook URL ใน Stripe Dashboard:\n'
+      + '     '+BASE+'/v1/billing/webhook';
+  } else if (q.includes('next')||q.includes('ถัดไป')||q.includes('ต่อไป')) {
+    reply = 'ท่านประธาน — ขั้นตอนถัดไปที่ต้องทำ:\n\n'
+      + '1. ✅ Push ไฟล์ที่แก้ไปทั้งหมดขึ้น GitHub\n'
+      + '   (database.py, billing.py, schema_cache_v1.sql, mock_classification_agent.py, chairman_router.py, chairman.html)\n\n'
+      + '2. 🔑 ตั้งค่า Stripe Keys ใน Railway Variables\n\n'
+      + '3. 💳 เติม Anthropic credit ที่ console.anthropic.com\n'
+      + '   แล้วตั้ง MOCK_MODE=false → เปิด real AI classification\n\n'
+      + '4. 📢 Submit API registry (MCP, GPT Store, RapidAPI)\n\n'
+      + 'Unlock เดียวที่เปิดทุกอย่างคือ Anthropic credit ครับ';
+  } else if (q.includes('railway')||q.includes('ออนไลน์')||q.includes('server')) {
+    reply = 'ท่านประธาน — Railway status:\n'
+      + '• URL: '+BASE+'\n'
+      + '• Status: '+(online?'🟢 Online':'🔴 ไม่ตอบสนอง')+'\n'
+      + (errors.length?'• Failed to fetch '+errors.length+' endpoint — อาจเป็น CORS หรือ server sleep\n':'• ทุก endpoint ตอบสนองปกติ\n')
+      + '\n💡 Railway free tier: server sleep หลัง 15 นาที ไม่มี request — ทดสอบที่ /health ก่อนเสมอครับ';
+  } else {
+    reply = 'ท่านประธาน — รับทราบครับ\n'
+      + 'ระบบขณะนี้: '+(online?'🟢 Online':'🔴 Offline')+' | Mode: '+(mock?'MOCK':'LIVE')+' | Clients: '+clients+'\n\n'
+      + 'สามารถถามผมได้เกี่ยวกับ: สถานะระบบ, Error, รายได้, Stripe, Next Steps, Railway ครับ';
+  }
+
+  removeBubble(tid);
+  addBubble('bot', reply);
+  document.getElementById('send-btn').disabled = false;
+}
+
+let msgN = 0;
+function addBubble(role, txt, thinking=false) {
+  const id = 'b'+( ++msgN);
+  const body = document.getElementById('chat-body');
+  const el = document.createElement('div');
+  el.className = 'msg msg-'+(role==='bot'?'b':'u');
+  el.id = id;
+  const now = new Date().toLocaleTimeString('th-TH',{hour12:false});
+  el.innerHTML = '<div class="bubble bubble-'+(role==='bot'?'b':'u')+(thinking?' thinking':'')+'">'+txt.replace(/\n/g,'<br>')+'</div>'
+    + '<div class="msg-time">'+now+'</div>';
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return id;
+}
+function removeBubble(id) { const e = document.getElementById(id); if(e) e.remove(); }
 </script>
 </body>
 </html>

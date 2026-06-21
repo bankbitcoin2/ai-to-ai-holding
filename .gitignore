@@ -1,10 +1,40 @@
-# Sensitive — ห้าม push ขึ้น GitHub เด็ดขาด
+# ======================================================
+# SENSITIVE —ห้าม push เด็ดขาด
+# ======================================================
+
+# Environment & Secrets
 .env
+*.env
+.env.*
+
+# Local database
 *.db
-*.sqlite
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Chairman private files
+chairman_wallet_setup.py
+chairman_wallet_recover.py
+DNA.txt
+deploy.sh
+
+# Chat history & internal docs
+แชต*.txt
+แพ็คเกจ.txt
+Newcutom.txt
+PlanFull.txt
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
-.DS_Store
+
+# Virtual environments
 venv/
-*.key
+.venv/
+
+# OS
+.DS_Store
+.fuse_hidden*
+Thumbs.db

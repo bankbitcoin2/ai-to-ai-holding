@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_model": "ai_to_ai_holding_customs",
   "name_for_human": "AI TO AI HOLDING — Thai Trade Intelligence",
-  "description_for_model": "Trade intelligence API for AI agents. Classifies HS codes from product descriptions, calculates Thai import duties, checks OGA compliance requirements, and looks up FTA preferential rates across 13 agreements (RCEP, AFTA, ACFTA, AJCEP, AKFTA, AANZFTA, AIFTA, TAFTA, TNZCEP, JTEPA, TCFTA, TPFTA, MFN). Always returns confidence scores and legal source citations. Never returns binding legal advice — outputs are decision-support only. Use POST /v1/customs/classify with X-API-Key header for production. Use POST /v1/sandbox/classify for free trial (no auth required).",
-  "description_for_human": "Thai customs HS code classification, import duty calculation, OGA compliance check, and FTA rate lookup for 13 trade agreements. Built for AI-to-AI transactions.",
+  "description_for_model": "Thai Trade Intelligence API for AI agents. One call returns: HS code classification (Thai + English input), import duty (MFN), best FTA rate across 13 agreements, OGA permit requirements from relevant Thai agencies, and Halal compliance status across 21 countries. Every response includes SHA-256 audit hash and CKAN-verified source citation. Lookup pipeline: keyword_match → CKAN_fallback → cache. Output is decision-support only — not binding legal advice. Sandbox: POST /v1/sandbox/classify (no auth, 20 req/min). Production: POST /v1/customs/classify with X-API-Key header (60 req/min, $1.50/query prepaid via Stripe).",
+  "description_for_human": "One API call. Full Thai trade compliance. HS code + 13 FTA rates + OGA permits + Halal status across 21 countries — with SHA-256 evidence chain on every answer. Accepts Thai and English product descriptions.",
   "auth": {
     "type": "service_http",
     "authorization_type": "bearer",
@@ -11,37 +11,67 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://api.ai-to-ai-holding.com/openapi.json",
+    "url": "https://web-production-c9da4.up.railway.app/openapi.json",
     "is_user_authenticated": false
   },
-  "logo_url": "https://api.ai-to-ai-holding.com/static/logo.png",
-  "contact_email": "api@ai-to-ai-holding.com",
-  "legal_info_url": "https://api.ai-to-ai-holding.com/docs",
+  "logo_url": "https://web-production-c9da4.up.railway.app/static/logo.png",
+  "contact_email": "bankbitcoin2@gmail.com",
+  "legal_info_url": "https://web-production-c9da4.up.railway.app/docs",
   "capabilities": [
     "hs_code_classification",
     "import_duty_calculation",
-    "oga_compliance_check",
     "fta_rate_lookup",
+    "oga_compliance_check",
+    "halal_certification_check",
+    "ckan_customs_fallback",
+    "sha256_evidence_chain",
     "thai_customs_law",
     "trade_statistics"
   ],
   "gpt_actions": {
     "type": "openapi",
-    "url": "https://api.ai-to-ai-holding.com/openapi.json"
+    "url": "https://web-production-c9da4.up.railway.app/openapi.json"
   },
   "jurisdictions": ["TH"],
   "languages": ["th", "en"],
+  "input_languages": {
+    "th": "รับชื่อสินค้าภาษาไทย เช่น มือถือ รถยนต์ ข้าวหอมมะลิ ทองคำ",
+    "en": "Accepts English product descriptions e.g. hydraulic excavator, frozen shrimp",
+    "mixed": "Thai and English keywords can be combined in a single description"
+  },
   "fta_coverage": [
     "AFTA", "ACFTA", "AJCEP", "AKFTA", "AANZFTA",
     "AIFTA", "TAFTA", "TNZCEP", "JTEPA", "RCEP",
     "TCFTA", "TPFTA", "MFN"
   ],
+  "halal_engine": {
+    "countries_covered": 21,
+    "note": "Checks halal certification requirement per destination country"
+  },
+  "oga_engine": {
+    "agencies": [
+      "FDA (อย.)", "กรมประมง", "กรมปศุสัตว์",
+      "มอก./TISI", "กรมวิชาการเกษตร",
+      "กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่"
+    ],
+    "note": "Returns required permit agencies per HS code"
+  },
+  "audit": {
+    "evidence_chain": "SHA-256 hash on every response",
+    "ckan_fallback": "Queries Thai Customs CKAN open data when keyword match is insufficient",
+    "lookup_chain": ["keyword_match", "CKAN_fallback", "cache_hit"]
+  },
   "pricing": {
-    "sandbox": "free",
-    "production": "pay-per-call, prepaid credits"
+    "sandbox": "free — no API key required, 20 req/min",
+    "production": "$1.50 per query — prepaid credits via Stripe, no contract, no monthly fee"
   },
   "rate_limits": {
     "sandbox": "20 req/min (no auth)",
-    "production": "60 req/min (API key required)"
+    "production": "60 req/min (X-API-Key required)"
+  },
+  "sandbox_example": {
+    "method": "POST",
+    "url": "https://web-production-c9da4.up.railway.app/v1/sandbox/classify",
+    "body": { "description": "มือถือ iPhone 16 Pro" }
   }
 }

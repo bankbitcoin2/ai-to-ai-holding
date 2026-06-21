@@ -115,6 +115,74 @@ async def register_client(req: RegisterRequest):
         "sandbox": "ทดลองฟรีได้ที่ POST /v1/sandbox/classify (ไม่ต้องใช้ API key)",
     }
 
+# ── Recover Key ───────────────────────────────────────────────
+
+class RecoverKeyRequest(BaseModel):
+    contact_email: str = Field(..., description="Email ที่ใช้สมัคร")
+    agent_name: str = Field(..., description="ชื่อ Agent ที่ใช้สมัคร (ยืนยันตัวตน)")
+
+@router.post("/recover-key", summary="กู้คืน API Key ด้วย email + ชื่อ Agent")
+async def recover_key(req: RecoverKeyRequest):
+    """
+    ลูกค้าลืม API Key:
+    1. ยืนยัน email + agent_name ต้องตรงกับที่สมัคร
+    2. ออก API Key ใหม่ (hint ใหม่)
+    3. Key เก่า invalidate อัตโนมัติ (hint เปลี่ยน)
+    4. บันทึก audit event
+    """
+    db = await _get_db()
+    try:
+        async with db.execute(
+            "SELECT id, agent_name, contact_email, status FROM client_agents "
+            "WHERE contact_email = ? AND LOWER(agent_name) = LOWER(?)",
+            (req.contact_email.strip(), req.agent_name.strip())
+        ) as cur:
+            row = await cur.fetchone()
+
+        if not row:
+            raise HTTPException(404, {
+                "error": "NOT_FOUND",
+                "message": "ไม่พบบัญชีที่ตรงกับ email และชื่อ Agent ที่ระบุ"
+            })
+
+        if row["status"] != "ACTIVE":
+            raise HTTPException(403, {
+                "error": "ACCOUNT_SUSPENDED",
+                "message": "บัญชีนี้ถูกระงับ ติดต่อ support"
+            })
+
+        # ออก key ใหม่
+        new_key  = _generate_api_key()
+        new_hint = new_key[-8:]
+        now      = datetime.now(timezone.utc).isoformat()
+
+        await db.execute(
+            "UPDATE client_agents SET api_key_hint = ? WHERE id = ?",
+            (new_hint, row["id"])
+        )
+
+        # audit trail
+        audit_detail = f"KEY_RECOVERED|agent_id={row['id']}|email={req.contact_email}|new_hint=...{new_hint}"
+        audit_hash   = hashlib.sha256(audit_detail.encode()).hexdigest()
+        await db.execute(
+            "INSERT INTO audit_events (id, event_type, actor_id, detail, sha256_hash, created_at) "
+            "VALUES (?, 'KEY_RECOVERY', ?, ?, ?, ?)",
+            (str(uuid.uuid4()), row["id"], audit_detail, audit_hash, now)
+        )
+        await db.commit()
+
+    finally:
+        await db.close()
+
+    return {
+        "success": True,
+        "message": "ออก API Key ใหม่สำเร็จ Key เก่าถูก invalidate แล้ว",
+        "api_key": new_key,
+        "api_key_hint": f"...{new_hint}",
+        "agent_name": row["agent_name"],
+        "warning": "บันทึก key ใหม่นี้ไว้ให้ดี จะไม่แสดงอีก",
+    }
+
 # ── Check Balance ─────────────────────────────────────────────
 
 @router.get("/billing/balance", summary="ตรวจสอบ credit คงเหลือ")
@@ -209,7 +277,7 @@ async def stripe_webhook(request: Request):
             expected = hmac.new(
                 STRIPE_WEBHOOK_SECRET.encode(),
                 signed.encode(),
-                hashlib.sha256
+                digestmod=hashlib.sha256
             ).hexdigest()
             if not hmac.compare_digest(expected, v1):
                 raise HTTPException(400, "Invalid signature")
@@ -230,67 +298,69 @@ async def stripe_webhook(request: Request):
         if agent_id and amount_usd > 0:
             db = await _get_db()
             try:
+                # ── Idempotency check: ถ้า session นี้ completed แล้ว ข้ามทันที ──
+                async with db.execute(
+                    "SELECT status FROM credit_topups WHERE stripe_session_id = ?",
+                    (stripe_session_id,)
+                ) as cur:
+                    topup_row = await cur.fetchone()
+
+                if topup_row and topup_row["status"] == "completed":
+                    print(f"[BILLING] Webhook duplicate ignored: {stripe_session_id}")
+                    return {"received": True}
+
+                # ── Credit the agent ──────────────────────────────────
                 await db.execute("""
                     INSERT INTO client_credits (agent_id, credit_balance, credit_topup_total)
                     VALUES (?, ?, ?)
                     ON CONFLICT(agent_id) DO UPDATE SET
                         credit_balance = credit_balance + excluded.credit_balance,
-                        credit_topup_total = credit_topup_total + excluded.credit_topup_total,
-                        updated_at = strftime('%Y-%m-%dT%H:%M:%SZ','now')
+                        credit_topup_total = credit_topup_total + excluded.credit_topup_total
                 """, (agent_id, amount_usd, amount_usd))
+
+                # ── Mark topup completed ───────────────────────────────
+                now = datetime.now(timezone.utc).isoformat()
                 await db.execute("""
-                    UPDATE credit_topups
-                    SET status = 'completed',
-                        completed_at = ?,
-                        stripe_payment_intent = ?
+                    UPDATE credit_topups SET status = 'completed'
                     WHERE stripe_session_id = ?
-                """, (datetime.now(timezone.utc).isoformat(),
-                      session.get("payment_intent", ""),
-                      stripe_session_id))
+                """, (stripe_session_id,))
+
+                # ── SHA-256 audit event ────────────────────────────────
+                audit_detail = (
+                    f"TOPUP_COMPLETE|agent_id={agent_id}"
+                    f"|amount_usd={amount_usd}|stripe_session={stripe_session_id}"
+                )
+                audit_hash = hashlib.sha256(audit_detail.encode()).hexdigest()
+                await db.execute(
+                    "INSERT INTO audit_events "
+                    "(id, event_type, actor_id, detail, sha256_hash, created_at) "
+                    "VALUES (?, 'CREDIT_TOPUP', ?, ?, ?, ?)",
+                    (str(uuid.uuid4()), agent_id, audit_detail, audit_hash, now)
+                )
                 await db.commit()
+                print(f"[BILLING] Credit +{amount_usd} USD → agent {agent_id}")
+
+            except Exception as exc:
+                print(f"[BILLING] Webhook processing error: {exc}")
+                raise HTTPException(500, "Internal error processing webhook")
             finally:
                 await db.close()
 
     return {"received": True}
 
-@router.get("/billing/success", include_in_schema=False)
-async def billing_success():
-    return {"message": "ชำระเงินสำเร็จ! Credit จะเข้าบัญชีภายใน 1-2 นาที"}
+# ── Stripe Success / Cancel redirect pages ────────────────────
 
-@router.get("/billing/cancel", include_in_schema=False)
+@router.get("/billing/success")
+async def billing_success(session_id: str = ""):
+    return JSONResponse({
+        "status": "success",
+        "message": "ชำระเงินสำเร็จ! Credit จะถูกเติมภายใน 1-2 นาที",
+        "session_id": session_id,
+    })
+
+@router.get("/billing/cancel")
 async def billing_cancel():
-    return {"message": "ยกเลิกการชำระเงิน กลับมาเติมได้ใหม่ที่ POST /v1/billing/topup"}
-
-# ── Auto-deduct helper (เรียกจาก customs.py) ─────────────────
-
-async def deduct_credit(api_key: str, item_count: int) -> dict:
-    """
-    หัก credit ก่อน classify จริง
-    return: {"success": True, "remaining": float} หรือ raise HTTPException 402
-    """
-    cost = round(PRICE_PER_ITEM * item_count, 4)
-    db = await _get_db()
-    try:
-        row = await _get_agent_by_key(db, api_key)
-        if not row:
-            raise HTTPException(401, "API key ไม่ถูกต้อง")
-        balance = row["credit_balance"]
-        if balance < cost:
-            raise HTTPException(
-                402,
-                f"Credit ไม่พอ — ต้องการ ${cost:.2f} แต่มี ${balance:.2f} "
-                f"เติมได้ที่ POST /v1/billing/topup"
-            )
-        new_balance = round(balance - cost, 4)
-        await db.execute("""
-            UPDATE client_credits SET credit_balance = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%SZ','now')
-            WHERE agent_id = ?
-        """, (new_balance, row["id"]))
-        await db.execute(
-            "UPDATE client_agents SET total_spend = total_spend + ? WHERE id = ?",
-            (cost, row["id"])
-        )
-        await db.commit()
-    finally:
-        await db.close()
-    return {"success": True, "cost": cost, "remaining": new_balance, "agent_id": row["id"]}
+    return JSONResponse({
+        "status": "cancelled",
+        "message": "ยกเลิกการชำระเงิน ไม่มีการตัดเงิน",
+    })

@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS hs_classification_cache (
     notes           TEXT,
     model_used      TEXT,                      -- 'mock' | 'haiku' | 'sonnet' ฯลฯ
     hit_count       INTEGER DEFAULT 1,         -- ถูกดึงกี่ครั้งแล้ว
-    created_at      TIMESTAMP DEFAULT NOW(),
-    last_hit_at     TIMESTAMP DEFAULT NOW()
+    created_at      TIMESTAMP DEFAULT (datetime('now')),
+    last_hit_at     TIMESTAMP DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_cache_hs ON hs_classification_cache(hs_code);

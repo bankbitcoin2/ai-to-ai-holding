@@ -52,7 +52,7 @@
   .section-title { text-align: center; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
   .section-sub { text-align: center; color: var(--muted); margin-bottom: 3rem; }
   .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; transition: border-color 0.2s; }
+  .card { cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; } .card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(99,102,241,0.2); } .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; transition: border-color 0.2s; }
   .card:hover { border-color: var(--accent); }
   .card-icon { font-size: 1.75rem; margin-bottom: 1rem; }
   .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
@@ -123,26 +123,26 @@
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="stat-num">6,000+</div><div class="stat-label" data-i18n="stat_hs">HS Code ที่รองรับ</div></div>
-  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label" data-i18n="stat_uptime">ให้บริการตลอดเวลา</div></div>
-  <div class="stat"><div class="stat-num">$0.001</div><div class="stat-label" data-i18n="stat_price">ต่อ 1 รายการ</div></div>
+  <div class="stat"><div class="stat-num">6,000+</div><div class="stat-label" data-i18n="stat_hs">HS Code รองรับ</div></div>
+  <div class="stat"><div class="stat-num">13</div><div class="stat-label">ความตกลง FTA</div></div>
+  <div class="stat"><div class="stat-num">$1.50</div><div class="stat-label" data-i18n="stat_price">ต่อ 1 รายการ</div></div>
   <div class="stat"><div class="stat-num">&lt;2s</div><div class="stat-label" data-i18n="stat_speed">Response time</div></div>
 </div>
 
 <div class="section">
   <div class="section-title" data-i18n="why_title">ทำไมต้องเลือกเรา</div>
-  <div class="section-sub" data-i18n="why_sub">ออกแบบมาเพื่อ AI Agent โดยเฉพาะ ไม่ใช่มนุษย์</div>
+  <div class="section-sub" data-i18n="why_sub">ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง</div>
   <div class="grid-3">
-    <div class="card"><div class="card-icon">🎯</div><h3 data-i18n="f1_title">HS Code Classification</h3><p data-i18n="f1_desc">จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p></div>
-    <div class="card"><div class="card-icon">💰</div><h3 data-i18n="f2_title">คำนวณภาษีอัตโนมัติ</h3><p data-i18n="f2_desc">คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p></div>
-    <div class="card"><div class="card-icon">⚡</div><h3 data-i18n="f3_title">AI-Native API</h3><p data-i18n="f3_desc">รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p></div>
-    <div class="card"><div class="card-icon">🔒</div><h3 data-i18n="f4_title">Prepaid Credit</h3><p data-i18n="f4_desc">ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p></div>
-    <div class="card"><div class="card-icon">📋</div><h3 data-i18n="f5_title">OGA Compliance Check</h3><p data-i18n="f5_desc">ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p></div>
-    <div class="card"><div class="card-icon">🌏</div><h3 data-i18n="f6_title">ASEAN Ready</h3><p data-i18n="f6_desc">รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p></div>
+    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">🎯</div><h3 data-i18n="f1_title">HS Code Classification</h3><p data-i18n="f1_desc">จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p></div>
+    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">💰</div><h3 data-i18n="f2_title">คำนวณภาษีอัตโนมัติ</h3><p data-i18n="f2_desc">คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p></div>
+    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">⚡</div><h3 data-i18n="f3_title">AI-Native API</h3><p data-i18n="f3_desc">รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p></div>
+    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">🔒</div><h3 data-i18n="f4_title">Prepaid Credit</h3><p data-i18n="f4_desc">ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p></div>
+    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">📋</div><h3 data-i18n="f5_title">OGA Compliance Check</h3><p data-i18n="f5_desc">ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p></div>
+    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">🌏</div><h3 data-i18n="f6_title">ASEAN Ready</h3><p data-i18n="f6_desc">รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p></div>
   </div>
 </div>
 
-<div class="section" style="background:var(--card);border-radius:16px;border:1px solid var(--border);padding:3rem 2rem;">
+<div class="section" id="how-to" style="background:var(--card);border-radius:16px;border:1px solid var(--border);padding:3rem 2rem;">
   <div class="section-title" data-i18n="how_title">วิธีเริ่มต้นใช้งาน</div>
   <div class="section-sub" data-i18n="how_sub">4 ขั้นตอน เริ่มได้ใน 2 นาที</div>
   <div class="steps">
@@ -157,20 +157,28 @@
   <div class="section-title" data-i18n="price_title">ราคา</div>
   <div class="section-sub" data-i18n="price_sub">ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง</div>
   <div class="pricing-card">
-    <div class="price">$0.001 <span data-i18n="per_item">/ รายการ</span></div>
+    <div class="price">$1.50 <span data-i18n="per_item">/ query</span></div>
     <div class="price-desc" data-i18n="price_desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</div>
     <ul class="feature-list">
       <li data-i18n="pf1">HS Code Classification พร้อม Confidence Score</li>
       <li data-i18n="pf2">คำนวณภาษีนำเข้า + VAT อัตโนมัติ</li>
       <li data-i18n="pf3">OGA Compliance Check</li>
       <li data-i18n="pf4">อ้างอิงกฎหมายทุกผลลัพธ์</li>
-      <li data-i18n="pf5">Sandbox ฟรีไม่จำกัด</li>
+      <li data-i18n="pf5">Sandbox ฟรี (ไม่ต้องใช้ API Key)</li>
       <li data-i18n="pf6">รองรับ MCP, GPT Actions, LangChain</li>
+      <li data-i18n="pf7">FTA 13 ความตกลง — หาอัตราภาษีดีสุดอัตโนมัติ</li>
+      <li data-i18n="pf8">Halal Engine 21 ประเทศ</li>
     </ul>
     <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()" data-i18n="cta_register">สมัครฟรี — รับ API Key</button>
   </div>
 </div>
 
+
+<!-- LEGAL DISCLAIMER -->
+<div style="max-width:860px;margin:2rem auto;padding:1.5rem 2rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;font-size:0.82rem;color:var(--muted);line-height:1.7">
+  <p style="font-weight:600;color:var(--text);margin-bottom:0.5rem">⚠️ <span data-i18n="disclaimer_title">ข้อจำกัดความรับผิดชอบ</span></p>
+  <p data-i18n="disclaimer_body">ข้อมูลที่ได้จากระบบนี้ — รวมถึงพิกัดศุลกากร (HS Code) อัตราภาษี ใบอนุญาต OGA และสถานะ Halal — มีวัตถุประสงค์เพื่อ <strong>อำนวยความสะดวกในการค้นหาข้อมูลเบื้องต้นเท่านั้น</strong> ไม่ถือเป็นคำวินิจฉัย คำตัดสิน หรือคำแนะนำทางกฎหมายแต่อย่างใด ผู้ใช้งานควรตรวจสอบกับกรมศุลกากร หน่วยงาน OGA ที่เกี่ยวข้อง หรือผู้เชี่ยวชาญด้านกฎหมายศุลกากรก่อนดำเนินการทางการค้าทุกครั้ง AI TO AI HOLDING ไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการนำข้อมูลนี้ไปใช้โดยไม่ตรวจสอบเพิ่มเติม</p>
+</div>
 <footer>
   <p>© 2026 AI TO AI HOLDING · <a href="/docs">API Documentation</a> · <a href="/.well-known/ai-plugin.json">AI Plugin Manifest</a></p>
   <p style="margin-top:0.5rem" data-i18n="footer_sub">Customs Intelligence Division · Built for AI Agents</p>
@@ -205,6 +213,9 @@
         <input type="text" id="originSystem" placeholder="Claude, GPT-4, LangChain..." />
       </div>
       <div id="errorMsg" class="error-msg"></div>
+      <p style="text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--muted)">
+        มี Key แล้วแต่ลืม? <a href="#" onclick="closeRegister();openRecover();return false;" style="color:var(--purple);text-decoration:underline">กู้คืน API Key</a>
+      </p>
       <div class="modal-footer">
         <button class="btn btn-cancel btn-lg" onclick="closeRegister()" data-i18n="cancel">ยกเลิก</button>
         <button class="btn btn-primary btn-lg" style="flex:2" onclick="doRegister()" id="registerBtn" data-i18n="reg_submit">สมัครเลย</button>
@@ -253,7 +264,7 @@ const i18n = {
     hero_desc: 'API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ',
     cta_register: 'เริ่มต้นฟรี — รับ API Key', cta_try: 'ทดลองใช้ฟรี',
     stat_hs: 'HS Code ที่รองรับ', stat_uptime: 'ให้บริการตลอดเวลา', stat_price: 'ต่อ 1 รายการ', stat_speed: 'Response time',
-    why_title: 'ทำไมต้องเลือกเรา', why_sub: 'ออกแบบมาเพื่อ AI Agent โดยเฉพาะ ไม่ใช่มนุษย์',
+    why_title: 'ทำไมต้องเลือกเรา', why_sub: 'ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง',
     f1_title: 'HS Code Classification', f1_desc: 'จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง',
     f2_title: 'คำนวณภาษีอัตโนมัติ', f2_desc: 'คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน',
     f3_title: 'AI-Native API', f3_desc: 'รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ',
@@ -266,8 +277,9 @@ const i18n = {
     s3_title: 'เติม Credit เพื่อใช้ Production', s3_desc: 'เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท',
     s4_title: 'เรียก API ได้เลย', s4_desc: 'POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ',
     price_title: 'ราคา', price_sub: 'ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง',
-    per_item: '/ รายการ', price_desc: 'จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร',
-    pf1:'HS Code Classification พร้อม Confidence Score', pf2:'คำนวณภาษีนำเข้า + VAT อัตโนมัติ', pf3:'OGA Compliance Check', pf4:'อ้างอิงกฎหมายทุกผลลัพธ์', pf5:'Sandbox ฟรีไม่จำกัด', pf6:'รองรับ MCP, GPT Actions, LangChain',
+    per_item: '/ query', price_desc: 'จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร',
+    pf1:'HS Code Classification พร้อม Confidence Score', pf2:'คำนวณภาษีนำเข้า + VAT อัตโนมัติ', pf3:'OGA Compliance Check', pf4:'อ้างอิงกฎหมายทุกผลลัพธ์', pf5:'Sandbox ฟรี (ไม่ต้องใช้ API Key)', pf6:'รองรับ MCP, GPT Actions, LangChain', pf7:'FTA 13 ความตกลง — หาอัตราภาษีดีสุดอัตโนมัติ', pf8:'Halal Engine 21 ประเทศ',
+    disclaimer_title:'ข้อจำกัดความรับผิดชอบ', disclaimer_body:'ข้อมูลที่ได้จากระบบนี้ รวมถึงพิกัดศุลกากร อัตราภาษี ใบอนุญาต OGA และสถานะ Halal มีวัตถุประสงค์เพื่ออำนวยความสะดวกในการค้นหาข้อมูลเบื้องต้นเท่านั้น ไม่ถือเป็นคำวินิจฉัยหรือคำแนะนำทางกฎหมาย ควรตรวจสอบกับกรมศุลกากรหรือผู้เชี่ยวชาญก่อนดำเนินการทางการค้าทุกครั้ง',
     footer_sub: 'Customs Intelligence Division · Built for AI Agents',
     reg_title: 'สมัครรับ API Key', reg_sub: 'ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที',
     reg_name: 'ชื่อ AI Agent / ระบบของคุณ', reg_name_ph: 'เช่น MyTradingBot, Claude-Customs',
@@ -300,7 +312,7 @@ const i18n = {
     s4_title: 'Call the API', s4_desc: 'POST /v1/customs/classify with X-API-Key header. Credits deducted automatically.',
     price_title: 'Pricing', price_sub: 'No monthly fee. Pay only for what you use.',
     per_item: '/ item', price_desc: 'Pay-as-you-go. No sign-up fee.',
-    pf1:'HS Code Classification with Confidence Score', pf2:'Import Duty + VAT Calculation', pf3:'OGA Compliance Check', pf4:'Legal citations in every result', pf5:'Unlimited free sandbox', pf6:'MCP, GPT Actions, LangChain support',
+    pf1:'HS Code Classification with Confidence Score', pf2:'Import Duty + VAT Calculation', pf3:'OGA Compliance Check', pf4:'Legal citations in every result', pf5:'Free sandbox (no API Key needed)', pf6:'MCP, GPT Actions, LangChain support', pf7:'FTA 13 Agreements — auto best-rate calculation', pf8:'Halal Engine covering 21 countries',
     footer_sub: 'Customs Intelligence Division · Built for AI Agents',
     reg_title: 'Get Your API Key', reg_sub: 'Free. No credit card. Instant key.',
     reg_name: 'Your AI Agent / System Name', reg_name_ph: 'e.g. MyTradingBot, Claude-Customs',
@@ -333,7 +345,7 @@ const i18n = {
     s4_title: '调用API', s4_desc: '发送POST /v1/customs/classify带X-API-Key标头，系统自动扣除费用。',
     price_title: '定价', price_sub: '无月费，只为使用付费',
     per_item: '/ 项', price_desc: '按使用付费，无注册费。',
-    pf1:'HS编码分类含置信度', pf2:'进口关税+增值税计算', pf3:'OGA合规检查', pf4:'每项结果附法律引用', pf5:'无限免费沙盒', pf6:'支持MCP、GPT Actions、LangChain',
+    pf1:'HS编码分类含置信度', pf2:'进口关税+增值税计算', pf3:'OGA合规检查', pf4:'每项结果附法律引用', pf5:'免费沙盒（无需API Key）', pf6:'支持MCP、GPT Actions、LangChain', pf7:'FTA 13个协定 — 自动计算最优税率', pf8:'清真认证引擎 覆盖21个国家',
     footer_sub: '海关情报部门 · 为AI智能体构建',
     reg_title: '获取您的API Key', reg_sub: '免费，无需信用卡，即时获得。',
     reg_name: '您的AI智能体/系统名称', reg_name_ph: '例如 MyTradingBot',
@@ -366,7 +378,8 @@ const i18n = {
     s4_title: 'APIを呼び出す', s4_desc: 'POST /v1/customs/classifyにX-API-Keyヘッダーで呼び出し。自動課金。',
     price_title: '料金', price_sub: '月額費用なし。使用分のみ支払い。',
     per_item: '/ 件', price_desc: '従量課金。登録料なし。',
-    pf1:'信頼スコア付きHSコード分類', pf2:'輸入関税+VAT自動計算', pf3:'OGAコンプライアンスチェック', pf4:'全結果に法的引用', pf5:'無制限の無料サンドボックス', pf6:'MCP・GPT Actions・LangChain対応',
+    pf1:'信頼スコア付きHSコード分類', pf2:'輸入関税+VAT自動計算', pf3:'OGAコンプライアンスチェック', pf4:'全結果に法的引用', pf5:'無料サンドボックス（APIキー不要）', pf6:'MCP・GPT Actions・LangChain対応', pf7:'FTA 13協定 — 最適税率を自動算出', pf8:'ハラール認証エンジン 21カ国対応',
+    disclaimer_title:'免責事項', disclaimer_body:'本システムが提供する情報（HSコード、税率、OGA許可、ハラール認証状況を含む）は、あくまで参考情報の提供を目的としており、法的助言または公式裁定を構成するものではありません。いかなる貿易上の意思決定を行う前にも、タイ税関当局、関係OGA機関、または資格を有する通関専門家に確認されることを強くお勧めします。',
     footer_sub: '税関インテリジェンス部門 · AIエージェントのために構築',
     reg_title: 'APIキーを取得', reg_sub: '無料。クレジットカード不要。即時発行。',
     reg_name: 'AIエージェント/システム名', reg_name_ph: '例: MyTradingBot',
@@ -506,14 +519,98 @@ async function doSandbox() {
 }
 
 // close modals on backdrop click
-['registerModal','sandboxModal'].forEach(id => {
+['registerModal','sandboxModal','recoverModal'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('show');
   });
 });
 
+
+// ── RECOVER KEY ───────────────────────────────────────────────
+function openRecover() {
+  document.getElementById('recoverForm').style.display = 'block';
+  document.getElementById('recoverResult').style.display = 'none';
+  document.getElementById('recoverError').style.display = 'none';
+  document.getElementById('recoverEmail').value = '';
+  document.getElementById('recoverAgentName').value = '';
+  document.getElementById('recoverModal').classList.add('show');
+}
+function closeRecover() { document.getElementById('recoverModal').classList.remove('show'); }
+
+async function doRecover() {
+  const btn = document.getElementById('recoverBtn');
+  const err = document.getElementById('recoverError');
+  err.style.display = 'none';
+  const email = document.getElementById('recoverEmail').value.trim();
+  const agent = document.getElementById('recoverAgentName').value.trim();
+  if (!email || !agent) {
+    err.textContent = 'กรุณากรอก Email และชื่อ Agent';
+    err.style.display = 'block';
+    return;
+  }
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(API + '/v1/recover-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact_email: email, agent_name: agent }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = (data.detail && data.detail.message) ? data.detail.message : (data.detail || 'เกิดข้อผิดพลาด');
+      throw new Error(msg);
+    }
+    document.getElementById('recoverNewKey').textContent = data.api_key;
+    document.getElementById('recoverForm').style.display = 'none';
+    document.getElementById('recoverResult').style.display = 'block';
+  } catch(e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+    btn.textContent = 'กู้คืน Key →';
+    btn.disabled = false;
+  }
+}
+
+function copyRecoverKey() {
+  navigator.clipboard.writeText(document.getElementById('recoverNewKey').textContent);
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', () => setLang(detectLang()));
 </script>
+
+<!-- RECOVER KEY MODAL -->
+<div class="modal-overlay" id="recoverModal">
+  <div class="modal">
+    <h2>🔑 ลืม API Key?</h2>
+    <p>ยืนยันตัวตนด้วย Email และชื่อ Agent ที่ใช้สมัคร — ระบบจะออก Key ใหม่ให้</p>
+    <div id="recoverForm">
+      <div class="form-group">
+        <label>Email ที่ใช้สมัคร</label>
+        <input type="email" id="recoverEmail" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>ชื่อ Agent (ตรงกับที่สมัคร)</label>
+        <input type="text" id="recoverAgentName" placeholder="เช่น MyTradeBotV1" />
+      </div>
+      <div id="recoverError" class="error-msg"></div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel btn-lg" onclick="closeRecover()">ยกเลิก</button>
+        <button class="btn btn-primary btn-lg" style="flex:2" onclick="doRecover()" id="recoverBtn">กู้คืน Key →</button>
+      </div>
+    </div>
+    <div id="recoverResult" style="display:none;margin-top:1.5rem">
+      <div style="background:rgba(16,185,129,0.1);border:1px solid var(--green);border-radius:10px;padding:1rem">
+        <p style="color:var(--green);font-weight:700;margin-bottom:0.5rem">✅ ออก API Key ใหม่สำเร็จ</p>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0.75rem">Key เก่าถูก invalidate แล้ว — คัดลอกและเก็บ Key ใหม่นี้ไว้ให้ดี</p>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem;font-family:monospace;font-size:0.85rem;color:var(--green);word-break:break-all" id="recoverNewKey"></div>
+        <button onclick="copyRecoverKey()" class="btn btn-primary" style="margin-top:0.75rem;width:100%">📋 คัดลอก Key</button>
+      </div>
+      <button class="btn btn-cancel" style="margin-top:0.75rem;width:100%" onclick="closeRecover()">ปิด</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

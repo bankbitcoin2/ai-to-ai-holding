@@ -42,7 +42,15 @@ async def close_pool():
 def _convert_sql(sql: str) -> str:
     """แปลง SQLite SQL → PostgreSQL SQL"""
     # INSERT OR IGNORE → INSERT ... ON CONFLICT DO NOTHING
+    # ต้องเพิ่ม ON CONFLICT DO NOTHING ท้าย statement ไม่ใช่แค่ลบ OR IGNORE
+    was_ignore = bool(re.search(r'\bINSERT\s+OR\s+IGNORE\b', sql, re.IGNORECASE))
     sql = re.sub(r'\bINSERT\s+OR\s+IGNORE\b', 'INSERT', sql, flags=re.IGNORECASE)
+    if was_ignore:
+        sql = sql.rstrip()
+        if sql.endswith(';'):
+            sql = sql[:-1].rstrip() + ' ON CONFLICT DO NOTHING;'
+        else:
+            sql += ' ON CONFLICT DO NOTHING'
 
     # datetime('now') → NOW()
     sql = re.sub(r"datetime\('now'\)", "NOW()", sql, flags=re.IGNORECASE)

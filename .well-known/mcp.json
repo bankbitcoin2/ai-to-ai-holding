@@ -1,28 +1,32 @@
 {
   "name": "ai-to-ai-holding-customs",
-  "version": "1.0.0",
-  "description": "Thai Trade Intelligence MCP Server — HS Code classification, duty calculation, OGA compliance, FTA rates",
+  "version": "2.0.0",
+  "description": "Thai Trade Intelligence MCP Server — One call returns HS code classification, best FTA rate across 13 agreements, OGA permit requirements, and Halal compliance status across 21 countries. SHA-256 evidence chain on every response. Accepts Thai and English product descriptions.",
   "protocol": "mcp",
   "transport": ["http", "stdio"],
-  "server_url": "https://api.ai-to-ai-holding.com/mcp",
+  "server_url": "https://web-production-c9da4.up.railway.app/mcp",
   "tools": [
     {
       "name": "classify_hs_code",
-      "description": "Classify a product into Thai Customs HS Code. Returns top HS code candidates with confidence scores and legal citations. Output is decision-support only, not a binding classification.",
+      "description": "Classify a product into Thai Customs HS Code. Returns HS code, MFN duty rate, best FTA rate (across 13 agreements), OGA permit requirements, Halal status (21 countries), confidence score, and SHA-256 evidence chain. Accepts Thai or English product descriptions — or both mixed. Output is decision-support only, not a binding classification.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "product_description": {
             "type": "string",
-            "description": "Product description in any language (Thai or English)"
+            "description": "Product description in Thai, English, or mixed. Examples: 'hydraulic excavator', 'มือถือ iPhone', 'frozen shrimp vannamei'"
           },
           "origin_country": {
             "type": "string",
-            "description": "ISO 3166-1 alpha-2 country code of origin (e.g. CN, US, JP)"
+            "description": "ISO 3166-1 alpha-2 country code of origin (e.g. CN, US, JP, TH)"
+          },
+          "destination_country": {
+            "type": "string",
+            "description": "Destination country for Halal check (ISO alpha-2). Defaults to TH."
           },
           "value_usd": {
             "type": "number",
-            "description": "CIF value in USD (optional, for duty calculation)"
+            "description": "CIF value in USD (optional, used for duty calculation)"
           }
         },
         "required": ["product_description"]
@@ -30,7 +34,7 @@
     },
     {
       "name": "check_fta_rate",
-      "description": "Look up preferential import duty rate under FTA agreements between Thailand and origin country. Covers RCEP, AFTA, ACFTA, AJCEP, AKFTA, AANZFTA, AIFTA, TAFTA, TNZCEP, JTEPA, TCFTA, TPFTA, MFN.",
+      "description": "Look up best preferential import duty rate under FTA agreements between Thailand and origin country. Covers all 13 agreements: RCEP, AFTA, ACFTA, AJCEP, AKFTA, AANZFTA, AIFTA, TAFTA, TNZCEP, JTEPA, TCFTA, TPFTA, MFN. Returns best available rate and the agreement it comes from.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -48,7 +52,7 @@
     },
     {
       "name": "check_oga_compliance",
-      "description": "Check if a product requires Other Government Agency (OGA) permits or inspections before import into Thailand. Returns list of required agencies (FDA, TISI/มอก., FDA-TH, AERONAUTICS_DEPT, etc.)",
+      "description": "Check if a product requires Other Government Agency (OGA) permits before import into Thailand. Returns list of required agencies: FDA (อย.), กรมประมง, กรมปศุสัตว์, มอก./TISI, กรมวิชาการเกษตร, and others.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -58,7 +62,25 @@
           },
           "product_description": {
             "type": "string",
-            "description": "Product description for additional context"
+            "description": "Product description for additional context (Thai or English)"
+          }
+        },
+        "required": ["hs_code"]
+      }
+    },
+    {
+      "name": "check_halal_status",
+      "description": "Check Halal certification requirements for a product across 21 countries. Returns halal_required flag, risk level, and per-country requirements.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code (6-10 digits)"
+          },
+          "destination_country": {
+            "type": "string",
+            "description": "ISO alpha-2 country code. If omitted, checks all 21 countries."
           }
         },
         "required": ["hs_code"]
@@ -66,13 +88,13 @@
     },
     {
       "name": "sandbox_classify",
-      "description": "Free trial classification — no API key required. Rate limited to 20 req/min. Returns mock results suitable for testing integration.",
+      "description": "Free trial — no API key required. Rate limited to 20 req/min. Returns full classification result including HS code, FTA rates, OGA, and Halal flags. Suitable for prototyping and integration testing.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "product_description": {
             "type": "string",
-            "description": "Product description"
+            "description": "Product description in Thai, English, or mixed"
           }
         },
         "required": ["product_description"]
@@ -84,5 +106,20 @@
     "header": "X-API-Key",
     "sandbox_bypass": true,
     "sandbox_endpoint": "/v1/sandbox/classify"
-  }
+  },
+  "pricing": {
+    "sandbox": "free",
+    "production": "$1.50 per query — prepaid Stripe credits, no contract"
+  },
+  "audit": {
+    "evidence_chain": "SHA-256 hash on every response",
+    "lookup_pipeline": ["keyword_match", "CKAN_fallback", "cache_hit"]
+  },
+  "fta_coverage": [
+    "AFTA", "ACFTA", "AJCEP", "AKFTA", "AANZFTA",
+    "AIFTA", "TAFTA", "TNZCEP", "JTEPA", "RCEP",
+    "TCFTA", "TPFTA", "MFN"
+  ],
+  "halal_countries_covered": 21,
+  "supported_input_languages": ["th", "en", "mixed"]
 }

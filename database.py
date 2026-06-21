@@ -121,3 +121,5 @@ async def _init_sqlite():
                         pass
                     else:
                         print(f"[DB WARN] {fname}: {e} | {stmt[:80]}")
+        await db.commit()
+    print("[DB] SQLite initialized")

@@ -9,24 +9,50 @@ Knowledge Service — Bridge ชุด B ↔ ชุด A
   - restricted_engine → OGA / ใบอนุญาต
   - halal_engine    → 21 ประเทศ Halal (offline)
   - glossary        → คลังศัพท์การค้า (offline)
+
+⚠️ บน Railway (Production) ชุด A ไม่มีอยู่ในระบบ — _OK จะ False
+   ระบบจะ fallback เป็น mock/unavailable โดยอัตโนมัติ ไม่ crash
 """
 import sys
+import os
 from pathlib import Path
 from typing import Optional
 
-# ── ชี้ path ไปที่ root (ชุด A อยู่ที่ root = พ่อของโฟลเดอร์นี้) ──────────────
-# AI_TO_AI_HOLDING/knowledge_service.py → parent = AI_TO_AI_HOLDING → parent = root
-_ROOT = Path(__file__).resolve().parent.parent  # e:\ส่วนตัว2\Ai_to_Ai_CEO\
-if str(_ROOT) not in sys.path:
+# ── ค้นหา root ของชุด A แบบ multi-path strategy ────────────────────────────────
+# ลำดับการค้น:
+# 1. KNOWLEDGE_ROOT env var (ตั้งใน Railway ถ้าต้องการ)
+# 2. parent ของ parent directory (สำหรับ local dev บน Windows)
+# 3. ไม่พบ = _OK = False, ระบบ fallback mock
+
+_ROOT: Optional[Path] = None
+
+_env_root = os.getenv("KNOWLEDGE_ROOT", "")
+if _env_root and Path(_env_root).exists():
+    _ROOT = Path(_env_root)
+else:
+    _candidate = Path(__file__).resolve().parent.parent
+    if (_candidate / "tax_engine.py").exists():
+        _ROOT = _candidate
+
+if _ROOT and str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-# ── Import ชุด A ──────────────────────────────────────────────────────────────
+# ── Import halal_engine แยกต่างหาก — bundled ใน repo ทำงานได้ทุก env ──────────
 try:
+    import halal_engine as halal_engine
+    _HALAL_OK = True
+except ImportError:
+    _HALAL_OK = False
+
+# ── Import ชุด A — graceful fallback ถ้าไม่พบ KNOWLEDGE_ROOT ────────────────
+try:
+    if not _ROOT:
+        raise ImportError("KNOWLEDGE_ROOT not found — running in MOCK mode")
     import tax_engine
     import restricted_engine
-    import halal_engine
     import glossary
     _OK = True
+    _ERR = ""
 except ImportError as _err:
     _OK = False
     _ERR = str(_err)
@@ -110,8 +136,8 @@ def check_restricted(hs_code: str) -> dict:
 
 # ── Halal ─────────────────────────────────────────────────────────────────────
 def check_halal(hs_code: str, destination_country: Optional[str]) -> dict:
-    """ตรวจ Halal 21 ประเทศ (offline ฟรี)"""
-    if not _OK or not hs_code:
+    """ตรวจ Halal 21 ประเทศ (offline ฟรี) — ใช้ halal_engine ที่ bundled ใน repo"""
+    if not _HALAL_OK or not hs_code:
         return {"halal_required": False, "risk_level": "UNKNOWN"}
     try:
         return halal_engine.check(hs_code, destination_country)
@@ -119,29 +145,11 @@ def check_halal(hs_code: str, destination_country: Optional[str]) -> dict:
         return {"halal_required": False, "risk_level": "ERROR", "note": str(e)}
 
 
-# ── Status ────────────────────────────────────────────────────────────────────
+# -- Status --
 def status() -> dict:
-    if not _OK:
-        return {"status": "DEGRADED", "error": _ERR, "root": str(_ROOT)}
-    engines = {}
-    try:
-        tax_engine.reload_store()
-        engines["tax_engine"] = "OK"
-    except Exception as e:
-        engines["tax_engine"] = f"ERROR:{e}"
-    try:
-        restricted_engine.reload_store()
-        engines["restricted_engine"] = "OK"
-    except Exception as e:
-        engines["restricted_engine"] = f"ERROR:{e}"
-    try:
-        engines["halal_engine"] = f"OK ({len(halal_engine.list_halal_countries())} countries)"
-    except Exception as e:
-        engines["halal_engine"] = f"ERROR:{e}"
-    try:
-        g = glossary.lookup_product("battery")
-        engines["glossary"] = f"OK (battery→{g['hs_hint'] if g else '?'})"
-    except Exception as e:
-        engines["glossary"] = f"ERROR:{e}"
-    all_ok = all("OK" in v for v in engines.values())
-    return {"status": "OK" if all_ok else "PARTIAL", "root": str(_ROOT), "engines": engines}
+    return {
+        "status": "OK" if _OK else "MOCK",
+        "halal_engine": "OK" if _HALAL_OK else "UNAVAILABLE",
+        "error": _ERR if not _OK else None,
+        "root": str(_ROOT) if _ROOT else "NOT_FOUND",
+    }

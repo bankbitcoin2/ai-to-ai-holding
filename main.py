@@ -55,12 +55,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Middleware stack (bottom = runs first)
-# 1. KillSwitchMiddleware - check HALTED state
-# 2. SecurityMiddleware   - rate limit + API Key + IP check
-# 3. CORSMiddleware       - CORS headers
-app.add_middleware(KillSwitchMiddleware)
-app.add_middleware(SecurityMiddleware)
+# Middleware stack — Starlette ใช้ stack: add_middleware ล่าสุด = outermost = รันก่อนสุด
+# ลำดับที่ต้องการ: KillSwitch → Security → CORS → app
+# ต้อง add ในลำดับกลับ: CORS ก่อน แล้ว Security แล้ว KillSwitch
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,  # [FIX-3] no wildcard
@@ -68,6 +65,10 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["X-API-Key", "Content-Type", "Accept"],
 )
+app.add_middleware(SecurityMiddleware)
+# KillSwitchMiddleware เป็น outermost — เมื่อ HALTED short-circuit ทันที
+# ก่อนผ่าน rate limiter เพื่อไม่เปลือง resource
+app.add_middleware(KillSwitchMiddleware)
 
 
 @app.get("/health", tags=["System"])
