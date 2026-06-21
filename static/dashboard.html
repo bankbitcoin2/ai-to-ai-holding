@@ -175,7 +175,58 @@
         <textarea id="sandboxInput" data-i18n-placeholder="sandbox_ph"></textarea>
       </div>
       <button class="btn btn-green" onclick="doSandbox()" id="sandboxBtn" data-i18n="sandbox_btn">จำแนก HS Code →</button>
-      <div class="result-area" id="sandboxResult"></div>
+
+      <!-- RESULT CARD — human readable -->
+      <div id="resultCard" style="display:none;margin-top:1rem;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <!-- Header -->
+        <div id="rcHeader" style="padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
+          <div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.2rem" data-i18n="rc_hs">HS Code ที่แนะนำ</div>
+            <div style="font-size:1.8rem;font-weight:800;color:white;letter-spacing:1px" id="rcCode">—</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.6);margin-bottom:0.4rem" data-i18n="rc_conf">ความมั่นใจ</div>
+            <div id="rcConfBar" style="width:120px;height:8px;background:rgba(255,255,255,0.2);border-radius:999px;overflow:hidden">
+              <div id="rcConfFill" style="height:100%;border-radius:999px;transition:width 0.6s"></div>
+            </div>
+            <div id="rcConfPct" style="font-size:0.85rem;font-weight:700;color:white;margin-top:0.3rem">—</div>
+          </div>
+        </div>
+        <!-- Body -->
+        <div style="background:var(--card);padding:1.25rem;display:grid;gap:0.75rem">
+          <div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.2rem" data-i18n="rc_desc">คำอธิบาย HS</div>
+            <div id="rcDesc" style="font-size:0.875rem;line-height:1.5">—</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem">
+            <div style="background:var(--bg);border-radius:8px;padding:0.75rem">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.25rem" data-i18n="rc_duty">อัตราภาษีนำเข้า</div>
+              <div id="rcDuty" style="font-size:1.1rem;font-weight:700;color:var(--yellow)">—</div>
+            </div>
+            <div style="background:var(--bg);border-radius:8px;padding:0.75rem">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.25rem">VAT</div>
+              <div id="rcVat" style="font-size:1.1rem;font-weight:700;color:var(--yellow)">—</div>
+            </div>
+            <div style="background:var(--bg);border-radius:8px;padding:0.75rem">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.25rem" data-i18n="rc_oga">OGA / ใบอนุญาต</div>
+              <div id="rcOga" style="font-size:1rem;font-weight:700">—</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.2rem" data-i18n="rc_source">แหล่งอ้างอิง</div>
+            <div id="rcSource" style="font-size:0.8rem;color:var(--accent);line-height:1.5">—</div>
+          </div>
+          <div id="rcNoteWrap" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:0.75rem">
+            <div style="font-size:0.72rem;color:var(--yellow);font-weight:600;margin-bottom:0.3rem">⚠️ <span data-i18n="rc_note">ข้อควรระวัง</span></div>
+            <div id="rcNote" style="font-size:0.82rem;color:var(--muted);line-height:1.6">—</div>
+          </div>
+          <!-- toggle raw JSON -->
+          <div style="border-top:1px solid var(--border);padding-top:0.75rem">
+            <button onclick="toggleRaw()" style="background:none;border:none;color:var(--muted);font-size:0.78rem;cursor:pointer" data-i18n="rc_raw">▶ ดู Raw JSON</button>
+            <div class="result-area" id="sandboxResult" style="margin-top:0.5rem;display:none"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="section-card">
@@ -392,6 +443,9 @@ const i18n = {
     faq_a4: 'ได้เลย — รองรับ MCP Protocol, GPT Actions, LangChain ค้นพบอัตโนมัติผ่าน /.well-known/',
     faq_q5: '🌿 Halal Check คืออะไร?',
     faq_a5: 'ตรวจสอบ Halal compliance อัตโนมัติ 21 ประเทศ ครอบคลุม GCC, SEA, Middle East รวมอยู่ในทุก query',
+    rc_hs: 'HS Code ที่แนะนำ', rc_conf: 'ความมั่นใจ', rc_desc: 'คำอธิบาย HS',
+    rc_duty: 'อัตราภาษีนำเข้า', rc_oga: 'OGA / ใบอนุญาต', rc_source: 'แหล่งอ้างอิง',
+    rc_note: 'ข้อควรระวัง', rc_raw: 'ดู Raw JSON',
   },
   en: {
     login_title: 'Client Login',
@@ -443,6 +497,9 @@ const i18n = {
     faq_a4: 'Yes — supports MCP Protocol, GPT Actions, LangChain. Auto-discovered via /.well-known/',
     faq_q5: '🌿 What is Halal Check?',
     faq_a5: 'Automatic Halal compliance check for 21 countries: GCC, SEA, Middle East. Included in every query at no extra cost.',
+    rc_hs: 'Recommended HS Code', rc_conf: 'Confidence', rc_desc: 'HS Description',
+    rc_duty: 'Import Duty', rc_oga: 'OGA / Permit', rc_source: 'Source Reference',
+    rc_note: 'Note', rc_raw: 'View Raw JSON',
   },
   zh: {
     login_title: '客户登录',
@@ -494,6 +551,9 @@ const i18n = {
     faq_a4: '可以 — 支持 MCP Protocol、GPT Actions、LangChain，通过 /.well-known/ 自动发现',
     faq_q5: '🌿 清真检查是什么？',
     faq_a5: '自动检查21个国家的清真合规：GCC、东南亚、中东，每次查询免费包含',
+    rc_hs: '推荐HS编码', rc_conf: '置信度', rc_desc: 'HS描述',
+    rc_duty: '进口关税', rc_oga: 'OGA/许可证', rc_source: '参考来源',
+    rc_note: '注意事项', rc_raw: '查看原始JSON',
   },
   ja: {
     login_title: 'クライアントログイン',
@@ -545,6 +605,9 @@ const i18n = {
     faq_a4: 'はい — MCP Protocol、GPT Actions、LangChainに対応。/.well-known/ で自動検出',
     faq_q5: '🌿 ハラール確認とは何ですか？',
     faq_a5: '21カ国のハラール適合を自動確認：GCC、東南アジア、中東。全クエリに無料で含まれます',
+    rc_hs: '推奨HSコード', rc_conf: '信頼度', rc_desc: 'HS説明',
+    rc_duty: '輸入関税', rc_oga: 'OGA/許可証', rc_source: '参照元',
+    rc_note: '注意事項', rc_raw: 'Raw JSONを見る',
   },
 };
 
@@ -637,6 +700,73 @@ function doLogout() {
 }
 
 // ── SANDBOX ───────────────────────────────────────────────────
+let _rawJsonShown = false;
+
+function toggleRaw() {
+  const el = document.getElementById('sandboxResult');
+  _rawJsonShown = !_rawJsonShown;
+  el.style.display = _rawJsonShown ? 'block' : 'none';
+  document.querySelector('[data-i18n="rc_raw"]').textContent =
+    (_rawJsonShown ? '▼ ' : '▶ ') + t('rc_raw');
+}
+
+function renderCard(data) {
+  const item = (data.items || [])[0];
+  if (!item) return;
+
+  const card = document.getElementById('resultCard');
+  card.style.display = 'block';
+
+  // confidence color + gradient
+  const conf = item.confidence_score || 0;
+  const pct = Math.round(conf * 100);
+  const color = pct >= 85 ? '#10b981' : pct >= 65 ? '#f59e0b' : '#ef4444';
+  const headerBg = pct >= 85
+    ? 'linear-gradient(135deg,#064e3b,#065f46)'
+    : pct >= 65
+    ? 'linear-gradient(135deg,#78350f,#92400e)'
+    : 'linear-gradient(135deg,#7f1d1d,#991b1b)';
+
+  document.getElementById('rcHeader').style.background = headerBg;
+  document.getElementById('rcCode').textContent = item.hs_code || '—';
+  document.getElementById('rcConfFill').style.width = pct + '%';
+  document.getElementById('rcConfFill').style.background = color;
+  document.getElementById('rcConfPct').textContent = pct + '%';
+
+  // confidence label
+  const confLabel = pct >= 85
+    ? (currentLang === 'th' ? '✅ มั่นใจสูง' : currentLang === 'zh' ? '✅ 高置信度' : currentLang === 'ja' ? '✅ 高信頼度' : '✅ High confidence')
+    : pct >= 65
+    ? (currentLang === 'th' ? '⚠️ ปานกลาง' : currentLang === 'zh' ? '⚠️ 中等' : currentLang === 'ja' ? '⚠️ 中程度' : '⚠️ Moderate')
+    : (currentLang === 'th' ? '❌ ต่ำ — ควรตรวจสอบเพิ่ม' : '❌ Low — review needed');
+  document.getElementById('rcConfPct').textContent = pct + '% · ' + confLabel;
+
+  document.getElementById('rcDesc').textContent = item.hs_description || '—';
+  document.getElementById('rcDuty').textContent = item.duty_rate != null ? (item.duty_rate * 100).toFixed(0) + '%' : '—';
+  document.getElementById('rcVat').textContent = item.vat_rate != null ? (item.vat_rate * 100).toFixed(0) + '%' : '—';
+
+  const ogaEl = document.getElementById('rcOga');
+  if (item.oga_required) {
+    ogaEl.textContent = currentLang === 'th' ? '⚠️ ต้องมีใบอนุญาต' : currentLang === 'zh' ? '⚠️ 需要许可证' : currentLang === 'ja' ? '⚠️ 許可証が必要' : '⚠️ Permit required';
+    ogaEl.style.color = 'var(--yellow)';
+  } else {
+    ogaEl.textContent = currentLang === 'th' ? '✅ ไม่ต้อง' : currentLang === 'zh' ? '✅ 无需' : currentLang === 'ja' ? '✅ 不要' : '✅ Not required';
+    ogaEl.style.color = 'var(--green)';
+  }
+
+  document.getElementById('rcSource').textContent = item.source_reference || '—';
+
+  // notes
+  const noteWrap = document.getElementById('rcNoteWrap');
+  const noteEl = document.getElementById('rcNote');
+  if (item.notes) {
+    noteWrap.style.display = 'block';
+    noteEl.textContent = item.notes;
+  } else {
+    noteWrap.style.display = 'none';
+  }
+}
+
 async function doSandbox() {
   const desc = document.getElementById('sandboxInput').value.trim();
   const result = document.getElementById('sandboxResult');
@@ -644,8 +774,9 @@ async function doSandbox() {
   if (!desc) return;
   btn.textContent = t('sandbox_loading');
   btn.disabled = true;
-  result.style.display = 'block';
-  result.textContent = t('sandbox_processing');
+  document.getElementById('resultCard').style.display = 'none';
+  result.style.display = 'none';
+  _rawJsonShown = false;
 
   try {
     const res = await fetch(API + '/v1/sandbox/classify', {
@@ -655,7 +786,10 @@ async function doSandbox() {
     });
     const data = await res.json();
     result.textContent = JSON.stringify(data, null, 2);
+    result.style.color = 'var(--green)';
+    renderCard(data);
   } catch(e) {
+    result.style.display = 'block';
     result.textContent = 'Error: ' + e.message;
     result.style.color = 'var(--red)';
   }
