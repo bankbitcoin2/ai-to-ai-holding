@@ -44,6 +44,13 @@ try:
 except ImportError:
     _HALAL_OK = False
 
+# ── Import oga_engine — bundled ใน repo ทำงานได้ทุก env (ไม่ต้อง KNOWLEDGE_ROOT) ──
+try:
+    import oga_engine as oga_engine
+    _OGA_OK = True
+except ImportError:
+    _OGA_OK = False
+
 # ── Import ชุด A — graceful fallback ถ้าไม่พบ KNOWLEDGE_ROOT ────────────────
 try:
     if not _ROOT:
@@ -185,14 +192,32 @@ def lookup_tax_rate(hs_code: str, origin_country: Optional[str]) -> dict:
 
 # ── OGA / Restricted ──────────────────────────────────────────────────────────
 def check_restricted(hs_code: str) -> dict:
-    """ตรวจ OGA / ของต้องกำกัดจาก restricted_engine"""
-    if not _OK or not hs_code:
+    """
+    ตรวจ OGA / ของต้องกำกัด
+    ลำดับ:
+    1. restricted_engine (ชุด A — ข้อมูลเต็ม ถ้ามี KNOWLEDGE_ROOT)
+    2. oga_engine (bundled offline rules — ใช้เสมอเมื่อ restricted_engine ไม่พร้อม)
+    """
+    if not hs_code:
         return {"status": "unavailable", "is_restricted": False}
-    try:
-        restricted_engine.reload_store()
-        return restricted_engine.lookup_restricted(hs_code)
-    except Exception as e:
-        return {"status": "error", "note": str(e), "is_restricted": False}
+    # ลอง restricted_engine ก่อน (ชุด A — เต็ม)
+    if _OK:
+        try:
+            restricted_engine.reload_store()
+            result = restricted_engine.lookup_restricted(hs_code)
+            result["source"] = "RESTRICTED_ENGINE"
+            return result
+        except Exception as e:
+            pass  # fallthrough to oga_engine
+    # Fallback: oga_engine bundled rules
+    if _OGA_OK:
+        try:
+            result = oga_engine.check(hs_code)
+            result["status"] = "ok"
+            return result
+        except Exception as e:
+            return {"status": "error", "note": str(e), "is_restricted": False}
+    return {"status": "unavailable", "is_restricted": False}
 
 
 # ── Halal ─────────────────────────────────────────────────────────────────────
@@ -211,6 +236,7 @@ def status() -> dict:
     return {
         "status": "OK" if _OK else "MOCK",
         "halal_engine": "OK" if _HALAL_OK else "UNAVAILABLE",
+        "oga_engine": "OK" if _OGA_OK else "UNAVAILABLE",
         "error": _ERR if not _OK else None,
         "root": str(_ROOT) if _ROOT else "NOT_FOUND",
     }
