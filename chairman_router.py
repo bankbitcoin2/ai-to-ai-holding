@@ -99,18 +99,18 @@ async def chairman_topups(
             " t.stripe_session_id"
             " FROM credit_topups t"
             " LEFT JOIN client_agents a ON a.id = t.agent_id"
-            " ORDER BY t.created_at DESC LIMIT ?"
+            " ORDER BY t.created_at DESC LIMIT $1"
         )
         async with db.execute(sql_topups, (limit,)) as cur:
             topup_rows = await cur.fetchall()
 
         sql_deducts = (
-            "SELECT e.id, e.actor_id, e.detail, e.created_at,"
+            "SELECT e.id, e.actor_id, e.action, e.occurred_at,"
             " a.agent_name"
             " FROM audit_events e"
             " LEFT JOIN client_agents a ON a.id = e.actor_id"
             " WHERE e.event_type = 'CREDIT_DEDUCT'"
-            " ORDER BY e.created_at DESC LIMIT ?"
+            " ORDER BY e.occurred_at DESC LIMIT $1"
         )
         async with db.execute(sql_deducts, (limit,)) as cur2:
             deduct_rows = await cur2.fetchall()
