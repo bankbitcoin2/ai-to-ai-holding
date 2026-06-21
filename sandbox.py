@@ -227,3 +227,13 @@ async def sandbox_feedback(body: FeedbackReq):
         raise
     except Exception as e:
         raise HTTPException(500, detail={"error": "FEEDBACK_ERROR", "message": str(e)})
+
+# ── CKAN Probe Endpoint (debug — ดู field structure ของ tariff resource) ──────
+@router.get("/probe-ckan", summary="Probe CKAN tariff resource fields")
+async def probe_ckan(hs: str = "6802"):
+    try:
+        from knowledge_service import fetch_hs_full
+        result = await fetch_hs_full(hs)
+        return result
+    except Exception as e:
+        return {"error": str(e)}

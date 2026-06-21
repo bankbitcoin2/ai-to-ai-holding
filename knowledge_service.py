@@ -60,12 +60,73 @@ except ImportError as _err:
 import httpx
 
 CKAN_BASE = "https://catalog.customs.go.th/api/3/action"
-HS_4DIGIT_RESOURCE = "b65e3b9e-6189-4869-b3fc-b8383e639d38"
+HS_4DIGIT_RESOURCE  = "b65e3b9e-6189-4869-b3fc-b8383e639d38"   # 4-digit headings
+HS_TARIFF_RESOURCE  = "3389251a-2240-4bc3-a797-53b82b99c767"   # full tariff (may have 11-digit)
+
+# field map — detected at runtime from first successful call
+_TARIFF_FIELD_MAP: dict = {}
 
 
-# ── CKAN: ดึง HS Candidates ───────────────────────────────────────────────────
+async def _probe_tariff_fields(client: httpx.AsyncClient) -> dict:
+    """ดู field names ของ HS_TARIFF_RESOURCE ครั้งแรก แล้ว cache ไว้"""
+    global _TARIFF_FIELD_MAP
+    if _TARIFF_FIELD_MAP:
+        return _TARIFF_FIELD_MAP
+    try:
+        r = await client.get(
+            f"{CKAN_BASE}/datastore_search",
+            params={"resource_id": HS_TARIFF_RESOURCE, "limit": 1},
+        )
+        data = r.json()
+        if data.get("success"):
+            fields = {f["id"]: f.get("type","") for f in data["result"].get("fields", [])}
+            records = data["result"].get("records", [])
+            sample = records[0] if records else {}
+            _TARIFF_FIELD_MAP = {"fields": fields, "sample": sample}
+    except Exception:
+        pass
+    return _TARIFF_FIELD_MAP
+
+
+async def fetch_hs_full(hs_code: str) -> dict:
+    """
+    ค้น HS Code แบบ full จาก TARIFF_RESOURCE
+    คืน dict พร้อม hs_code_11, description_th ถ้าเจอ
+    """
+    hs_digits = hs_code.replace(".", "").strip()
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        # probe fields ก่อน
+        probe = await _probe_tariff_fields(client)
+
+        # ลองค้นด้วย 4 หลักแรก
+        for q in [hs_digits, hs_digits[:6], hs_digits[:4]]:
+            if not q:
+                continue
+            try:
+                r = await client.get(
+                    f"{CKAN_BASE}/datastore_search",
+                    params={"resource_id": HS_TARIFF_RESOURCE, "q": q, "limit": 5},
+                )
+                data = r.json()
+                if not data.get("success"):
+                    continue
+                for rec in data["result"].get("records", []):
+                    # หา field ที่น่าจะเป็น HS code (มีตัวเลขยาว)
+                    rec_str = str(rec)
+                    if hs_digits[:4] in rec_str:
+                        return {
+                            "found": True,
+                            "raw_record": rec,
+                            "probe_fields": list(probe.get("fields", {}).keys()),
+                        }
+            except Exception:
+                continue
+    return {"found": False, "probe_fields": list(_TARIFF_FIELD_MAP.get("fields", {}).keys())}
+
+
+# ── CKAN: ดึง HS Candidates (4-digit heading) ─────────────────────────────────
 async def fetch_hs_candidates(keywords: list[str], limit: int = 12) -> list[dict]:
-    """ค้น HS Code 4 หลักจาก CKAN กรมศุลกากร (ฟรี)"""
+    """ค้น HS Code 4 หลักจาก CKAN กรมศุลกากร พร้อม description ภาษาไทย"""
     seen, results = set(), []
     async with httpx.AsyncClient(timeout=15.0) as client:
         for kw in keywords:
