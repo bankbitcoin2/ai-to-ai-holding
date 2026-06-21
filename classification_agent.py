@@ -24,12 +24,14 @@ STRICT RULES:
 5. Return UP TO 5 candidates ranked by confidence_score descending.
 6. Only include candidates with confidence_score >= 0.75.
 7. If none reach 0.75, return single best candidate anyway.
+8. hs_description_th: Thai language description of the HS heading — translate the official HS description to Thai. Keep it concise (≤80 chars).
 
 Response format (JSON array ranked best first):
 [
   {
     "hs_code": "8471.30",
     "hs_description": "Portable automatic data processing machines...",
+    "hs_description_th": "เครื่องประมวลผลข้อมูลอัตโนมัติแบบพกพา...",
     "confidence_score": 0.92,
     "source_reference": "HS 2022, Chapter 84, Note 5(A); Explanatory Note 84.71",
     "reasoning_steps": ["Step 1: ...", "Step 2: ..."],
@@ -104,17 +106,22 @@ async def _enrich_with_ckan(candidates: list) -> list:
         hs6 = hs_raw.replace(".", "")[:6]
         hs_th = None
 
-        # ดึง description ภาษาไทยจาก CKAN (4-digit heading)
+        # ดึง description ภาษาไทยจาก CKAN (4-digit heading) — fallback: ใช้ที่ Claude generate
+        claude_th = c.get("hs_description_th")
         if hs6:
             try:
                 ckan = await fetch_hs_candidates([hs6[:4]], limit=5)
                 for row in ckan:
                     code = str(row.get("hs_code", "")).replace(".", "")
                     if code.startswith(hs6[:4]):
-                        hs_th = row.get("description", "")
-                        break
+                        ckan_th = row.get("description", "")
+                        if ckan_th:
+                            hs_th = ckan_th  # prefer CKAN if available
+                            break
             except Exception:
                 pass
+        if not hs_th and claude_th:
+            hs_th = claude_th  # fallback to Claude-generated Thai description
 
         # สร้าง 11-digit estimate (ยืนยันกับ igtf.customs.go.th ก่อนใช้จริง)
         hs_11 = _build_hs11_estimate(hs_raw)
