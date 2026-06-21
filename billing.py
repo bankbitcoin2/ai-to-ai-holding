@@ -134,7 +134,7 @@ async def recover_key(req: RecoverKeyRequest):
     try:
         async with db.execute(
             "SELECT id, agent_name, contact_email, status FROM client_agents "
-            "WHERE contact_email = ? AND LOWER(agent_name) = LOWER(?)",
+            "WHERE contact_email = $1 AND LOWER(agent_name) = LOWER($2)",
             (req.contact_email.strip(), req.agent_name.strip())
         ) as cur:
             row = await cur.fetchone()
@@ -157,7 +157,7 @@ async def recover_key(req: RecoverKeyRequest):
         now      = datetime.now(timezone.utc).isoformat()
 
         await db.execute(
-            "UPDATE client_agents SET api_key_hint = ? WHERE id = ?",
+            "UPDATE client_agents SET api_key_hint = $1 WHERE id = $2",
             (new_hint, row["id"])
         )
 
@@ -166,7 +166,7 @@ async def recover_key(req: RecoverKeyRequest):
         audit_hash   = hashlib.sha256(audit_detail.encode()).hexdigest()
         await db.execute(
             "INSERT INTO audit_events (id, event_type, actor_id, detail, sha256_hash, created_at) "
-            "VALUES (?, 'KEY_RECOVERY', ?, ?, ?, ?)",
+            "VALUES ($1, 'KEY_RECOVERY', $2, $3, $4, $5)",
             (str(uuid.uuid4()), row["id"], audit_detail, audit_hash, now)
         )
         await db.commit()
