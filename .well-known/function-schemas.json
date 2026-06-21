@@ -3,7 +3,7 @@
   "_usage": "Pass these definitions in the 'tools' array when initializing your LLM call",
   "schema_version": "2024-01",
   "provider": "AI TO AI HOLDING",
-  "base_url": "https://api.ai-to-ai-holding.com",
+  "base_url": "https://web-production-c9da4.up.railway.app",
   "auth_header": "X-API-Key",
   "functions": [
     {
@@ -84,6 +84,6 @@
   ],
   "langchain_tool_example": {
     "_comment": "Python snippet for LangChain integration",
-    "code": "from langchain.tools import StructuredTool\nimport requests\n\ndef classify_product(product_description: str, origin_country: str = 'CN') -> dict:\n    resp = requests.post(\n        'https://api.ai-to-ai-holding.com/v1/customs/classify',\n        headers={'X-API-Key': 'YOUR_KEY', 'Content-Type': 'application/json'},\n        json={'items': [{'description': product_description, 'origin_country': origin_country}]}\n    )\n    return resp.json()\n\ncustoms_tool = StructuredTool.from_function(\n    func=classify_product,\n    name='thai_customs_classifier',\n    description='Classify products for Thai customs import. Returns HS code, duty rate, FTA rates, OGA requirements.'\n)"
+    "code": "from langchain.tools import StructuredTool\nimport requests\n\ndef classify_product(product_description: str, origin_country: str = 'CN') -> dict:\n    resp = requests.post(\n        'https://web-production-c9da4.up.railway.app/v1/customs/classify',\n        headers={'X-API-Key': 'YOUR_KEY', 'Content-Type': 'application/json'},\n        json={'items': [{'description': product_description, 'origin_country': origin_country}]}\n    )\n    return resp.json()\n\ncustoms_tool = StructuredTool.from_function(\n    func=classify_product,\n    name='thai_customs_classifier',\n    description='Classify products for Thai customs import. Returns HS code, duty rate, FTA rates, OGA requirements.'\n)"
   }
 }

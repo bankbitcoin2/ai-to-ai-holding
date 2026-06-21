@@ -1,177 +1,124 @@
-# AI TO AI HOLDING
-### Customs Intelligence Division — Phase 1
+# 🇹🇭 AI TO AI HOLDING — Thai Trade Intelligence API
 
-> Digital customs infrastructure for AI-to-AI trade.
-> ระบบจำแนกพิกัดศุลกากรและคำนวณภาษีอัตโนมัติ สำหรับ AI Agent ที่ทำการค้าระหว่างประเทศ
+> **One API call. Full Thai customs compliance.**  
+> HS code · Import duty · 13 FTA rates · OGA permits · Halal status (21 countries) · SHA-256 evidence chain
 
----
-
-## ระบบนี้ทำอะไร
-
-ส่ง invoice มา → ได้ HS Code + อัตราภาษี + OGA flags + Confidence Score กลับไป
-
-ทุก transaction บันทึกใน Evidence Chain อัตโนมัติ
-ทุกรายได้แบ่ง 60/40 เข้า Corporate Reserve และ Chairman Wallet ทันที
+[![Live](https://img.shields.io/badge/status-live-brightgreen)](https://web-production-c9da4.up.railway.app)
+[![Sandbox](https://img.shields.io/badge/sandbox-free-blue)](https://web-production-c9da4.up.railway.app/v1/sandbox/classify)
+[![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://web-production-c9da4.up.railway.app/.well-known/mcp.json)
+[![GPT Actions](https://img.shields.io/badge/GPT_Actions-ready-orange)](https://web-production-c9da4.up.railway.app/.well-known/ai-plugin.json)
+[![LangChain](https://img.shields.io/badge/LangChain-tool-yellow)](./langchain_tool.py)
 
 ---
 
-## เริ่มใช้งาน
+## What It Does
+
+Given a product name (Thai or English), returns in a single call:
+
+| Field | Description |
+|-------|-------------|
+| `hs_code` | Thai Customs HS Code (6-digit, HS 2022) |
+| `hs_description_th` | Thai language heading description |
+| `confidence_score` | Classification confidence (0–1) |
+| `duty_rate` | MFN import duty rate (%) |
+| `applicable_fta` | Best FTA rate + agreement name |
+| `is_restricted` | OGA permit required? (true/false) |
+| `oga_permits` | Required agencies (FDA, TISI, DOF, etc.) |
+| `halal_required` | Halal cert required at destination? |
+| `evidence_hash` | SHA-256 audit hash |
+
+---
+
+## Try It Free (No Key)
 
 ```bash
-# 1. ติดตั้ง
-pip install -r app/requirements.txt
+curl -X POST https://web-production-c9da4.up.railway.app/v1/sandbox/classify \
+  -H "Content-Type: application/json" \
+  -d '{"description": "frozen shrimp vannamei"}'
+```
 
-# 2. รัน
-python app/main.py
-
-# 3. เปิด API docs
-http://localhost:8000/docs
+```bash
+# Thai input works too
+curl -X POST https://web-production-c9da4.up.railway.app/v1/sandbox/classify \
+  -H "Content-Type: application/json" \
+  -d '{"description": "มือถือ iPhone 16 Pro"}'
 ```
 
 ---
 
-## Endpoints
+## Integrations
 
-### ฟรี — ทดสอบก่อนตัดสินใจ
+### MCP (Model Context Protocol)
 
+Compatible with Claude Desktop, Cursor, and any MCP-enabled AI system.
+
+Manifest: `/.well-known/mcp.json`
+
+### GPT Actions (OpenAI Custom GPT)
+
+OpenAPI schema: `/openapi.json`  
+Plugin manifest: `/.well-known/ai-plugin.json`
+
+### LangChain / LangGraph
+
+```python
+from langchain_tool import ThaiSandboxTool, ThaiCustomsTool
+
+# Free sandbox
+tool = ThaiSandboxTool()
+result = tool.run("hydraulic excavator")
+
+# Production (requires API key)
+tool = ThaiCustomsTool(api_key="YOUR_KEY")
+result = tool.run("frozen shrimp", origin_country="VN")
 ```
-POST /v1/sandbox/classify
-```
 
-ส่งสินค้าได้สูงสุด 3 รายการ ไม่มีค่าใช้จ่าย ไม่บันทึกข้อมูล
-ใช้ตรวจสอบว่า Confidence Score สูงพอก่อนใช้งานจริง
+### OpenAI Function Calling / Gemini Function Declarations
 
-**ตัวอย่าง Request:**
-```json
-{
-  "client_id": "your-ai-agent-id",
-  "destination_country": "TH",
-  "items": [
-    {
-      "description": "Portable laptop computer 15-inch Intel i7",
-      "origin_country": "CN",
-      "unit_price": 800,
-      "quantity": 10
-    }
-  ]
-}
-```
-
-**ตัวอย่าง Response:**
-```json
-{
-  "sandbox_session_id": "uuid",
-  "mode": "SANDBOX",
-  "items": [
-    {
-      "hs_code": "8471.30",
-      "hs_description": "Portable automatic data processing machines",
-      "confidence_score": 0.94,
-      "source_reference": "HS 2022, Chapter 84, Note 5(A)",
-      "duty_rate": 0.05,
-      "duty_amount": 400.0,
-      "vat_rate": 0.07,
-      "vat_amount": 56.0,
-      "oga_required": true,
-      "oga_agencies": ["มอก."],
-      "watermark": "[SANDBOX — NOT FOR PRODUCTION USE]"
-    }
-  ],
-  "summary": {
-    "avg_confidence_score": 0.94,
-    "ready_for_production": true
-  },
-  "next_step": "Confidence looks good — call POST /v1/customs/classify to go live."
-}
-```
+Schema: `/.well-known/function-schemas.json`
 
 ---
 
-### Production — คิดค่าบริการ $1.50 ต่อ item
+## FTA Coverage (13 Agreements)
 
-```
-POST /v1/customs/classify
-```
-
-รับ invoice เต็มรูปแบบ บันทึก Evidence Chain ทุก item เรียกเก็บเงินและ split รายได้อัตโนมัติ
-
-```
-GET /v1/customs/case/{case_id}
-```
-
-ดูผลการจำแนกย้อนหลังตาม case ID
-
----
-
-### Internal — Chairman และ AI CEO เท่านั้น
-
-```
-POST /v1/treasury/settle     ← รับรายได้และ split 60/40
-GET  /v1/treasury/ledger/{YYYY-MM}  ← สรุปรายรับรายเดือน
-```
-
----
-
-## โครงสร้างไฟล์
-
-```
-app/
-├── main.py                          ← Entry point
-├── api/
-│   ├── customs.py                   ← Production endpoint
-│   ├── sandbox.py                   ← Free trial endpoint
-│   └── treasury.py                  ← Internal revenue endpoint
-├── services/
-│   ├── customs_service.py           ← Business logic หลัก
-│   └── treasury_service.py          ← Split pipeline (P-03)
-├── agents/
-│   └── classification_agent.py      ← Claude ทำหน้าที่ Classifier
-└── core/
-    ├── database.py                  ← SQLite connection (P-06)
-    └── audit.py                     ← Evidence Chain (P-04)
-
-schema/
-├── schema_v1.sql                    ← [A] Organization, Knowledge, Treasury, Customs
-├── schema_comms_v1.sql              ← [B] Command & Communication
-└── schema_learning_v1.sql           ← [C] Learning Loop & Feedback
-```
-
----
-
-## หลักการที่ระบบบังคับใช้
-
-| Code | หลักการ | วิธีที่ระบบ enforce |
-|------|---------|-------------------|
-| P-01 | Chairman คืออำนาจสูงสุด | ไม่มี AI ใดแก้ไข constitution ได้ |
-| P-02 | Kill Switch พร้อมตลอด | `gov_kill_switch_log` บังคับผ่าน Governance Office |
-| P-03 | แบ่งรายได้ 60/40 อัตโนมัติ | `treasury_service.py` split ทันทีหลัง case close |
-| P-04 | บันทึกทุกการตัดสินใจด้วย hash | `core/audit.py` SHA-256 chain ทุก event |
-| P-05 | ห้าม AI เดาคำตอบ | ทุก output บังคับมี `confidence_score` + `source_reference` |
-| P-06 | ฐานข้อมูลเดียวทั้งองค์กร | SQLite ไฟล์เดียว ทุก module ใช้ร่วมกัน |
+| Code | Agreement | Partners |
+|------|-----------|---------|
+| ATIGA/AFTA | ASEAN Trade in Goods | BN, KH, ID, LA, MY, MM, PH, SG, VN |
+| RCEP | Regional Comprehensive Economic Partnership | CN, JP, KR, AU, NZ + ASEAN |
+| ACFTA | ASEAN–China FTA | CN |
+| AJCEP | ASEAN–Japan CEP | JP |
+| AKFTA | ASEAN–Korea FTA | KR |
+| AANZFTA | ASEAN–Australia–NZ FTA | AU, NZ |
+| AIFTA | ASEAN–India FTA | IN |
+| JTEPA | Japan–Thailand EPA | JP |
+| TAFTA | Thailand–Australia FTA | AU |
+| TNZCEP | Thailand–NZ CEP | NZ |
+| TCFTA | Thailand–Chile FTA | CL |
+| TPFTA | Thailand–Peru FTA | PE |
+| MFN | Most Favoured Nation | All others |
 
 ---
 
 ## Pricing
 
-| บริการ | ราคา |
-|--------|------|
-| Sandbox (ทดสอบ) | ฟรี — สูงสุด 3 items |
-| HS Code Classification | $1.50 ต่อ item |
-| Duty & VAT Estimation | รวมอยู่ใน classification |
-| OGA Compliance Check | รวมอยู่ใน classification |
-| Escrow / Arbitration | ตามข้อตกลง (Pillar 3) |
+| Tier | Price | Limit |
+|------|-------|-------|
+| Sandbox | **Free** | 20 req/min, no auth |
+| Production | **$1.50 / query** | 60 req/min, X-API-Key |
+
+Prepaid credits via Stripe — no contract, no monthly fee.  
+[Register → Get API Key](https://web-production-c9da4.up.railway.app)
 
 ---
 
-## ขั้นตอนถัดไป (Roadmap)
+## Legal Disclaimer
 
-- [ ] Real tariff data — ข้อมูล HS rates จริงจากฐานข้อมูลศุลกากร
-- [ ] Deploy to server — เปิดให้ client AI เข้าถึงได้จริง
-- [ ] Learning Loop Agent — Knowledge Office ประมวลผล lesson อัตโนมัติ
-- [ ] KaaS endpoint — Pillar 2 ปล่อยเช่าข้อมูลแบบ Pay-per-Query
-- [ ] Escrow API — Pillar 3 อนุญาโตตุลาการดิจิทัล
+Output is **decision-support only** — not a binding customs ruling or legal advice.  
+Always verify with a licensed customs broker or the Thai Customs Department before making trade decisions.
 
 ---
 
-*AI TO AI HOLDING — Customs Intelligence Division*
-*Phase 1 Foundation v1 | Chairman Authority Active*
+## API Reference
+
+- Swagger UI: `https://web-production-c9da4.up.railway.app/docs`
+- OpenAPI JSON: `https://web-production-c9da4.up.railway.app/openapi.json`
