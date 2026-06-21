@@ -77,7 +77,11 @@ async def classify_item(
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
             ANTHROPIC_API_URL,
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "x-api-key": os.getenv("ANTHROPIC_API_KEY", ""),
+                "anthropic-version": "2023-06-01",
+            },
             json=payload,
         )
         response.raise_for_status()
