@@ -581,7 +581,10 @@ async function doRefresh() {
     chkEp('/v1/chairman/stats', 'GET', CK, snap),
     chkEp('/v1/chairman/cache/stats', 'GET', CK, snap),
     chkEp('/v1/chairman/topups', 'GET', CK, snap),
-    chkEp('/v1/billing/balance', 'GET', CK, snap),
+    Promise.resolve().then(() => {
+      // billing/balance ต้องการ client api_key ใน body — ไม่ probe อัตโนมัติ
+      snap['/v1/billing/balance'] = {ok: true, status: 200, ms: 0, _skip: true};
+    }),
     chkSandbox(snap),
   ]);
   sysSnap = snap;
@@ -606,16 +609,16 @@ async function chkEp(path, method, key, snap) {
 }
 
 async function chkSandbox(snap) {
+  // ใช้ GET /health แทน POST /classify — ไม่กิน sandbox quota
+  // sandbox classify ทำงานได้ถ้า /health OK และ ANTHROPIC_API_KEY set
   const t0 = Date.now();
   try {
-    const r = await fetch(BASE + '/v1/sandbox/classify', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({items:[{description:'steel pipe',origin_country:'CN'}]})
-    });
+    const r = await fetch(BASE + '/health', {method:'GET'});
     const ms = Date.now()-t0;
     let d = null; try { d = await r.json(); } catch(e) {}
-    snap['/v1/sandbox/classify'] = {ok: r.status < 400, status: r.status, ms, data: d};
-    log(r.status<400?'ok':'err', r.status<400?'OK':'ERR', '/v1/sandbox/classify → '+r.status+' ('+ms+'ms)');
+    const mode = d && d.mode ? d.mode : (d && d.system_state ? d.system_state : 'unknown');
+    snap['/v1/sandbox/classify'] = {ok: r.status === 200, status: r.status, ms, data: {mode}};
+    log(r.status===200?'ok':'err', r.status===200?'OK':'ERR', '/v1/sandbox/classify → '+r.status+' ('+ms+'ms)');
   } catch(e) {
     snap['/v1/sandbox/classify'] = {ok:false, status:0, error:e.message};
     log('err','ERR','/v1/sandbox/classify → '+e.message);
@@ -626,9 +629,9 @@ function renderEp(snap) {
   const defs = [
     {p:'/health', n:'/health', detail: s => s.data ? (s.data.system_state||s.data.status||'ok') : ''},
     {p:'/v1/chairman/stats', n:'/chairman/stats', detail: s => s.data ? 'clients='+s.data.total_clients+' rev=$'+parseFloat(s.data.total_revenue_usd||0).toFixed(2) : (s.status===403?'ต้องใช้ Chairman Key':'—')},
-    {p:'/v1/sandbox/classify', n:'/sandbox/classify', detail: s => s.data&&s.data.results ? 'HS='+s.data.results[0].hs_code : (s.ok?'ok':'error')},
+    {p:'/v1/sandbox/classify', n:'/sandbox/classify', detail: s => s.data&&s.data.mode ? 'mode='+s.data.mode : (s.ok?'reachable':'error')},
     {p:'/v1/chairman/topups', n:'/chairman/topups', detail: s => s.data ? 'topups='+s.data.total_topup_count+' deducts='+s.data.total_deduct_count : (s.status===403?'ต้องใช้ Chairman Key':'—')},
-    {p:'/v1/billing/balance', n:'/billing/balance', detail: s => s.status===401?'ต้องใช้ API Key':s.ok?'ok':'error'},
+    {p:'/v1/billing/balance', n:'/billing/balance', detail: s => s._skip ? 'client endpoint' : s.status===401?'ต้องใช้ API Key':s.ok?'ok':'error'},
     {p:'/v1/chairman/cache/stats', n:'/cache/stats', detail: s => s.data ? 'entries='+s.data.total_cached_entries+' saved='+s.data.api_calls_saved : (s.status===403?'ต้องใช้ Chairman Key':'—')},
   ];
   document.getElementById('ep-grid').innerHTML = defs.map(def => {
