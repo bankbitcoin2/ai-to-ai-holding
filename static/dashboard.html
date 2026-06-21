@@ -158,7 +158,7 @@
     <div class="credit-card">
       <div class="credit-label" data-i18n="credit_label">Credit คงเหลือ</div>
       <div class="credit-amount">$<span id="creditBalance">0.00</span></div>
-      <div class="credit-sub">≈ <span id="callsRemaining">0</span> <span data-i18n="calls_remaining">calls remaining</span> · $0.001 / <span data-i18n="per_item">รายการ</span></div>
+      <div class="credit-sub">≈ <span id="callsRemaining">0</span> <span data-i18n="calls_remaining">calls remaining</span> · $0.05 / <span data-i18n="per_item">รายการ</span></div>
       <div class="credit-actions">
         <button class="btn-topup" onclick="openTopup()" data-i18n="topup_btn">+ เติม Credit</button>
         <button class="btn btn-outline" onclick="refreshBalance()" style="color:white;border-color:rgba(255,255,255,0.2)" data-i18n="refresh_btn">🔄 รีเฟรช</button>
@@ -176,7 +176,7 @@
       </div>
       <div class="stat-card">
         <div class="label" data-i18n="stat_price">ราคาต่อรายการ</div>
-        <div class="value" style="font-size:1.1rem">$0.001</div>
+        <div class="value" style="font-size:1.1rem" id="pricePerItem">$0.05</div>
       </div>
     </div>
 
@@ -703,6 +703,7 @@ function showDashboard(data) {
 function updateBalance(data) {
   document.getElementById('creditBalance').textContent = (data.credit_balance || 0).toFixed(4);
   document.getElementById('callsRemaining').textContent = (data.estimated_calls_remaining || 0).toLocaleString();
+  if (data.price_per_item) document.getElementById('pricePerItem').textContent = '$' + Number(data.price_per_item).toFixed(2);
 }
 
 async function refreshBalance() {
