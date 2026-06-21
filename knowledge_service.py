@@ -286,3 +286,70 @@ def get_fta_form(hs_code: str, origin_country: str) -> dict:
         except Exception:
             pass
     return {"eligible": False, "form": None, "all_eligible_countries": []}
+
+
+async def get_hs_description_db(hs_code: str) -> dict:
+    """
+    ดึง HS description จาก PostgreSQL hs_code_master ก่อน
+    ถ้าไม่มีหรือ error → fallback bundled
+    """
+    clean = hs_code.replace(" ","").replace(".","").strip()
+    # Try DB first
+    try:
+        from database import USE_POSTGRES
+        if USE_POSTGRES:
+            from db_adapter import get_pool
+            pool = await get_pool()
+            async with pool.acquire() as conn:
+                row = await conn.fetchrow(
+                    "SELECT desc_th, desc_en FROM hs_code_master WHERE TRIM(hs_code) = $1",
+                    clean
+                )
+                if row:
+                    return {"th": row["desc_th"], "en": row["desc_en"], "source": "db"}
+    except Exception:
+        pass
+    # Fallback: bundled
+    r = get_hs_description(hs_code)
+    if r.get("th") or r.get("en"):
+        r["source"] = "bundled"
+    return r
+
+
+async def get_fta_form_db(hs_code: str, origin_country: str) -> dict:
+    """
+    ดึง FTA eligibility จาก PostgreSQL fta_eligibility ก่อน
+    ถ้าไม่มีหรือ error → fallback bundled
+    """
+    clean = hs_code.replace(" ","").replace(".","").strip()
+    try:
+        from database import USE_POSTGRES
+        if USE_POSTGRES:
+            from db_adapter import get_pool
+            from fta_eligibility_bundled import _ALIASES
+            cc = _ALIASES.get(origin_country.strip().upper(), origin_country.strip().upper()[:2])
+            pool = await get_pool()
+            async with pool.acquire() as conn:
+                # Try 8-digit, 6-digit
+                for length in [8, 6]:
+                    row = await conn.fetchrow(
+                        "SELECT fta_form FROM fta_eligibility WHERE hs_code = $1 AND country_code = $2",
+                        clean[:length], cc
+                    )
+                    if row:
+                        all_rows = await conn.fetch(
+                            "SELECT country_code, fta_form FROM fta_eligibility WHERE hs_code = $1",
+                            clean[:length]
+                        )
+                        return {
+                            "eligible": True,
+                            "form": row["fta_form"],
+                            "all_eligible_countries": [r["country_code"] for r in all_rows],
+                            "source": "db"
+                        }
+    except Exception:
+        pass
+    # Fallback: bundled
+    result = get_fta_form(hs_code, origin_country)
+    result["source"] = "bundled"
+    return result
