@@ -1,0 +1,156 @@
+# -*- coding: utf-8 -*-
+"""
+normalize_description.py — Product Description Normalizer
+แปลงคำไทยทับศัพท์ / ชื่อแบรนด์ → canonical English form
+"""
+import re
+from functools import lru_cache
+
+# Compound phrases (longest first)
+_COMPOUNDS = [
+    ("\u0e41\u0e21\u0e04\u0e1a\u0e38\u0e4a\u0e04 \u0e41\u0e2d\u0e23\u0e4c", "macbook air"),
+    ("\u0e41\u0e21\u0e04\u0e1a\u0e38\u0e49\u0e04 \u0e41\u0e2d\u0e23\u0e4c", "macbook air"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e27\u0e34\u0e48\u0e07", "running shoes"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e1c\u0e49\u0e32\u0e43\u0e1a", "sneakers"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e2a\u0e49\u0e19\u0e2a\u0e39\u0e07", "high heels"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e2a\u0e1b\u0e2d\u0e23\u0e4c\u0e15", "sports shoes"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e41\u0e15\u0e30", "sandals"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e2b\u0e19\u0e31\u0e07", "leather shoes"),
+    ("\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32", "shoes"),
+    ("\u0e2b\u0e39\u0e1f\u0e31\u0e07\u0e1a\u0e25\u0e39\u0e17\u0e39\u0e18", "bluetooth earphone"),
+    ("\u0e25\u0e33\u0e42\u0e1e\u0e07\u0e1a\u0e25\u0e39\u0e17\u0e39\u0e18", "bluetooth speaker"),
+    ("\u0e2a\u0e21\u0e32\u0e23\u0e4c\u0e17\u0e42\u0e1f\u0e19", "smartphone"),
+    ("\u0e2a\u0e21\u0e32\u0e23\u0e4c\u0e15\u0e42\u0e1f\u0e19", "smartphone"),
+    ("\u0e42\u0e17\u0e23\u0e28\u0e31\u0e1e\u0e17\u0e4c\u0e21\u0e37\u0e2d\u0e16\u0e37\u0e2d", "mobile phone"),
+    ("\u0e21\u0e37\u0e2d\u0e16\u0e37\u0e2d", "mobile phone"),
+    ("\u0e42\u0e17\u0e23\u0e28\u0e31\u0e1e\u0e17\u0e4c", "telephone"),
+    ("\u0e41\u0e1a\u0e15\u0e40\u0e15\u0e2d\u0e23\u0e35\u0e48", "battery"),
+    ("\u0e2a\u0e32\u0e22\u0e0a\u0e32\u0e23\u0e4c\u0e08", "charging cable"),
+    ("\u0e17\u0e35\u0e48\u0e0a\u0e32\u0e23\u0e4c\u0e08", "charger"),
+    ("\u0e0a\u0e32\u0e23\u0e4c\u0e08\u0e40\u0e08\u0e2d\u0e23\u0e4c", "charger"),
+    ("\u0e2a\u0e32\u0e22\u0e44\u0e1f", "cable"),
+    ("\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e0b\u0e31\u0e01\u0e1c\u0e49\u0e32", "washing machine"),
+    ("\u0e15\u0e39\u0e49\u0e40\u0e22\u0e47\u0e19", "refrigerator"),
+    ("\u0e44\u0e21\u0e42\u0e04\u0e23\u0e40\u0e27\u0e1f", "microwave oven"),
+    ("\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e39\u0e14\u0e1d\u0e38\u0e48\u0e19", "vacuum cleaner"),
+    ("\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e1b\u0e23\u0e31\u0e1a\u0e2d\u0e32\u0e01\u0e32\u0e28", "air conditioner"),
+    ("\u0e2b\u0e21\u0e49\u0e2d\u0e2b\u0e38\u0e07\u0e02\u0e49\u0e32\u0e27", "rice cooker"),
+    ("\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32\u0e16\u0e37\u0e2d", "handbag"),
+    ("\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32\u0e40\u0e14\u0e34\u0e19\u0e17\u0e32\u0e07", "luggage"),
+    ("\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32\u0e2a\u0e30\u0e1e\u0e32\u0e22", "shoulder bag"),
+    ("\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32\u0e40\u0e1b\u0e49", "backpack"),
+    ("\u0e01\u0e23\u0e30\u0e40\u0e1b\u0e4b\u0e32", "bag"),
+    ("\u0e19\u0e32\u0e2c\u0e34\u0e01\u0e32\u0e02\u0e49\u0e2d\u0e21\u0e37\u0e2d", "wristwatch"),
+    ("\u0e19\u0e32\u0e2c\u0e34\u0e01\u0e32", "watch"),
+    ("\u0e41\u0e27\u0e48\u0e19\u0e01\u0e31\u0e19\u0e41\u0e14\u0e14", "sunglasses"),
+    ("\u0e41\u0e27\u0e48\u0e19\u0e15\u0e32", "eyeglasses"),
+    ("\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e40\u0e2a\u0e23\u0e34\u0e21", "food supplement"),
+    ("\u0e19\u0e49\u0e33\u0e1c\u0e25\u0e44\u0e21\u0e49", "fruit juice"),
+    ("\u0e19\u0e49\u0e33\u0e21\u0e31\u0e19\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07", "engine oil"),
+    ("\u0e2d\u0e30\u0e44\u0e2b\u0e25\u0e48\u0e23\u0e16", "auto parts"),
+    ("\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c", "automobile"),
+    ("\u0e2b\u0e19\u0e49\u0e32\u0e01\u0e32\u0e01\u0e2d\u0e19\u0e32\u0e21\u0e31\u0e22", "surgical mask"),
+    ("\u0e22\u0e32\u0e2a\u0e35\u0e1f\u0e31\u0e19", "toothpaste"),
+    ("\u0e19\u0e49\u0e33\u0e2b\u0e2d\u0e21", "perfume"),
+]
+
+# Single words
+_SINGLES = [
+    ("\u0e44\u0e2d\u0e42\u0e1f\u0e19", "iphone"),
+    ("\u0e44\u0e2d\u0e41\u0e1e\u0e14", "ipad"),
+    ("\u0e44\u0e2d\u0e41\u0e21\u0e04", "imac"),
+    ("\u0e41\u0e21\u0e04\u0e1a\u0e38\u0e4a\u0e04", "macbook"),
+    ("\u0e41\u0e21\u0e04\u0e1a\u0e38\u0e49\u0e04", "macbook"),
+    ("\u0e41\u0e2d\u0e1b\u0e40\u0e1b\u0e34\u0e49\u0e25", "apple"),
+    ("\u0e41\u0e2d\u0e1b\u0e40\u0e1b\u0e34\u0e25", "apple"),
+    ("\u0e0b\u0e31\u0e21\u0e0b\u0e38\u0e07", "samsung"),
+    ("\u0e0b\u0e31\u0e21\u0e0b\u0e31\u0e07", "samsung"),
+    ("\u0e2b\u0e31\u0e27\u0e40\u0e27\u0e48\u0e22", "huawei"),
+    ("\u0e42\u0e2d\u0e1b\u0e42\u0e1b\u0e49", "oppo"),
+    ("\u0e27\u0e35\u0e42\u0e27\u0e48", "vivo"),
+    ("\u0e42\u0e19\u0e40\u0e01\u0e35\u0e22", "nokia"),
+    ("\u0e42\u0e0b\u0e19\u0e35\u0e48", "sony"),
+    ("\u0e41\u0e2d\u0e25\u0e08\u0e35", "lg"),
+    ("\u0e1e\u0e32\u0e19\u0e32\u0e42\u0e0b\u0e19\u0e34\u0e04", "panasonic"),
+    ("\u0e42\u0e15\u0e0a\u0e34\u0e1a\u0e32", "toshiba"),
+    ("\u0e41\u0e25\u0e47\u0e1b\u0e17\u0e47\u0e2d\u0e1b", "laptop"),
+    ("\u0e41\u0e25\u0e47\u0e1b\u0e17\u0e49\u0e2d\u0e1b", "laptop"),
+    ("\u0e42\u0e19\u0e49\u0e15\u0e1a\u0e38\u0e4a\u0e04", "notebook"),
+    ("\u0e42\u0e19\u0e49\u0e15\u0e1a\u0e38\u0e4a\u0e01", "notebook"),
+    ("\u0e04\u0e2d\u0e21\u0e1e\u0e34\u0e27\u0e40\u0e15\u0e2d\u0e23\u0e4c", "computer"),
+    ("\u0e04\u0e2d\u0e21\u0e1e\u0e4c", "computer"),
+    ("\u0e41\u0e17\u0e47\u0e1a\u0e40\u0e25\u0e47\u0e15", "tablet"),
+    ("\u0e1a\u0e25\u0e39\u0e17\u0e39\u0e18", "bluetooth"),
+    ("\u0e25\u0e33\u0e42\u0e1e\u0e07", "speaker"),
+    ("\u0e01\u0e25\u0e49\u0e2d\u0e07", "camera"),
+    ("\u0e17\u0e35\u0e27\u0e35", "television"),
+    ("\u0e42\u0e17\u0e23\u0e17\u0e31\u0e28\u0e19\u0e4c", "television"),
+    ("\u0e42\u0e1b\u0e23\u0e40\u0e08\u0e04\u0e40\u0e15\u0e2d\u0e23\u0e4c", "projector"),
+    ("\u0e42\u0e14\u0e23\u0e19", "drone"),
+    ("\u0e42\u0e14\u0e23\u0e13", "drone"),
+    ("\u0e40\u0e23\u0e32\u0e40\u0e15\u0e2d\u0e23\u0e4c", "router"),
+    ("\u0e1e\u0e23\u0e34\u0e49\u0e19\u0e40\u0e15\u0e2d\u0e23\u0e4c", "printer"),
+    ("\u0e40\u0e21\u0e32\u0e2a\u0e4c", "mouse"),
+    ("\u0e2b\u0e39\u0e1f\u0e31\u0e07", "earphone"),
+    ("\u0e41\u0e1a\u0e15", "battery"),
+    ("\u0e40\u0e04\u0e40\u0e1a\u0e34\u0e25", "cable"),
+    ("\u0e19\u0e34\u0e49\u0e27", "inch"),
+    ("\u0e40\u0e21\u0e15\u0e23", "meter"),
+    ("\u0e01\u0e34\u0e42\u0e25\u0e01\u0e23\u0e31\u0e21", "kg"),
+    ("\u0e01\u0e34\u0e42\u0e25", "kg"),
+    ("\u0e42\u0e1b\u0e23", "pro"),
+    ("\u0e41\u0e21\u0e01\u0e0b\u0e4c", "max"),
+    ("\u0e41\u0e21\u0e47\u0e01\u0e0b\u0e4c", "max"),
+    ("\u0e41\u0e21\u0e47\u0e01\u0e0b\u0e4c", "max"),
+    ("\u0e21\u0e34\u0e19\u0e34", "mini"),
+    ("\u0e2d\u0e31\u0e25\u0e15\u0e23\u0e49\u0e32", "ultra"),
+    ("\u0e1e\u0e25\u0e31\u0e2a", "plus"),
+    ("\u0e44\u0e25\u0e17\u0e4c", "lite"),
+    ("\u0e44\u0e19\u0e01\u0e35\u0e49", "nike"),
+    ("\u0e2d\u0e32\u0e14\u0e34\u0e14\u0e32\u0e2a", "adidas"),
+    ("\u0e1e\u0e39\u0e21\u0e48\u0e32", "puma"),
+    ("\u0e40\u0e2a\u0e37\u0e49\u0e2d\u0e22\u0e37\u0e14", "t-shirt"),
+    ("\u0e40\u0e2a\u0e37\u0e49\u0e2d\u0e40\u0e0a\u0e34\u0e49\u0e15", "shirt"),
+    ("\u0e40\u0e2a\u0e37\u0e49\u0e2d", "shirt"),
+    ("\u0e01\u0e32\u0e07\u0e40\u0e01\u0e07", "pants"),
+    ("\u0e41\u0e08\u0e47\u0e04\u0e40\u0e01\u0e47\u0e15", "jacket"),
+    ("\u0e42\u0e1b\u0e23\u0e15\u0e35\u0e19", "protein"),
+    ("\u0e27\u0e34\u0e15\u0e32\u0e21\u0e34\u0e19", "vitamin"),
+    ("\u0e01\u0e32\u0e41\u0e1f", "coffee"),
+    ("\u0e19\u0e21", "milk"),
+    ("\u0e08\u0e31\u0e01\u0e23\u0e22\u0e32\u0e19", "bicycle"),
+    ("\u0e2a\u0e01\u0e39\u0e15\u0e40\u0e15\u0e2d\u0e23\u0e4c", "scooter"),
+    ("\u0e02\u0e2d\u0e07\u0e40\u0e25\u0e48\u0e19", "toy"),
+    ("\u0e15\u0e38\u0e4a\u0e01\u0e15\u0e32", "doll"),
+    ("\u0e2b\u0e38\u0e48\u0e19\u0e22\u0e19\u0e15\u0e4c", "robot"),
+    ("\u0e04\u0e23\u0e35\u0e21", "cream"),
+    ("\u0e25\u0e34\u0e1b\u0e2a\u0e15\u0e34\u0e01", "lipstick"),
+    ("\u0e41\u0e0a\u0e21\u0e1e\u0e39", "shampoo"),
+    ("\u0e2a\u0e1a\u0e39\u0e48", "soap"),
+    ("\u0e22\u0e32", "medicine"),
+    ("\u0e41\u0e2d\u0e23\u0e4c", "air conditioner"),
+]
+
+_NOISE = re.compile(
+    r'\b(pcs|pieces?|units?|sets?|pack|packs?|new|original|genuine|sale|discount)\b',
+    re.IGNORECASE,
+)
+
+@lru_cache(maxsize=4096)
+def normalize(description: str) -> str:
+    if not description:
+        return ""
+    text = description.strip()
+    for th, en in _COMPOUNDS:
+        text = text.replace(th, en)
+    for th, en in _SINGLES:
+        text = text.replace(th, en)
+    text = text.lower()
+    text = _NOISE.sub("", text)
+    text = re.sub(r'[\u0e00-\u0e7f]+', " ", text)
+    text = re.sub(r'[^\w\s\-\.]', " ", text)
+    text = re.sub(r'\s+', " ", text).strip()
+    return text
+
+def normalize_for_cache_key(description: str, origin_country: str = "") -> str:
+        return normalize(description) + '|' + (origin_country or '').upper().strip()

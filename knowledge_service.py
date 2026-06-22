@@ -150,6 +150,11 @@ async def fetch_hs_candidates(keywords: list[str], limit: int = 12) -> list[dict
 
 # ── Glossary fast-path ────────────────────────────────────────────────────────
 def search_glossary(product_name: str) -> Optional[dict]:
+    try:
+        from normalize_description import normalize
+        product_name = normalize(product_name) or product_name
+    except Exception:
+        pass
     if not _OK:
         return None
     try:
@@ -387,7 +392,13 @@ async def db_search_hs(description: str) -> dict:
         if not USE_POSTGRES:
             return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
 
-        keywords = _extract_keywords(description)
+        # normalize ก่อน — "ไอโฟน 15" → "iphone 15" เพื่อ match desc_en ได้
+        try:
+            from normalize_description import normalize
+            normalized = normalize(description)
+            keywords = _extract_keywords(normalized) or _extract_keywords(description)
+        except Exception:
+            keywords = _extract_keywords(description)
         if not keywords:
             return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
 

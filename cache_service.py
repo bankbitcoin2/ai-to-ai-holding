@@ -13,7 +13,11 @@ USE_POSTGRES = bool(DATABASE_URL)
 
 
 def _make_key(description: str, origin_country: Optional[str]) -> str:
-    norm = description.lower().strip()
+    try:
+        from normalize_description import normalize
+        norm = normalize(description)
+    except Exception:
+        norm = description.lower().strip()
     origin = (origin_country or "").upper().strip()
     return hashlib.sha256(f"{norm}|{origin}".encode("utf-8")).hexdigest()
 
