@@ -12,116 +12,151 @@
   --text:#f1f5f9;--muted:#64748b;--dim:#334155;
 }
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;min-height:100vh;display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:10px;padding:0 20px;height:46px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:100}
-.logo{font-size:13px;font-weight:800;letter-spacing:.05em}
-.logo span{color:var(--accent)}
-.sep{color:var(--dim);margin:0 4px}
-#sys-badge{padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+
+/* NAV */
+header{display:flex;align-items:center;gap:10px;padding:0 20px;height:48px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:100}
+.logo-wrap{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-txt{font-size:13px;font-weight:800;letter-spacing:.04em;color:var(--text)}
+.logo-txt span{color:var(--accent)}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:.1em;line-height:1}
+.sep{color:var(--dim);margin:0 2px}
+#sys-badge{padding:2px 10px;border-radius:999px;font-size:10px;font-weight:700;background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3);transition:all .3s}
 #sys-badge.online{background:rgba(16,185,129,.15);color:var(--green);border-color:rgba(16,185,129,.3)}
 #sys-badge.halt{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.3)}
-.hdr-r{margin-left:auto;display:flex;align-items:center;gap:10px}
-#hdr-clock{font-size:11px;color:var(--muted);font-family:monospace}
-.btn-h{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+#hdr-clock{font-size:11px;color:var(--muted);font-family:monospace;min-width:60px}
+.btn-h{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .15s}
 .btn-h:hover{border-color:var(--accent);color:var(--text)}
 .btn-h.danger:hover{border-color:var(--red);color:var(--red)}
 
 /* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;flex:1;padding:2rem}
 .login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:100%;max-width:380px}
-.login-box h1{font-size:1.3rem;font-weight:700;margin-bottom:.25rem}
-.login-box p{color:var(--muted);font-size:.85rem;margin-bottom:1.75rem}
-.field{margin-bottom:1rem}
-.field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.35rem}
-.field input{width:100%;padding:.65rem .9rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;font-family:monospace;transition:border-color .2s}
+.login-box h1{font-size:1.25rem;font-weight:700;margin-bottom:.2rem}
+.login-box p{color:var(--muted);font-size:.82rem;margin-bottom:1.75rem}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.3rem}
+.field input{width:100%;padding:.6rem .9rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.88rem;font-family:monospace;transition:border-color .2s}
 .field input:focus{outline:none;border-color:var(--accent)}
-.btn-acc{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.7rem 1.25rem;font-size:.9rem;font-weight:600;cursor:pointer;width:100%;transition:opacity .15s}
+.btn-acc{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.68rem 1.2rem;font-size:.88rem;font-weight:600;cursor:pointer;width:100%;margin-top:1rem;transition:opacity .15s}
 .btn-acc:hover{opacity:.88}
 .btn-acc:disabled{opacity:.5;cursor:not-allowed}
-.err-msg{color:var(--red);font-size:.8rem;margin-top:.6rem;display:none;padding:.5rem;background:rgba(239,68,68,.08);border-radius:6px;border:1px solid rgba(239,68,68,.2)}
+.err-msg{color:var(--red);font-size:.78rem;margin-top:.6rem;display:none;padding:.5rem .75rem;background:rgba(239,68,68,.07);border-radius:6px;border:1px solid rgba(239,68,68,.2)}
 
 /* OFFICE */
 #office{display:none;flex-direction:column;flex:1}
-.tabbar{display:flex;background:var(--card);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;flex-shrink:0}
-.tab{padding:10px 16px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;user-select:none}
+.tabbar{display:flex;background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto;flex-shrink:0}
+.tabbar::-webkit-scrollbar{height:0}
+.tab{padding:11px 16px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;user-select:none}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
 .panels{flex:1;overflow:auto}
-.panel{display:none;padding:20px}
+.panel{display:none;padding:22px 24px}
 .panel.active{display:block}
 
-/* CARDS */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
-.card-label{font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-.card-val{font-size:1.6rem;font-weight:700;color:var(--text);line-height:1}
-.card-sub{font-size:11px;color:var(--muted);margin-top:4px}
-.card.green .card-val{color:var(--green)}
-.card.yellow .card-val{color:var(--yellow)}
-.card.red .card-val{color:var(--red)}
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.kcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.kcard-label{font-size:10px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em}
+.kcard-val{font-size:1.65rem;font-weight:700;line-height:1;color:var(--text)}
+.kcard-val.green{color:var(--green)}
+.kcard-val.yellow{color:var(--yellow)}
+.kcard-sub{font-size:10px;color:var(--muted);margin-top:5px}
+
+/* 2-COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.box-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
 
 /* STATUS ROWS */
-.ep-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
-.ep-row{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ep-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 0;border-bottom:1px solid rgba(26,37,64,.5)}
+.ep-row:last-child{border-bottom:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .dot.g{background:var(--green)}
 .dot.r{background:var(--red)}
-.dot.y{background:var(--yellow);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.ep-name{font-weight:600;min-width:160px}
-.ep-detail{color:var(--muted);flex:1}
-.ep-status{font-size:10px;font-family:monospace;padding:2px 6px;border-radius:4px;background:var(--card2)}
+.dot.y{background:var(--yellow)}
+.ep-name{flex:1;color:var(--text)}
+.ep-code{font-size:10px;font-family:monospace;padding:1px 6px;border-radius:4px;background:var(--card2)}
+.ep-code.ok{color:var(--green)}
+.ep-code.warn{color:var(--yellow)}
+.ep-code.err{color:var(--red)}
+
+/* ACTION BTNS */
+.action-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;width:100%;margin-bottom:7px;transition:all .15s;text-align:left}
+.action-btn:last-child{margin-bottom:0}
+.action-btn:hover{border-color:var(--accent);background:rgba(99,102,241,.07)}
+.action-btn.danger{color:var(--muted)}
+.action-btn.danger:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.07)}
+.action-icon{font-size:14px;width:18px;text-align:center}
+
+/* STATUS BAR */
+.status-bar{background:rgba(13,20,33,.8);border-top:1px solid var(--border);padding:7px 24px;display:flex;align-items:center;gap:16px;font-size:10px;color:var(--muted);flex-shrink:0}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
 
 /* TABLE */
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;padding:8px 10px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:8px 10px;border-bottom:1px solid rgba(26,37,64,.5)}
+th{text-align:left;padding:8px 10px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+td{padding:9px 10px;border-bottom:1px solid rgba(26,37,64,.5)}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(99,102,241,.04)}
+tr:hover td{background:rgba(99,102,241,.03)}
 
-/* MEETING */
-.chat-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;height:420px}
-.chat-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:12px}
-.chat-msg{padding:8px 12px;border-radius:8px;max-width:85%;line-height:1.5}
-.chat-msg.sys{background:var(--card2);color:var(--muted);align-self:flex-start}
-.chat-msg.user{background:var(--accent);color:#fff;align-self:flex-end}
-.chat-msg.ai{background:#1a2033;color:var(--text);align-self:flex-start;border:1px solid var(--border)}
-.chat-inp{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
-.chat-inp textarea{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;resize:none;font-family:inherit;line-height:1.4}
-.chat-inp textarea:focus{outline:none;border-color:var(--accent)}
-.send-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 16px;font-size:18px;cursor:pointer}
-.send-btn:hover{opacity:.88}
+/* CEO · HEAD ROOM */
+.room-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--card);border-radius:12px 12px 0 0}
+.axis-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1a1f35,#252b45);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.05em;flex-shrink:0}
+.axis-name{font-size:13px;font-weight:700;color:var(--text)}
+.axis-role{font-size:10px;color:var(--muted);margin-top:1px}
+.axis-status{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--yellow);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.chat-log{padding:16px 18px;min-height:260px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.chat-log::-webkit-scrollbar{width:4px}
+.chat-log::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.msg{padding:9px 13px;border-radius:10px;font-size:12px;line-height:1.55;max-width:82%}
+.msg.sys{background:var(--card2);color:var(--muted);align-self:flex-start;border-radius:4px 10px 10px 10px}
+.msg.user{background:var(--accent);color:#fff;align-self:flex-end;border-radius:10px 10px 4px 10px}
+.msg.ai{background:var(--card);color:var(--text);align-self:flex-start;border:1px solid var(--border);border-radius:4px 10px 10px 10px}
+.msg-meta{font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:600}
+.chat-inp-wrap{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border);background:var(--card);border-radius:0 0 12px 12px}
+.chat-inp-wrap textarea{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;resize:none;font-family:inherit;line-height:1.45}
+.chat-inp-wrap textarea:focus{outline:none;border-color:var(--accent)}
+.send-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 18px;font-size:18px;cursor:pointer;transition:opacity .15s}
+.send-btn:hover{opacity:.85}
+.standby-note{font-size:10px;color:var(--dim);text-align:center;padding:6px;font-style:italic}
 
-/* KILL SWITCH */
-.ks-box{max-width:480px;margin:0 auto;text-align:center;padding:40px 20px}
-.ks-status{font-size:3rem;margin-bottom:12px}
-.ks-title{font-size:1.1rem;font-weight:700;margin-bottom:6px}
-.ks-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem}
-.btn-halt{background:var(--red);color:#fff;border:none;border-radius:10px;padding:.8rem 2rem;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .15s}
-.btn-halt:hover{opacity:.85}
-.btn-resume{background:var(--green);color:#fff;border:none;border-radius:10px;padding:.8rem 2rem;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .15s;display:none}
-.btn-resume:hover{opacity:.85}
-
-/* SECTION HEADERS */
-.sec{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px}
-.divider{height:1px;background:var(--border);margin:16px 0}
-
-/* BADGES */
-.badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:600}
+/* OFFICES */
+.office-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:6px;background:var(--card2);border:1px solid var(--border)}
+.office-name{font-size:12px;font-weight:600;color:var(--text);min-width:170px}
+.office-desc{font-size:11px;color:var(--muted);flex:1}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600}
 .badge.g{background:rgba(16,185,129,.15);color:var(--green)}
-.badge.r{background:rgba(239,68,68,.15);color:var(--red)}
 .badge.y{background:rgba(245,158,11,.15);color:var(--yellow)}
 .badge.b{background:rgba(99,102,241,.15);color:#a5b4fc}
 
-h2{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--text)}
+/* REVENUE */
+.rev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+
+/* ROADMAP */
+.road-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:8px;margin-bottom:6px;background:var(--card2);border:1px solid var(--border)}
+
+/* KILL SWITCH FLOATING BTN */
+#ks-float{position:fixed;bottom:2rem;right:2rem;z-index:999;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);padding:.6rem 1.2rem;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s}
+#ks-float:hover{background:var(--red);color:#fff}
+#ks-float.halted{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--green)}
+#ks-float.halted:hover{background:var(--green);color:#fff}
+
+h2{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--text)}
 </style>
 </head>
 <body>
 
 <header>
-  <svg width="24" height="24" viewBox="0 0 32 32"><defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs><rect width="32" height="32" rx="7" fill="#111827"/><polygon points="16,3 27,9 27,21 16,27 5,21 5,9" fill="#0a0e1a" stroke="url(#hg)" stroke-width="1.2"/><text x="16" y="20" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="11" letter-spacing="-0.3" fill="url(#hg)">HSW</text></svg>
-  <span class="logo">AI<span>TO</span>AI HOLDING</span>
+  <a href="/" class="logo-wrap" style="text-decoration:none">
+    <svg width="26" height="26" viewBox="0 0 32 32"><defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs><rect width="32" height="32" rx="7" fill="#111827"/><polygon points="16,3 27,9 27,21 16,27 5,21 5,9" fill="#0a0e1a" stroke="url(#hg)" stroke-width="1.2"/><text x="16" y="20" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="11" letter-spacing="-0.3" fill="url(#hg)">HSW</text></svg>
+    <div>
+      <div class="logo-txt">AI<span>TO</span>AI HOLDING</div>
+      <div class="logo-sub">CHAIRMAN OFFICE</div>
+    </div>
+  </a>
   <span class="sep">|</span>
-  <span style="font-size:12px;color:var(--muted)">CHAIRMAN OFFICE</span>
   <span id="sys-badge">CONNECTING</span>
   <div class="hdr-r">
     <span id="hdr-clock">--:--:--</span>
@@ -148,71 +183,95 @@ h2{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--text)}
 <div id="office">
   <div class="tabbar">
     <div class="tab active" data-panel="overview">overview</div>
-    <div class="tab" data-panel="meeting">meeting room</div>
+    <div class="tab" data-panel="ceohead">ceo · head</div>
     <div class="tab" data-panel="offices">7 offices</div>
     <div class="tab" data-panel="clients">clients</div>
     <div class="tab" data-panel="revenue">revenue</div>
-    <div class="tab" data-panel="killswitch">kill switch</div>
     <div class="tab" data-panel="roadmap">roadmap</div>
   </div>
+
   <div class="panels">
 
     <!-- OVERVIEW -->
     <div class="panel active" id="panel-overview">
-      <h2>System Overview</h2>
-      <div class="grid" id="kpi-grid">
-        <div class="card green"><div class="card-label">Clients</div><div class="card-val" id="kpi-clients">—</div><div class="card-sub">registered agents</div></div>
-        <div class="card green"><div class="card-label">Revenue (USD)</div><div class="card-val" id="kpi-rev">—</div><div class="card-sub">total gross</div></div>
-        <div class="card"><div class="card-label">API Calls</div><div class="card-val" id="kpi-calls">—</div><div class="card-sub">total processed</div></div>
-        <div class="card"><div class="card-label">Cache Entries</div><div class="card-val" id="kpi-cache">—</div><div class="card-sub">HS classifications</div></div>
+      <div class="kpi-grid">
+        <div class="kcard"><div class="kcard-label">Clients</div><div class="kcard-val green" id="kpi-clients">—</div><div class="kcard-sub">registered agents</div></div>
+        <div class="kcard"><div class="kcard-label">Revenue (USD)</div><div class="kcard-val green" id="kpi-rev">—</div><div class="kcard-sub">total gross</div></div>
+        <div class="kcard"><div class="kcard-label">API Calls</div><div class="kcard-val" id="kpi-calls">—</div><div class="kcard-sub">total processed</div></div>
+        <div class="kcard"><div class="kcard-label">Cache Entries</div><div class="kcard-val" id="kpi-cache">—</div><div class="kcard-sub">HS classifications</div></div>
       </div>
-      <div class="sec">Endpoint Health</div>
-      <div class="ep-list" id="ep-list"><div class="ep-row"><span class="dot y"></span><span class="ep-name">กำลังตรวจสอบ...</span></div></div>
+      <div class="two-col">
+        <div class="box">
+          <div class="box-title">Endpoint Health</div>
+          <div id="ep-list"><div class="ep-row"><span class="dot y"></span><span class="ep-name">กำลังตรวจสอบ...</span></div></div>
+        </div>
+        <div class="box">
+          <div class="box-title">Quick Actions</div>
+          <button class="action-btn" id="qa-clients"><span class="action-icon">👥</span> ดู Clients ทั้งหมด</button>
+          <button class="action-btn" id="qa-revenue"><span class="action-icon">💰</span> Revenue Report</button>
+          <button class="action-btn" id="qa-ceohead"><span class="action-icon">🤝</span> เปิด CEO · Head Room</button>
+          <button class="action-btn danger" id="qa-ks"><span class="action-icon">🛑</span> Kill Switch</button>
+        </div>
+      </div>
+      <div class="status-bar">
+        <span><span class="status-dot"></span>PostgreSQL connected</span>
+        <span>·</span><span>12,247 HS codes</span>
+        <span>·</span><span>202,438 FTA rows</span>
+        <span>·</span><span>Railway US West</span>
+        <span style="margin-left:auto">auto-refresh 30s</span>
+      </div>
     </div>
 
-    <!-- MEETING ROOM -->
-    <div class="panel" id="panel-meeting">
-      <h2>🤝 Meeting Room — ARIA</h2>
-      <div class="chat-wrap">
+    <!-- CEO · HEAD ROOM -->
+    <div class="panel" id="panel-ceohead">
+      <div style="max-width:760px">
+        <div class="room-header">
+          <div class="axis-avatar">AX</div>
+          <div>
+            <div class="axis-name">AXIS</div>
+            <div class="axis-role">AI Chief Executive Officer · AI TO AI HOLDING</div>
+          </div>
+          <div class="axis-status">
+            <span class="pulse"></span>
+            <span id="axis-status-txt">standby — CEO Real Mode ยังไม่เปิดใช้</span>
+          </div>
+        </div>
         <div class="chat-log" id="chat-log">
-          <div class="chat-msg sys">ARIA พร้อมรับคำสั่ง Chairman ครับ</div>
+          <div class="msg sys">AXIS รับทราบ Chairman ครับ — CEO Real Mode ยังอยู่ในสถานะ deferred ตามคำสั่ง<br>เมื่อเปิดใช้งาน AXIS จะรับคำสั่ง ออกคำสั่งต่อ 7 Offices และรายงานกลับมาที่นี่</div>
         </div>
-        <div class="chat-inp">
-          <textarea id="chat-txt" rows="2" placeholder="สั่งงาน ARIA ครับ... (Enter = ส่ง, Shift+Enter = บรรทัดใหม่)"></textarea>
-          <button class="send-btn" id="send-btn">↑</button>
+        <div class="standby-note">⚠️ AXIS อยู่ใน standby — Phase 6 CEO Real Mode ยังไม่ถูก activate</div>
+        <div class="chat-inp-wrap">
+          <textarea id="chat-txt" rows="2" placeholder="สั่งงาน AXIS ครับ... (Enter = ส่ง, Shift+Enter = ขึ้นบรรทัดใหม่)" disabled></textarea>
+          <button class="send-btn" id="send-btn" disabled style="opacity:.4">↑</button>
         </div>
       </div>
     </div>
 
-    <!-- OFFICES -->
+    <!-- 7 OFFICES -->
     <div class="panel" id="panel-offices">
-      <h2>🏢 7 Offices Status</h2>
-      <div class="ep-list">
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">📚 Knowledge Office</span><span class="ep-detail">normalize pipeline · 199 rules · cross-lang cache</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">🛡️ Governance Office</span><span class="ep-detail">policy engine · kill switch interface</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">📋 Audit Office</span><span class="ep-detail">evidence chain · cryptographic hash log</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot y"></span><span class="ep-name">⚠️ Risk Office</span><span class="ep-detail">OGA screening · compliance alerts</span><span class="ep-status badge y">PARTIAL</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">💰 Treasury Office</span><span class="ep-detail">60/40 revenue split · auto-routing</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot y"></span><span class="ep-name">🤝 Trust Office</span><span class="ep-detail">agent identity · reputation scoring</span><span class="ep-status badge y">PLANNED</span></div>
-        <div class="ep-row"><span class="dot y"></span><span class="ep-name">🔍 Discovery Office</span><span class="ep-detail">MCP registry · GPT Actions · RapidAPI</span><span class="ep-status badge b">SUBMITTED</span></div>
-      </div>
-      <div class="divider"></div>
+      <h2>🏢 7 Offices</h2>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">📚 Knowledge Office</div><div class="office-desc">normalize pipeline · 199 rules · cross-lang cache</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">🛡️ Governance Office</div><div class="office-desc">policy engine · kill switch interface</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">📋 Audit Office</div><div class="office-desc">evidence chain · cryptographic hash log</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot y"></span><div class="office-name">⚠️ Risk Office</div><div class="office-desc">OGA screening · compliance alerts</div><span class="badge y">PARTIAL</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">💰 Treasury Office</div><div class="office-desc">60/40 revenue split · auto-routing</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot y"></span><div class="office-name">🤝 Trust Office</div><div class="office-desc">agent identity · reputation scoring</div><span class="badge y">PLANNED</span></div>
+      <div class="office-row"><span class="dot b" style="background:#6366f1"></span><div class="office-name">🔍 Discovery Office</div><div class="office-desc">MCP registry · GPT Actions · RapidAPI · LangChain</div><span class="badge b">SUBMITTED</span></div>
+      <div style="height:20px"></div>
       <h2>⚡ Customs Intelligence Division</h2>
-      <div class="ep-list">
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">HS Code Classification</span><span class="ep-detail">12,247 codes · 88%+ confidence</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Duty & Tax Engine</span><span class="ep-detail">4/6-digit rates · FTA 14 countries</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Halal Compliance</span><span class="ep-detail">21 halal zones · cert routing</span><span class="ep-status badge g">LIVE</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">OGA Screening</span><span class="ep-detail">DLD · FDA · DI · DSS · TISI</span><span class="ep-status badge g">LIVE</span></div>
-      </div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">HS Code Classification</div><div class="office-desc">12,247 codes · 88%+ confidence</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">Duty & Tax Engine</div><div class="office-desc">4/6-digit rates · FTA 14 countries</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">Halal Compliance</div><div class="office-desc">21 halal zones · cert routing</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">OGA Screening</div><div class="office-desc">DLD · FDA · DI · DSS · TISI</div><span class="badge g">LIVE</span></div>
     </div>
 
     <!-- CLIENTS -->
     <div class="panel" id="panel-clients">
       <h2>👥 Registered Clients</h2>
-      <div style="overflow:auto">
+      <div style="overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:12px">
         <table>
           <thead><tr><th>#</th><th>Agent Name</th><th>Email</th><th>Credits</th><th>Calls</th><th>Joined</th></tr></thead>
-          <tbody id="cl-body"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--dim)">กำลังโหลด...</td></tr></tbody>
+          <tbody id="cl-body"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--dim)">กำลังโหลด...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -220,61 +279,51 @@ h2{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--text)}
     <!-- REVENUE -->
     <div class="panel" id="panel-revenue">
       <h2>💰 Revenue Dashboard</h2>
-      <div class="grid" style="margin-bottom:20px">
-        <div class="card green"><div class="card-label">Total Revenue</div><div class="card-val" id="rev-total">—</div><div class="card-sub">USD gross</div></div>
-        <div class="card"><div class="card-label">Corporate (60%)</div><div class="card-val" id="rev-corp">—</div><div class="card-sub">reserve fund</div></div>
-        <div class="card yellow"><div class="card-label">Chairman (40%)</div><div class="card-val" id="rev-chair">—</div><div class="card-sub">private wallet</div></div>
-        <div class="card"><div class="card-label">API Cost est.</div><div class="card-val" id="rev-cost">—</div><div class="card-sub">Claude API</div></div>
+      <div class="rev-grid">
+        <div class="kcard"><div class="kcard-label">Total Revenue</div><div class="kcard-val green" id="rev-total">—</div><div class="kcard-sub">USD gross</div></div>
+        <div class="kcard"><div class="kcard-label">Corporate (60%)</div><div class="kcard-val" id="rev-corp">—</div><div class="kcard-sub">reserve fund</div></div>
+        <div class="kcard"><div class="kcard-label">Chairman (40%)</div><div class="kcard-val yellow" id="rev-chair">—</div><div class="kcard-sub">private wallet</div></div>
+        <div class="kcard"><div class="kcard-label">API Cost est.</div><div class="kcard-val" id="rev-cost">—</div><div class="kcard-sub">Claude API</div></div>
       </div>
       <h2>Transaction Log</h2>
-      <div style="overflow:auto">
+      <div style="overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:12px">
         <table>
           <thead><tr><th>Agent</th><th>Email</th><th style="text-align:right">Amount</th><th>Date</th><th>Status</th></tr></thead>
-          <tbody id="topup-body"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--dim)">กำลังโหลด...</td></tr></tbody>
+          <tbody id="topup-body"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--dim)">กำลังโหลด...</td></tr></tbody>
         </table>
-      </div>
-    </div>
-
-    <!-- KILL SWITCH -->
-    <div class="panel" id="panel-killswitch">
-      <div class="ks-box">
-        <div class="ks-status" id="ks-icon">✅</div>
-        <div class="ks-title" id="ks-title">SYSTEM OPERATIONAL</div>
-        <div class="ks-sub" id="ks-sub">ระบบทำงานปกติ ทุก endpoint พร้อมรับ request</div>
-        <button class="btn-halt" id="btn-halt">🛑 HALT SYSTEM</button>
-        <button class="btn-resume" id="btn-res">▶️ RESUME SYSTEM</button>
-        <div style="margin-top:16px;font-size:11px;color:var(--muted)">Kill Switch อยู่ภายใต้อำนาจ Chairman เท่านั้น</div>
       </div>
     </div>
 
     <!-- ROADMAP -->
     <div class="panel" id="panel-roadmap">
       <h2>🗺️ Roadmap</h2>
-      <div class="ep-list">
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Phase 1 — Foundation</span><span class="ep-detail">PostgreSQL · asyncpg · Railway deploy</span><span class="ep-status badge g">✅ Done</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Phase 2 — Engines</span><span class="ep-detail">Halal · OGA · Tax · FTA · normalize pipeline</span><span class="ep-status badge g">✅ Done</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Phase 3 — API & UI</span><span class="ep-detail">sandbox · dashboard · chairman office</span><span class="ep-status badge g">✅ Done</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Phase 4 — Learning Cache</span><span class="ep-detail">cross-lang cache · feedback loop · 202k FTA rows</span><span class="ep-status badge g">✅ Done</span></div>
-        <div class="ep-row"><span class="dot g"></span><span class="ep-name">Phase 5 — Market Discovery</span><span class="ep-detail">MCP registry · GPT Actions · RapidAPI · LangChain</span><span class="ep-status badge b">Submitted</span></div>
-        <div class="ep-row"><span class="dot y"></span><span class="ep-name">Phase 6 — CEO Real Mode</span><span class="ep-detail">AI CEO _real_process() · command_queue · comms</span><span class="ep-status badge y">Deferred</span></div>
-        <div class="ep-row"><span class="dot y"></span><span class="ep-name">Phase 7 — Revenue Scale</span><span class="ep-detail">Stripe live · multi-tenant · white-label</span><span class="ep-status badge y">Planned</span></div>
-      </div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 1 — Foundation</div><div style="font-size:11px;color:var(--muted);margin-top:2px">PostgreSQL · asyncpg · Railway deploy</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 2 — Engines</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Halal · OGA · Tax · FTA · normalize pipeline</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 3 — API & UI</div><div style="font-size:11px;color:var(--muted);margin-top:2px">sandbox · dashboard · chairman office</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 4 — Learning Cache</div><div style="font-size:11px;color:var(--muted);margin-top:2px">cross-lang cache · feedback loop · 202k FTA rows</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot" style="background:#6366f1"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 5 — Market Discovery</div><div style="font-size:11px;color:var(--muted);margin-top:2px">MCP registry · GPT Actions · RapidAPI · LangChain</div></div><span class="badge b">Submitted</span></div>
+      <div class="road-row"><span class="dot y"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 6 — CEO Real Mode (AXIS)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">AXIS _real_process() · command_queue · Claude API</div></div><span class="badge y">Deferred</span></div>
+      <div class="road-row"><span class="dot y"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 7 — Revenue Scale</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Stripe live · multi-tenant · white-label</div></div><span class="badge y">Planned</span></div>
     </div>
 
   </div><!-- /panels -->
 </div><!-- /office -->
 
+<!-- KILL SWITCH FLOATING -->
+<button id="ks-float" style="display:none">🛑 HALT</button>
+
 <script>
 const BASE = 'https://web-production-c9da4.up.railway.app';
 let CK = '';
+let ksHalted = false;
 
-// ── CLOCK ──────────────────────────────────────────────────────────────────
+// CLOCK
 setInterval(() => {
   const el = document.getElementById('hdr-clock');
   if (el) el.textContent = new Date().toLocaleTimeString('th-TH', {hour12: false});
 }, 1000);
 
-// ── AUTH ───────────────────────────────────────────────────────────────────
+// AUTH
 async function doLogin() {
   const inp = document.getElementById('ck-inp');
   const err = document.getElementById('login-err');
@@ -282,8 +331,7 @@ async function doLogin() {
   const k = inp.value.trim();
   err.style.display = 'none';
   if (!k) { err.textContent = 'กรุณากรอก Chairman API Key'; err.style.display = 'block'; return; }
-  btn.disabled = true;
-  btn.textContent = 'กำลังเชื่อมต่อ...';
+  btn.disabled = true; btn.textContent = 'กำลังเชื่อมต่อ...';
   try {
     const r = await fetch(BASE + '/health', {signal: AbortSignal.timeout(8000)});
     if (r.ok || r.status < 500) {
@@ -291,33 +339,23 @@ async function doLogin() {
       localStorage.setItem('chairman_key', k);
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('office').style.display = 'flex';
+      document.getElementById('ks-float').style.display = 'block';
       setBadge('online', 'ONLINE');
       doRefresh();
       setInterval(doRefresh, 30000);
-    } else {
-      throw new Error('server returned ' + r.status);
-    }
-  } catch (e) {
-    err.textContent = '❌ เชื่อมต่อ Railway ไม่ได้: ' + e.message;
+    } else { throw new Error('server ' + r.status); }
+  } catch(e) {
+    err.textContent = '❌ เชื่อมต่อไม่ได้: ' + e.message;
     err.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'เข้าห้องทำงาน';
-  }
+  } finally { btn.disabled = false; btn.textContent = 'เข้าห้องทำงาน'; }
 }
 
-function doLogout() {
-  localStorage.removeItem('chairman_key');
-  location.reload();
-}
-
-function setBadge(cls, text) {
+function setBadge(cls, txt) {
   const b = document.getElementById('sys-badge');
-  b.className = cls;
-  b.textContent = text;
+  b.className = cls; b.textContent = txt;
 }
 
-// ── TABS ────────────────────────────────────────────────────────────────────
+// TABS
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const name = tab.dataset.panel;
@@ -330,13 +368,27 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// ── REFRESH ─────────────────────────────────────────────────────────────────
+// QUICK ACTIONS
+document.getElementById('qa-clients').addEventListener('click', () => {
+  document.querySelector('[data-panel="clients"]').click();
+});
+document.getElementById('qa-revenue').addEventListener('click', () => {
+  document.querySelector('[data-panel="revenue"]').click();
+});
+document.getElementById('qa-ceohead').addEventListener('click', () => {
+  document.querySelector('[data-panel="ceohead"]').click();
+});
+document.getElementById('qa-ks').addEventListener('click', () => {
+  if (confirm('ยืนยันการ HALT ระบบทั้งหมด?')) doHalt();
+});
+
+// REFRESH
 async function doRefresh() {
   await Promise.all([checkHealth(), loadStats()]);
 }
 
 async function checkHealth() {
-  const endpoints = [
+  const eps = [
     {path: '/health', name: '/health', method: 'GET'},
     {path: '/v1/sandbox/classify', name: '/sandbox/classify', method: 'POST'},
     {path: '/v1/chairman/stats', name: '/chairman/stats', method: 'GET'},
@@ -345,19 +397,18 @@ async function checkHealth() {
   ];
   const list = document.getElementById('ep-list');
   list.innerHTML = '';
-  for (const ep of endpoints) {
-    const row = document.createElement('div');
-    row.className = 'ep-row';
+  for (const ep of eps) {
     try {
       const opts = {method: ep.method, headers: {'X-API-Key': CK}, signal: AbortSignal.timeout(5000)};
       if (ep.method === 'POST') { opts.headers['Content-Type'] = 'application/json'; opts.body = '{}'; }
       const r = await fetch(BASE + ep.path, opts);
       const ok = r.status < 500;
-      row.innerHTML = `<span class="dot ${ok ? 'g' : 'r'}"></span><span class="ep-name">${ep.name}</span><span class="ep-detail"></span><span class="ep-status badge ${ok ? 'g' : 'r'}">${r.status}</span>`;
+      const cls = r.status === 200 ? 'ok' : r.status < 500 ? 'warn' : 'err';
+      const dc = r.status === 200 ? 'g' : r.status < 500 ? 'y' : 'r';
+      list.innerHTML += `<div class="ep-row"><span class="dot ${dc}"></span><span class="ep-name">${ep.name}</span><span class="ep-code ${cls}">${r.status}</span></div>`;
     } catch(e) {
-      row.innerHTML = `<span class="dot r"></span><span class="ep-name">${ep.name}</span><span class="ep-detail" style="color:var(--red)">${e.message}</span><span class="ep-status badge r">ERR</span>`;
+      list.innerHTML += `<div class="ep-row"><span class="dot r"></span><span class="ep-name">${ep.name}</span><span class="ep-code err">ERR</span></div>`;
     }
-    list.appendChild(row);
   }
 }
 
@@ -370,36 +421,29 @@ async function loadStats() {
     document.getElementById('kpi-rev').textContent = d.total_revenue_usd ? '$' + parseFloat(d.total_revenue_usd).toFixed(2) : '—';
     document.getElementById('kpi-calls').textContent = d.total_calls ?? '—';
   } catch(e) {}
-
   try {
     const r = await fetch(BASE + '/v1/chairman/cache/stats', {headers: {'X-API-Key': CK}, signal: AbortSignal.timeout(8000)});
-    if (r.ok) {
-      const d = (await r.json()).data || {};
-      document.getElementById('kpi-cache').textContent = d.total_cached_entries ?? '—';
-    }
+    if (r.ok) { const d = (await r.json()).data || {}; document.getElementById('kpi-cache').textContent = d.total_cached_entries ?? '—'; }
   } catch(e) {}
 }
 
 async function loadClients() {
   const tbody = document.getElementById('cl-body');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--dim)">กำลังโหลด...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--dim)">กำลังโหลด...</td></tr>';
   try {
     const r = await fetch(BASE + '/v1/chairman/clients', {headers: {'X-API-Key': CK}});
-    if (!r.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px">Error ${r.status}</td></tr>`; return; }
+    if (!r.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:24px">Error ${r.status} — ตรวจสอบ CHAIRMAN_API_KEY</td></tr>`; return; }
     const data = (await r.json()).data || [];
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--dim)">ยังไม่มี client</td></tr>'; return; }
-    tbody.innerHTML = data.map((c, i) => `
-      <tr>
-        <td style="color:var(--muted)">${i+1}</td>
-        <td style="font-weight:600">${c.agent_name||'—'}</td>
-        <td style="color:var(--muted)">${c.contact_email||'—'}</td>
-        <td style="color:var(--green)">$${parseFloat(c.credit_balance||0).toFixed(2)}</td>
-        <td>${c.total_calls||0}</td>
-        <td style="color:var(--muted);font-size:11px">${c.created_at ? c.created_at.slice(0,10) : '—'}</td>
-      </tr>`).join('');
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px">${e.message}</td></tr>`;
-  }
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--dim)">ยังไม่มี client</td></tr>'; return; }
+    tbody.innerHTML = data.map((c, i) => `<tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td style="font-weight:600">${c.agent_name||'—'}</td>
+      <td style="color:var(--muted)">${c.contact_email||'—'}</td>
+      <td style="color:var(--green)">$${parseFloat(c.credit_balance||0).toFixed(2)}</td>
+      <td>${c.total_calls||0}</td>
+      <td style="color:var(--muted);font-size:11px">${c.created_at?c.created_at.slice(0,10):'—'}</td>
+    </tr>`).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:24px">${e.message}</td></tr>`; }
 }
 
 async function loadRevenue() {
@@ -407,119 +451,71 @@ async function loadRevenue() {
     const r = await fetch(BASE + '/v1/chairman/stats', {headers: {'X-API-Key': CK}});
     if (r.ok) {
       const d = (await r.json()).data || {};
-      const gross = parseFloat(d.total_revenue_usd || 0);
-      document.getElementById('rev-total').textContent = '$' + gross.toFixed(2);
-      document.getElementById('rev-corp').textContent = '$' + (gross * 0.6).toFixed(2);
-      document.getElementById('rev-chair').textContent = '$' + (gross * 0.4).toFixed(2);
-      document.getElementById('rev-cost').textContent = '$' + (gross * 0.004).toFixed(4);
+      const g = parseFloat(d.total_revenue_usd || 0);
+      document.getElementById('rev-total').textContent = '$' + g.toFixed(2);
+      document.getElementById('rev-corp').textContent = '$' + (g * 0.6).toFixed(2);
+      document.getElementById('rev-chair').textContent = '$' + (g * 0.4).toFixed(2);
+      document.getElementById('rev-cost').textContent = '$' + (g * 0.004).toFixed(4);
     }
   } catch(e) {}
-
   const tbody = document.getElementById('topup-body');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--dim)">กำลังโหลด...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--dim)">กำลังโหลด...</td></tr>';
   try {
     const r = await fetch(BASE + '/v1/chairman/topups?limit=30', {headers: {'X-API-Key': CK}});
-    if (!r.ok) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:20px">Error ${r.status}</td></tr>`; return; }
+    if (!r.ok) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:24px">Error ${r.status}</td></tr>`; return; }
     const data = (await r.json()).data || [];
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--dim)">ยังไม่มีธุรกรรม</td></tr>'; return; }
-    tbody.innerHTML = data.map(t => `
-      <tr>
-        <td style="font-weight:600">${t.agent_name||'—'}</td>
-        <td style="color:var(--muted)">${t.contact_email||'—'}</td>
-        <td style="text-align:right;color:${t.action==='DEDUCT'?'var(--red)':'var(--green)'};font-weight:600">${t.action==='DEDUCT'?'-':'+'} $${Math.abs(parseFloat(t.amount||0)).toFixed(2)}</td>
-        <td style="color:var(--muted);font-size:11px">${t.created_at ? t.created_at.slice(0,16).replace('T',' ') : '—'}</td>
-        <td><span class="badge ${t.action==='DEDUCT'?'r':'g'}">${t.action}</span></td>
-      </tr>`).join('');
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:20px">${e.message}</td></tr>`;
-  }
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--dim)">ยังไม่มีธุรกรรม</td></tr>'; return; }
+    tbody.innerHTML = data.map(t => `<tr>
+      <td style="font-weight:600">${t.agent_name||'—'}</td>
+      <td style="color:var(--muted)">${t.contact_email||'—'}</td>
+      <td style="text-align:right;color:${t.action==='DEDUCT'?'var(--red)':'var(--green)'};font-weight:600">${t.action==='DEDUCT'?'-':'+'}$${Math.abs(parseFloat(t.amount||0)).toFixed(2)}</td>
+      <td style="color:var(--muted);font-size:11px">${t.created_at?t.created_at.slice(0,16).replace('T',' '):'—'}</td>
+      <td><span class="badge ${t.action==='DEDUCT'?'r':'g'}" style="${t.action==='DEDUCT'?'background:rgba(239,68,68,.15);color:var(--red)':'background:rgba(16,185,129,.15);color:var(--green)'}">${t.action}</span></td>
+    </tr>`).join('');
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:24px">${e.message}</td></tr>`; }
 }
 
-// ── MEETING ROOM ─────────────────────────────────────────────────────────────
-function addMsg(text, type) {
-  const log = document.getElementById('chat-log');
-  const div = document.createElement('div');
-  div.className = 'chat-msg ' + type;
-  div.textContent = text;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
-}
-
-async function sendMsg() {
-  const txt = document.getElementById('chat-txt');
-  const msg = txt.value.trim();
-  if (!msg) return;
-  txt.value = '';
-  addMsg(msg, 'user');
-  addMsg('ARIA กำลังประมวลผล...', 'sys');
-  try {
-    const r = await fetch(BASE + '/v1/agents/command', {
-      method: 'POST',
-      headers: {'X-API-Key': CK, 'Content-Type': 'application/json'},
-      body: JSON.stringify({command: msg, from: 'CHAIRMAN'}),
-      signal: AbortSignal.timeout(15000)
-    });
-    const log = document.getElementById('chat-log');
-    log.removeChild(log.lastChild);
-    const d = await r.json();
-    addMsg(d.response || d.message || JSON.stringify(d), 'ai');
-  } catch(e) {
-    const log = document.getElementById('chat-log');
-    log.removeChild(log.lastChild);
-    addMsg('❌ ' + e.message, 'sys');
-  }
-}
-
-// ── KILL SWITCH ───────────────────────────────────────────────────────────────
+// KILL SWITCH
 async function doHalt() {
-  if (!confirm('ยืนยันการ HALT ระบบทั้งหมด?')) return;
   try {
     const r = await fetch(BASE + '/v1/kill-switch/halt', {method: 'POST', headers: {'X-API-Key': CK}});
-    const d = await r.json();
-    if (r.ok) updateKS(true);
-    else alert('Error: ' + (d.detail || d.message || r.status));
+    if (r.ok) { ksHalted = true; updateKS(); }
+    else { const d = await r.json(); alert('Error: ' + (d.detail || r.status)); }
   } catch(e) { alert('Error: ' + e.message); }
 }
 
 async function doResume() {
-  if (!confirm('ยืนยันการ RESUME ระบบ?')) return;
   try {
     const r = await fetch(BASE + '/v1/kill-switch/resume', {method: 'POST', headers: {'X-API-Key': CK}});
-    const d = await r.json();
-    if (r.ok) updateKS(false);
-    else alert('Error: ' + (d.detail || d.message || r.status));
+    if (r.ok) { ksHalted = false; updateKS(); }
+    else { const d = await r.json(); alert('Error: ' + (d.detail || r.status)); }
   } catch(e) { alert('Error: ' + e.message); }
 }
 
-function updateKS(halted) {
-  document.getElementById('ks-icon').textContent = halted ? '🛑' : '✅';
-  document.getElementById('ks-title').textContent = halted ? 'SYSTEM HALTED' : 'SYSTEM OPERATIONAL';
-  document.getElementById('ks-sub').textContent = halted ? 'ระบบถูกหยุดชั่วคราว ทุก endpoint ถูกบล็อก' : 'ระบบทำงานปกติ ทุก endpoint พร้อมรับ request';
-  document.getElementById('btn-halt').style.display = halted ? 'none' : 'inline-block';
-  document.getElementById('btn-res').style.display = halted ? 'inline-block' : 'none';
-  setBadge(halted ? 'halt' : 'online', halted ? 'HALTED' : 'ONLINE');
+function updateKS() {
+  const btn = document.getElementById('ks-float');
+  if (ksHalted) {
+    btn.className = 'halted'; btn.textContent = '▶️ RESUME';
+    setBadge('halt', 'HALTED');
+  } else {
+    btn.className = ''; btn.textContent = '🛑 HALT';
+    setBadge('online', 'ONLINE');
+  }
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('ks-float').addEventListener('click', () => {
+  if (ksHalted) { if (confirm('ยืนยันการ RESUME ระบบ?')) doResume(); }
+  else { if (confirm('ยืนยันการ HALT ระบบทั้งหมด?')) doHalt(); }
+});
+
+// INIT
 document.getElementById('loginBtn').addEventListener('click', doLogin);
-document.getElementById('btn-logout').addEventListener('click', doLogout);
+document.getElementById('btn-logout').addEventListener('click', () => { localStorage.removeItem('chairman_key'); location.reload(); });
 document.getElementById('btn-refresh').addEventListener('click', doRefresh);
-document.getElementById('btn-halt').addEventListener('click', doHalt);
-document.getElementById('btn-res').addEventListener('click', doResume);
-document.getElementById('send-btn').addEventListener('click', sendMsg);
-document.getElementById('chat-txt').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
-});
-document.getElementById('ck-inp').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
+document.getElementById('ck-inp').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-// Auto-login if key saved
-const savedKey = localStorage.getItem('chairman_key');
-if (savedKey) {
-  document.getElementById('ck-inp').value = savedKey;
-  doLogin();
-}
+const saved = localStorage.getItem('chairman_key');
+if (saved) { document.getElementById('ck-inp').value = saved; doLogin(); }
 </script>
 </body>
 </html>
