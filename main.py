@@ -108,7 +108,8 @@ async def _auto_seed():
 async def _fix_audit_fk():
     """Drop FK constraint on audit_events.actor_id — client_agents are not in org_entities"""
     try:
-        from db_adapter import get_pool, USE_POSTGRES
+        from db_adapter import get_pool
+        USE_POSTGRES = True  # Railway always PostgreSQL
         if not USE_POSTGRES:
             return
         pool = await get_pool()
@@ -128,7 +129,8 @@ async def _migrate_cache_schema():
     เรียกทุก startup แต่ no-op ถ้าคอลัมน์มีอยู่แล้ว
     """
     try:
-        from db_adapter import get_pool, USE_POSTGRES
+        from db_adapter import get_pool
+        USE_POSTGRES = True  # Railway always PostgreSQL
         if not USE_POSTGRES:
             return
         pool = await get_pool()

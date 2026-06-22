@@ -69,7 +69,6 @@ nav {
   backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--border);
   position: sticky; top:0; z-index:100;
-  position:relative; z-index:100;
 }
 .nav-logo {
   display:flex; align-items:center; gap:10px;
@@ -1203,39 +1202,44 @@ async function doRecover() {
   finally { btn.textContent='กู้คืน Key →'; btn.disabled=false; }
 }
 
-// ── SESSION CHECK ─────────────────────────────────────────────
-function checkSavedSession() {
-  const key=localStorage.getItem('aitai_key');
-  const agent=localStorage.getItem('aitai_agent');
-  const btn=document.getElementById('navLoginBtn');
-  const heroCta=document.getElementById('heroCtaMain');
-
-  const params=new URLSearchParams(window.location.search);
-  if (params.get('session_expired')==='1') {
-    document.getElementById('sessionToast').style.display='block';
-    setTimeout(()=>{ document.getElementById('sessionToast').style.display='none'; },5000);
-    history.replaceState({},'',window.location.pathname);
-  }
-  if (!key) return;
-  const name=(agent&&agent.length<=18)?agent:'Dashboard';
-  if (btn) {
-    btn.innerHTML='<span style="font-size:0.65rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">ยินดีต้อนรับ</span>'+name;
-    btn.href='/dashboard';
-    btn.style.cssText+=';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
-    btn.removeAttribute('data-i18n');
-  }
-  if (heroCta) {
-    heroCta.textContent='🚀 เข้าสู่ Dashboard →';
-    heroCta.onclick=()=>window.location.href='/dashboard';
-    heroCta.style.background='linear-gradient(135deg,#059669,#10b981)';
-    heroCta.removeAttribute('data-i18n');
-  }
-}
-
 // ── SPIN ANIMATION (for sandbox loading) ──────────────────────
 const styleEl=document.createElement('style');
 styleEl.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(styleEl);
+
+// ── SESSION CHECK ─────────────────────────────────────────────
+function checkSavedSession() {
+  const key = localStorage.getItem('aitai_key');
+  const agent = localStorage.getItem('aitai_agent');
+  const btn = document.getElementById('navLoginBtn');
+  const heroCta = document.getElementById('heroCtaMain');
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('session_expired') === '1') {
+    document.getElementById('sessionToast').style.display = 'block';
+    setTimeout(() => { document.getElementById('sessionToast').style.display = 'none'; }, 5000);
+    history.replaceState({}, '', window.location.pathname);
+  }
+  if (!key) return;
+
+  const name = (agent && agent.length <= 18) ? agent : 'Dashboard';
+  const welcomeMap = { th:'ยินดีต้อนรับ', en:'Welcome', zh:'欢迎', ja:'ようこそ' };
+  const dashMap = { th:'🚀 เข้าสู่ Dashboard →', en:'🚀 Go to Dashboard →', zh:'🚀 前往控制台 →', ja:'🚀 ダッシュボードへ →' };
+  const welcome = welcomeMap[currentLang] || welcomeMap.en;
+
+  if (btn) {
+    btn.innerHTML = '<span style="font-size:0.65rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">' + welcome + '</span>' + name;
+    btn.href = '/dashboard';
+    btn.style.cssText += ';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
+    btn.removeAttribute('data-i18n');
+  }
+  if (heroCta) {
+    heroCta.textContent = dashMap[currentLang] || dashMap.en;
+    heroCta.onclick = () => window.location.href = '/dashboard';
+    heroCta.style.background = 'linear-gradient(135deg,#059669,#10b981)';
+    heroCta.removeAttribute('data-i18n');
+  }
+}
 
 window.addEventListener('load', () => {
   setLang(detectLang());
