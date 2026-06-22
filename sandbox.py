@@ -30,7 +30,7 @@ def _best_rate(t: dict) -> float:
     return float(g) / 100.0 if g is not None else 0.05
 
 router = APIRouter(prefix="/v1/sandbox", tags=["Sandbox (Free Trial)"])
-ITEM_LIMIT   = 3
+ITEM_LIMIT   = 5
 DAILY_LIMIT  = 5
 MINUTE_LIMIT = 10
 
