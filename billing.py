@@ -166,7 +166,7 @@ async def recover_key(req: RecoverKeyRequest):
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
                 "SELECT id, agent_name, contact_email, status FROM client_agents "
-                "WHERE contact_email = $1 AND LOWER(agent_name) = LOWER($2)",
+                "WHERE LOWER(contact_email) = LOWER($1) AND LOWER(agent_name) = LOWER($2)",
                 email, name
             )
             if not row:
