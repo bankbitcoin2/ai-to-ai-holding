@@ -27,7 +27,8 @@ def _evidence_hash(data: dict) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()
 
 async def _get_pool():
-    from db_adapter import get_pool, USE_POSTGRES
+    from db_adapter import get_pool
+    USE_POSTGRES = True  # Railway always PostgreSQL
     if not USE_POSTGRES:
         return None
     return await get_pool()

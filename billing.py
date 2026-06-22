@@ -98,7 +98,8 @@ async def log_agent_call(agent_id: str, endpoint: str, status_code: int,
                          session_id: str = None):
     """บันทึก API call ลง client_agent_calls — non-blocking, never raises"""
     try:
-        from db_adapter import get_pool, USE_POSTGRES
+        from db_adapter import get_pool
+        USE_POSTGRES = True  # Railway always PostgreSQL
         if not USE_POSTGRES:
             return
         pool = await get_pool()

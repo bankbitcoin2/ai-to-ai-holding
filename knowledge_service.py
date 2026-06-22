@@ -506,7 +506,8 @@ async def db_search_hs(description: str) -> dict:
       {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
     """
     try:
-        from db_adapter import get_pool, USE_POSTGRES
+        from db_adapter import get_pool
+        USE_POSTGRES = True  # Railway always PostgreSQL
         if not USE_POSTGRES:
             return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
 
