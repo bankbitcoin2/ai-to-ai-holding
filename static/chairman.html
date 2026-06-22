@@ -224,9 +224,9 @@ tr:last-child td{border:none}
     <p>AI TO AI HOLDING — Internal Access Only</p>
     <div class="field">
       <label>Chairman API Key</label>
-      <input type="password" id="ck-inp" placeholder="sk-aitai-..." autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="ck-inp" placeholder="sk-aitai-..." autocomplete="off">
     </div>
-    <button class="btn-acc" onclick="doLogin()">เข้าห้องทำงาน</button>
+    <button class="btn-acc" id="loginBtn">เข้าห้องทำงาน</button>
     <div class="err-msg" id="login-err">API Key ไม่ถูกต้อง หรือ server ไม่ตอบสนอง</div>
   </div>
 </div>
@@ -569,9 +569,15 @@ async function doLogin() {
 
 function logout() { localStorage.removeItem('chairman_key'); location.reload(); }
 
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
+  // bind login button and input — avoids inline onclick scope issues
+  const btn = document.getElementById('loginBtn');
+  const inp = document.getElementById('ck-inp');
+  if (btn) btn.addEventListener('click', doLogin);
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  // auto-login if key stored
   const s = localStorage.getItem('chairman_key');
-  if (s) { document.getElementById('ck-inp').value = s; doLogin(); }
+  if (s) { inp.value = s; doLogin(); }
 });
 
 // ── TABS ───────────────────────────────────────────────────────
