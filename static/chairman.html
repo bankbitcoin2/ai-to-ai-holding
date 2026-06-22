@@ -5,6 +5,8 @@
     <meta property="og:title" content="HSW Chairman">
   <meta property="og:image" content="/static/logo/logo-dark.svg">
   <link rel="icon" href="/static/logo/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico" sizes="32x32">
+  <link rel="apple-touch-icon" href="/static/logo/favicon-32.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chairman Office — AI TO AI HOLDING</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -916,21 +918,4 @@ async function sendMsg() {
       + '\n💡 Railway free tier: server sleep หลัง 15 นาที ไม่มี request — ทดสอบที่ /health ก่อนเสมอครับ';
   } else {
     reply = 'ท่านประธาน — รับทราบครับ\n'
-      + 'ระบบขณะนี้: '+(online?'🟢 Online':'🔴 Offline')+' | Mode: '+(mock?'MOCK':'LIVE')+' | Clients: '+clients+'\n\n'
-      + 'สามารถถามผมได้เกี่ยวกับ: สถานะระบบ, Error, รายได้, Stripe, Next Steps, Railway ครับ';
-  }
-
-  removeBubble(tid);
-  addBubble('bot', reply);
-  document.getElementById('send-btn').disabled = false;
-}
-
-let msgN = 0;
-function addBubble(role, txt, thinking=false) {
-  const id = 'b'+( ++msgN);
-  const body = document.getElementById('chat-body');
-  const el = document.createElement('div');
-  el.className = 'msg msg-'+(role==='bot'?'b':'u');
-  el.id = id;
-  const now = new Date().toLocaleTimeString('th-TH',{hour12:false});
-  el.innerHTML = '<div class="bubble bubble-'+(role==='bot'?'b':'u')+(thinking?' thinking':'')+'">'+txt.replace(/\n/g,'<
+      + 'ระบบขณะนี้: '+(online?'🟢 Online':'🔴 Offline')+' | Mode:
