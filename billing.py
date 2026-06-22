@@ -164,11 +164,18 @@ async def recover_key(req: RecoverKeyRequest):
         from db_adapter import get_pool
         pool = await get_pool()
         async with pool.acquire() as conn:
+            # DEBUG: dump all rows to find exact stored values
+            all_rows = await conn.fetch("SELECT id, agent_name, contact_email, status FROM client_agents LIMIT 20")
+            print(f"[DEBUG recover_key] total rows={len(all_rows)}")
+            for r in all_rows:
+                print(f"[DEBUG recover_key] row: name={r['agent_name']!r} email={r['contact_email']!r} status={r['status']!r}")
+            print(f"[DEBUG recover_key] querying email={email!r} name={name!r}")
             row = await conn.fetchrow(
                 "SELECT id, agent_name, contact_email, status FROM client_agents "
                 "WHERE LOWER(contact_email) = LOWER($1) AND LOWER(agent_name) = LOWER($2)",
                 email, name
             )
+            print(f"[DEBUG recover_key] fetchrow result={row}")
             if not row:
                 raise HTTPException(404, {
                     "error": "NOT_FOUND",
