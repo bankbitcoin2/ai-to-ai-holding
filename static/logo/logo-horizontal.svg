@@ -1,0 +1,16 @@
+<svg width="420" height="72" viewBox="0 0 420 72" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>HSW — horizontal logo for nav</title>
+<defs>
+  <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="100%" stop-color="#8b5cf6"/>
+  </linearGradient>
+</defs>
+<polygon points="36,8 60,0 84,8 84,40 60,52 36,40" fill="#111827" stroke="url(#g)" stroke-width="1.5"/>
+<text x="60" y="34" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="22" fill="url(#g)">H</text>
+<rect x="100" y="8" width="1.5" height="56" rx="1" fill="#1f2937"/>
+<text x="116" y="46" text-anchor="start" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="36" letter-spacing="-1" fill="#f9fafb">HSW</text>
+<rect x="116" y="54" width="66" height="2.5" rx="1" fill="url(#g)"/>
+<rect x="185" y="54" width="18" height="2.5" rx="1" fill="#10b981"/>
+<text x="116" y="68" text-anchor="start" font-family="'Segoe UI',system-ui,sans-serif" font-size="9" fill="#6b7280" letter-spacing="1.8">CUSTOMS INTELLIGENCE</text>
+</svg>

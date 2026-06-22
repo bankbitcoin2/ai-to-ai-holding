@@ -1,0 +1,17 @@
+<svg width="220" height="100" viewBox="0 0 220 100" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>HSW minimal</title>
+<defs>
+  <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="100%" stop-color="#8b5cf6"/>
+  </linearGradient>
+</defs>
+<rect x="8" y="15" width="6" height="60" rx="3" fill="#6366f1"/>
+<rect x="14" y="15" width="28" height="6" rx="3" fill="#6366f1"/>
+<rect x="14" y="69" width="28" height="6" rx="3" fill="#6366f1"/>
+<rect x="178" y="15" width="6" height="60" rx="3" fill="#8b5cf6"/>
+<rect x="150" y="15" width="28" height="6" rx="3" fill="#8b5cf6"/>
+<rect x="150" y="69" width="28" height="6" rx="3" fill="#8b5cf6"/>
+<text x="97" y="62" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="42" letter-spacing="2" fill="url(#g)">HSW</text>
+<text x="97" y="80" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="8" fill="#6366f1" letter-spacing="3">HS WATCH</text>
+</svg>

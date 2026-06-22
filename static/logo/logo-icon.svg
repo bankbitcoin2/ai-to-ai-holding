@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>HSW icon</title>
+<defs>
+  <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="100%" stop-color="#8b5cf6"/>
+  </linearGradient>
+</defs>
+<rect width="64" height="64" rx="14" fill="#0a0e1a"/>
+<polygon points="32,6 54,18 54,42 32,54 10,42 10,18" fill="#111827" stroke="url(#g)" stroke-width="1.5"/>
+<text x="32" y="38" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="22" letter-spacing="-0.5" fill="url(#g)">HSW</text>
+</svg>
