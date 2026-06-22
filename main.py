@@ -87,11 +87,28 @@ async def _auto_seed():
         print(f"[SEED] Warning — auto-seed failed (non-fatal): {e}")
 
 
+async def _fix_audit_fk():
+    """Drop FK constraint on audit_events.actor_id — client_agents are not in org_entities"""
+    try:
+        from db_adapter import get_pool, USE_POSTGRES
+        if not USE_POSTGRES:
+            return
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "ALTER TABLE audit_events DROP CONSTRAINT IF EXISTS audit_events_actor_id_fkey"
+            )
+        print("[MIGRATION] audit_events actor_id FK dropped (or already gone)")
+    except Exception as e:
+        print(f"[MIGRATION] _fix_audit_fk warning: {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print_config()
     await init_db()
     await _auto_seed()
+    await _fix_audit_fk()
     yield
 
 
@@ -171,6 +188,7 @@ async def well_known_index():
 
 # ── Static Files (Landing page + Dashboard) ──────────────────
 _STATIC = Path(__file__).parent / "static"
+
 
 @app.get("/dashboard", include_in_schema=False)
 async def dashboard():
