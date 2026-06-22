@@ -118,6 +118,12 @@ class ResultItem(BaseModel):
     oga_note_th: Optional[str] = None
     oga_note_en: Optional[str] = None
     oga_risk_level: Optional[str] = None
+    # FTA info
+    fta_eligible: bool = False
+    fta_form: Optional[str] = None
+    fta_note_th: Optional[str] = None
+    fta_eligible_countries: list[str] = []
+    fta_details: list[dict] = []
     notes: Optional[str]
     candidates: list[CandidateItem] = []   # ranked list >= 75%
     watermark: str = "[SANDBOX — NOT FOR PRODUCTION USE]"
@@ -139,7 +145,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     used, warn = _check(ip)
 
     from cache_service import cache_get, cache_set as _cache_set
-    from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db
+    from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db, _fta_note_th
 
     results, duties, scores = [], 0.0, []
     _t_start = time.time()
@@ -200,14 +206,16 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 tax = lookup_tax_rate(cls.hs_code or "", item.origin_country)
             except Exception:
                 tax = {"status": "unavailable"}
-            # ── Enrich FTA จาก DB (fta_eligibility) ──────────────────────
-            if cls.hs_code and item.origin_country:
+            # ── Enrich FTA จาก DB/bundled ──────────────────────────────
+            _fta_info: dict = {"eligible": False, "form": None, "all_eligible_countries": [], "fta_details": []}
+            if cls.hs_code:
                 try:
-                    _fta_db = await _get_fta_db(cls.hs_code, item.origin_country)
-                    if _fta_db.get("eligible"):
+                    _fta_db = await _get_fta_db(cls.hs_code, item.origin_country or "")
+                    if _fta_db.get("eligible") or _fta_db.get("all_eligible_countries"):
+                        _fta_info = _fta_db
                         tax["fta_form"] = _fta_db.get("form")
                         tax["fta_eligible_countries"] = _fta_db.get("all_eligible_countries", [])
-                        tax["fta_source"] = _fta_db.get("source", "db")
+                        tax["fta_source"] = _fta_db.get("source", "bundled")
                 except Exception:
                     pass
             dr = _best_rate(tax)
@@ -257,6 +265,11 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 oga_note_th=oga.get("note_th"),
                 oga_note_en=oga.get("note_en"),
                 oga_risk_level=oga.get("risk_level"),
+                fta_eligible=bool(_fta_info.get("eligible")),
+                fta_form=_fta_info.get("form"),
+                fta_note_th=_fta_note_th(_fta_info.get("form")),
+                fta_eligible_countries=_fta_info.get("all_eligible_countries", []),
+                fta_details=_fta_info.get("fta_details", []),
                 notes=cls.notes,
                 candidates=candidates_out,
             ))
