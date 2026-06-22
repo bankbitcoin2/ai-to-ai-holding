@@ -302,8 +302,8 @@ async def get_hs_description_db(hs_code: str) -> dict:
             pool = await get_pool()
             async with pool.acquire() as conn:
                 row = await conn.fetchrow(
-                    "SELECT desc_th, desc_en FROM hs_code_master WHERE TRIM(hs_code) = $1",
-                    clean
+                    "SELECT desc_th, desc_en FROM hs_code_master WHERE REPLACE(TRIM(hs_code), '.', '') LIKE $1",
+                    clean[:6] + '%'
                 )
                 if row:
                     return {"th": row["desc_th"], "en": row["desc_en"], "source": "db"}

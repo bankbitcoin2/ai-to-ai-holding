@@ -145,34 +145,50 @@ async def sandbox_classify(body: SandboxReq, req: Request):
             # ── Cache lookup ──────────────────────────────────
             _cached = await cache_get(item.description, item.origin_country)
             if _cached:
-                from dataclasses import dataclass
-                @dataclass
+                # ── Enrich Thai desc จาก DB (async) ──────────────────────
+                _db_d_c = await _get_desc_db(_cached.get("hs_code", ""))
+                _th_desc = _db_d_c.get("th") or None
+                _en_desc = _db_d_c.get("en") or _cached.get("hs_description")
+                _conf = float(_cached.get("confidence_score", 0.85))
+                _src = _cached.get("source_reference", "Cache")
+                _notes_c = _cached.get("notes")
+                _hs_c = _cached.get("hs_code")
+
                 class _FakeBest:
-                    hs_code = _cached.get("hs_code")
+                    rank = 1
+                    hs_code = _hs_c
                     hs_code_11 = None
-                    hs_description = _cached.get("hs_description")
-                    hs_description_th = None
-                _desc = _get_desc(_cached.get("hs_code",""))
+                    hs_description = _en_desc
+                    hs_description_th = _th_desc
+                    confidence_score = _conf
+                    source_reference = _src
+                    notes = _notes_c
+
+                _best_inst = _FakeBest()
+
                 class _FakeCls:
-                    hs_code = _cached.get("hs_code")
-                    confidence_score = float(_cached.get("confidence_score", 0.85))
-                    source_reference = _cached.get("source_reference", "Cache")
-                    notes = _cached.get("notes")
-                    best = _FakeBest()
-                    candidates = []
-                _FakeBest.hs_description_th = _desc.get("th")
-                _FakeBest.hs_description = _desc.get("en") or _cached.get("hs_description")
+                    hs_code = _hs_c
+                    confidence_score = _conf
+                    source_reference = _src
+                    notes = _notes_c
+                    best = _best_inst
+                    candidates = [_best_inst]
+
                 cls = _FakeCls()
             else:
                 cls = await classify_item(description=item.description,
                                            origin_country=item.origin_country)
-                # ── Enrich hs_description จาก DB (hs_code_master) ──────────
-                if cls.hs_code and cls.best:
-                    _db_d = await _get_desc_db(cls.hs_code)
-                    if _db_d.get("th"):
-                        cls.best.hs_description_th = _db_d["th"]
-                    if _db_d.get("en") and not getattr(cls.best, "hs_description", None):
-                        cls.best.hs_description = _db_d["en"]
+                # ── Enrich hs_description_th จาก DB สำหรับทุก candidate ──────
+                for _c in cls.candidates:
+                    if _c.hs_code and not _c.hs_description_th:
+                        try:
+                            _cd = await _get_desc_db(_c.hs_code)
+                            if _cd.get("th"):
+                                _c.hs_description_th = _cd["th"]
+                            if _cd.get("en") and not _c.hs_description:
+                                _c.hs_description = _cd["en"]
+                        except Exception:
+                            pass
                 # ── Save to cache ─────────────────────────────
                 if cls.hs_code and cls.confidence_score >= 0.75:
                     try:
