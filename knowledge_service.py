@@ -353,3 +353,98 @@ async def get_fta_form_db(hs_code: str, origin_country: str) -> dict:
     result = get_fta_form(hs_code, origin_country)
     result["source"] = "bundled"
     return result
+
+
+# ── DB-First HS Lookup ────────────────────────────────────────────────────────
+
+_TH_STOPWORDS = {"และ","หรือ","ที่","ของ","ใน","เป็น","มี","การ","สำหรับ","แบบ","ชนิด","ประเภท","จาก","โดย","กับ"}
+_EN_STOPWORDS  = {"and","or","of","for","in","with","a","an","the","type","kind","made","from","by","use","used"}
+
+def _extract_keywords(text: str) -> list[str]:
+    """ดึง keyword ที่มีความหมายจาก description (ตัด stopword + ตัวสั้น)"""
+    import re
+    tokens = re.split(r"[\s,/\-\(\)\.]+", text.strip())
+    out = []
+    for t in tokens:
+        t = t.strip()
+        if len(t) < 2:
+            continue
+        if t.lower() in _TH_STOPWORDS or t.lower() in _EN_STOPWORDS:
+            continue
+        out.append(t)
+    return out[:6]  # ใช้สูงสุด 6 keywords
+
+
+async def db_search_hs(description: str) -> dict:
+    """
+    ค้นหา HS code จาก hs_code_master ก่อนส่งให้ Claude
+    Returns:
+      {"found": True,  "mode": "exact"|"hint", "candidates": [...], "inject_prompt": str}
+      {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
+    """
+    try:
+        from db_adapter import get_pool, USE_POSTGRES
+        if not USE_POSTGRES:
+            return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
+
+        keywords = _extract_keywords(description)
+        if not keywords:
+            return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
+
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            # สร้าง WHERE clause: ทุก keyword ต้อง match อย่างน้อย 1 column
+            # ใช้ AND เพื่อให้ specific — ถ้า keyword มากกว่า 3 ใช้ 3 ตัวแรก
+            search_kw = keywords[:3]
+            conditions = []
+            params = []
+            for i, kw in enumerate(search_kw, start=1):
+                conditions.append(
+                    f"(LOWER(desc_th) LIKE LOWER(${i}) OR LOWER(desc_en) LIKE LOWER(${i}))"
+                )
+                params.append(f"%{kw}%")
+
+            where = " AND ".join(conditions)
+            sql = f"SELECT hs_code, desc_th, desc_en FROM hs_code_master WHERE {where} LIMIT 10"
+            rows = await conn.fetch(sql, *params)
+
+            if not rows:
+                # ลองกว้างขึ้น: OR แทน AND (keyword แรกที่ยาวที่สุด)
+                kw_long = max(keywords, key=len) if keywords else ""
+                if len(kw_long) >= 3:
+                    rows = await conn.fetch(
+                        "SELECT hs_code, desc_th, desc_en FROM hs_code_master "
+                        "WHERE LOWER(desc_th) LIKE LOWER($1) OR LOWER(desc_en) LIKE LOWER($1) LIMIT 10",
+                        f"%{kw_long}%"
+                    )
+
+            if not rows:
+                return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}
+
+            candidates = [{"hs_code": r["hs_code"], "desc_th": r["desc_th"], "desc_en": r["desc_en"]} for r in rows]
+
+            # exact mode: 1 result เท่านั้น + ใช้ keywords ≥ 2 ตัว
+            if len(rows) == 1 and len(search_kw) >= 2:
+                r = rows[0]
+                inject = (
+                    f"IMPORTANT: Thai Customs database found an exact match — "
+                    f"HS {r['hs_code']}: {r['desc_en']} / {r['desc_th']}. "
+                    f"Use this as your primary candidate unless clearly wrong."
+                )
+                return {"found": True, "mode": "exact", "candidates": candidates, "inject_prompt": inject}
+
+            # hint mode: 2-10 results — ส่งเป็น context ให้ Claude
+            hint_lines = "\n".join(
+                f"  - HS {c['hs_code']}: {c['desc_en']} / {c['desc_th']}"
+                for c in candidates
+            )
+            inject = (
+                f"Thai Customs database found these potential HS codes for reference:\n"
+                f"{hint_lines}\n"
+                f"Consider these when classifying, but apply your expert judgment."
+            )
+            return {"found": True, "mode": "hint", "candidates": candidates, "inject_prompt": inject}
+
+    except Exception as e:
+        print(f"[db_search_hs] warning: {e}")
+        return {"found": False, "mode": "none", "candidates": [], "inject_prompt": ""}

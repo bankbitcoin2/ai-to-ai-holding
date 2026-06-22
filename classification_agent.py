@@ -176,9 +176,22 @@ async def classify_item(
         except Exception:
             pass
 
+    # ── DB-First lookup: ค้นหาจาก hs_code_master ก่อน call Claude ──────────
+    db_hint = ""
+    try:
+        from knowledge_service import db_search_hs
+        db_result = await db_search_hs(description)
+        if db_result.get("found"):
+            db_hint = db_result.get("inject_prompt", "")
+            print(f"[DB-FIRST] mode={db_result['mode']} candidates={len(db_result['candidates'])}")
+    except Exception as _dbe:
+        print(f"[DB-FIRST] warning: {_dbe}")
+
     user_content = "Product description: {}".format(description)
     if origin_country:
         user_content += "\nOrigin country: {}".format(origin_country)
+    if db_hint:
+        user_content += "\n\n" + db_hint
     if additional_context:
         user_content += "\nAdditional context: {}".format(additional_context)
 
@@ -202,46 +215,4 @@ async def classify_item(
         response.raise_for_status()
 
     data = response.json()
-    raw_text = data["content"][0]["text"].strip()
-    clean = raw_text.replace("```json", "").replace("```", "").strip()
-    parsed = json.loads(clean)
-
-    if isinstance(parsed, dict):
-        parsed = [parsed]
-
-    filtered = sorted(
-        [c for c in parsed if float(c.get("confidence_score", 0)) >= CONFIDENCE_THRESHOLD],
-        key=lambda x: float(x.get("confidence_score", 0)),
-        reverse=True
-    )[:5]
-
-    if not filtered and parsed:
-        filtered = [max(parsed, key=lambda x: float(x.get("confidence_score", 0)))]
-
-    candidates = await _enrich_with_ckan(filtered)
-    best = candidates[0] if candidates else None
-
-    # Auto-save to cache if confidence >= 0.85
-    if db and best and best.confidence_score >= CACHE_THRESHOLD:
-        try:
-            from cache_classification import cache_save, log_candidates
-            await cache_save(db, description, {
-                "hs_code": best.hs_code,
-                "hs_code_11": best.hs_code_11,
-                "hs_description": best.hs_description,
-                "hs_description_th": best.hs_description_th,
-                "confidence_score": best.confidence_score,
-            }, source="CLAUDE")
-            if session_id:
-                await log_candidates(db, session_id, session_type, description, [
-                    {
-                        "rank": c.rank, "hs_code": c.hs_code, "hs_code_11": c.hs_code_11,
-                        "hs_description": c.hs_description, "confidence_score": c.confidence_score,
-                        "source_reference": c.source_reference,
-                    }
-                    for c in candidates
-                ])
-        except Exception:
-            pass
-
-    return ClassificationResult(candidates=candidates, best=best, raw_response=raw_text)
+    raw_text = da
