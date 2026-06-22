@@ -121,7 +121,6 @@ async def _fix_audit_fk():
         print(f"[MIGRATION] _fix_audit_fk warning: {e}")
 
 
-@asynccontextmanager
 async def _migrate_cache_schema():
     """
     Migration: เพิ่มคอลัมน์ที่ขาดใน hs_classification_cache
