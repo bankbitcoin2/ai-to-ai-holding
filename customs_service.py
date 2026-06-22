@@ -11,6 +11,7 @@ Customs Intelligence Service
   เพิ่ม halal_engine.check()                                   (21 ประเทศ)
   เพิ่ม glossary fast-path                                     (ประหยัด token)
 """
+import asyncio
 import hashlib
 import json
 import uuid
@@ -19,6 +20,9 @@ from typing import Optional
 import aiosqlite
 
 from agents_router import classify_item
+
+# Semaphore: รัน Claude parallel สูงสุด 5 พร้อมกัน ไม่โดน rate limit
+_CLASSIFY_SEM = asyncio.Semaphore(5)
 from audit import log_event
 from holding_config import LOW_CONFIDENCE_THRESHOLD, PRICE_PER_ITEM
 from knowledge_service import lookup_tax_rate, check_restricted, check_halal, search_glossary
@@ -66,10 +70,81 @@ async def process_invoice(
          buyer_name, buyer_country, invoice_date, currency, now),
     )
 
+    from cache_service import cache_get as _cg, cache_set as _cs
+    from knowledge_service import get_hs_description as _get_desc, get_hs_description_db as _get_desc_db
+
+    # ── Phase 1: Classify ทุก item พร้อมกัน (parallel) ──────────
+    # แยก classify ออกจาก DB write เพราะ aiosqlite ไม่ thread-safe
+    async def _classify_one(idx: int, item: dict):
+        description = item.get("description", "")
+        origin      = item.get("origin_country") or seller_country
+        gloss = search_glossary(description)
+        extra = f"Glossary hint: HS {gloss['hs_hint']} ({gloss.get('canonical_en','')})" if gloss else None
+
+        # Cache first — ไม่เสีย token เลย
+        _cached = await _cg(description, origin)
+        if _cached:
+            class _R:
+                hs_code = _cached.get("hs_code")
+                hs_description = _cached.get("hs_description")
+                confidence_score = float(_cached.get("confidence_score", 0.85))
+                source_reference = _cached.get("source_reference", "Cache")
+                notes = _cached.get("notes")
+                reasoning_steps = []
+                candidates = []
+                class best:
+                    hs_code = _cached.get("hs_code")
+                    hs_code_11 = None
+                    hs_description = _cached.get("hs_description")
+                    hs_description_th = None
+            _d = _get_desc(_cached.get("hs_code", ""))
+            _R.hs_description = _d.get("en") or _cached.get("hs_description")
+            _R.hs_description_th = _d.get("th")
+            return idx, item, gloss, _R()
+
+        # Cache miss → Claude (จำกัด 5 concurrent ด้วย semaphore)
+        async with _CLASSIFY_SEM:
+            result = await classify_item(
+                description=description,
+                origin_country=origin,
+                additional_context=extra,
+            )
+
+        # Enrich + save cache (ทำนอก semaphore ได้)
+        if result.hs_code and result.best:
+            _db_d = await _get_desc_db(result.hs_code)
+            if _db_d.get("th"):
+                result.best.hs_description_th = _db_d["th"]
+            if _db_d.get("en") and not getattr(result.best, "hs_description", None):
+                result.best.hs_description = _db_d["en"]
+        if result.hs_code and result.confidence_score >= 0.75:
+            try:
+                await _cs(
+                    description=description,
+                    origin_country=origin,
+                    hs_code=result.hs_code,
+                    hs_description=getattr(result, "hs_description", None) or
+                                   (result.best.hs_description if result.best else None),
+                    confidence_score=result.confidence_score,
+                    source_reference=result.source_reference,
+                    notes=result.notes,
+                    model_used="claude",
+                )
+            except Exception as _ce:
+                print(f"[CACHE] customs save warning: {_ce}")
+        return idx, item, gloss, result
+
+    # รัน parallel ทั้งหมด — 10 สินค้า = ~3-5 วิ แทนที่จะเป็น 30+ วิ
+    classify_results = await asyncio.gather(
+        *[_classify_one(idx, item) for idx, item in enumerate(items, start=1)],
+        return_exceptions=False,
+    )
+
+    # ── Phase 2: DB write + Tax/OGA/Halal (sequential — ใช้ DB ร่วมกัน) ──
     classified_items = []
     total_duty = 0.0
 
-    for idx, item in enumerate(items, start=1):
+    for idx, item, gloss, result in classify_results:
         description = item.get("description", "")
         quantity    = item.get("quantity")
         unit        = item.get("unit")
@@ -79,62 +154,6 @@ async def process_invoice(
         )
         origin      = item.get("origin_country") or seller_country
         destination = item.get("destination_country") or buyer_country
-
-        # ── Glossary fast-path (ข้าม Claude ถ้าเจอในคลัง) ──
-        gloss = search_glossary(description)
-        extra = f"Glossary hint: HS {gloss['hs_hint']} ({gloss.get('canonical_en','')})" if gloss else None
-
-        # ── Cache lookup ──────────────────────────────────────
-        from cache_service import cache_get as _cg, cache_set as _cs
-        from knowledge_service import get_hs_description as _get_desc, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db
-        _cached = await _cg(description, origin)
-        if _cached:
-            class _R:
-                hs_code = _cached.get("hs_code")
-                hs_description = _cached.get("hs_description")
-                confidence_score = float(_cached.get("confidence_score", 0.85))
-                source_reference = _cached.get("source_reference", "Cache")
-                notes = _cached.get("notes")
-                candidates = []
-                class best:
-                    hs_code = _cached.get("hs_code")
-                    hs_code_11 = None
-                    hs_description = _cached.get("hs_description")
-                    hs_description_th = None
-            _d = _get_desc(_cached.get("hs_code",""))
-            _R.hs_description = _d.get("en") or _cached.get("hs_description")
-            _R.hs_description_th = _d.get("th")
-            result = _R()
-        else:
-            # ── Classification Agent ──────────────────────────
-            result = await classify_item(
-                description=description,
-                origin_country=origin,
-                additional_context=extra,
-            )
-            # ── Enrich hs_description จาก DB ─────────────────
-            if result.hs_code and result.best:
-                _db_d = await _get_desc_db(result.hs_code)
-                if _db_d.get("th"):
-                    result.best.hs_description_th = _db_d["th"]
-                if _db_d.get("en") and not getattr(result.best, "hs_description", None):
-                    result.best.hs_description = _db_d["en"]
-            # ── Save to cache ─────────────────────────────────
-            if result.hs_code and result.confidence_score >= 0.75:
-                try:
-                    await _cs(
-                        description=description,
-                        origin_country=origin,
-                        hs_code=result.hs_code,
-                        hs_description=getattr(result, "hs_description", None) or
-                                       (result.best.hs_description if result.best else None),
-                        confidence_score=result.confidence_score,
-                        source_reference=result.source_reference,
-                        notes=result.notes,
-                        model_used="claude",
-                    )
-                except Exception as _ce:
-                    print(f"[CACHE] customs save warning: {_ce}")
 
         # ── Tax / FTA (IGTF จริง) ──
         tax_code   = result.hs_code or ""
