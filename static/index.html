@@ -253,6 +253,37 @@
   </div>
 </div>
 
+
+<!-- Recover Key Modal -->
+<div class="modal-overlay" id="recoverModal">
+  <div class="modal">
+    <h2>🔑 ลืม API Key?</h2>
+    <p>ยืนยันตัวตนด้วย Email และชื่อ Agent ที่ใช้สมัคร — ระบบจะออก Key ใหม่ให้</p>
+    <div id="recoverForm">
+      <div class="form-group">
+        <label>Email ที่ใช้สมัคร</label>
+        <input type="email" id="recoverEmail" placeholder="your@email.com" style="width:100%;padding:0.6rem 0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem">
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>ชื่อ Agent (ตรงกับที่สมัคร)</label>
+        <input type="text" id="recoverAgentName" placeholder="เช่น MyTradingBot" style="width:100%;padding:0.6rem 0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem">
+      </div>
+      <div id="recoverError" class="error-msg"></div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeRecover()">ยกเลิก</button>
+        <button class="btn btn-primary" id="recoverBtn" onclick="doRecover()">กู้คืน Key →</button>
+      </div>
+    </div>
+    <div id="recoverResult" style="display:none;margin-top:1rem">
+      <div class="result-box" style="display:block">
+        <div style="color:var(--green);font-weight:700;margin-bottom:0.5rem">✅ กู้คืนสำเร็จ!</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">API Key ใหม่ของคุณ (เก็บไว้ให้ดี จะไม่แสดงอีก):</div>
+        <code id="recoveredKey" style="font-size:0.8rem;word-break:break-all;color:var(--green)"></code>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="closeRecover()">ปิด</button>
+    </div>
+  </div>
+</div>
 <script>
 const API = 'https://web-production-c9da4.up.railway.app';
 
@@ -551,7 +582,8 @@ async function doSandbox() {
 
 // close modals on backdrop click
 ['registerModal','sandboxModal','recoverModal'].forEach(id => {
-  document.getElementById(id).addEventListener('click', function(e) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('show');
   });
 });
@@ -606,35 +638,5 @@ async function doRecover() {
 
 </script>
 
-<!-- Recover Key Modal -->
-<div class="modal-overlay" id="recoverModal">
-  <div class="modal">
-    <h2>🔑 ลืม API Key?</h2>
-    <p>ยืนยันตัวตนด้วย Email และชื่อ Agent ที่ใช้สมัคร — ระบบจะออก Key ใหม่ให้</p>
-    <div id="recoverForm">
-      <div class="form-group">
-        <label>Email ที่ใช้สมัคร</label>
-        <input type="email" id="recoverEmail" placeholder="your@email.com" style="width:100%;padding:0.6rem 0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem">
-      </div>
-      <div class="form-group" style="margin-top:1rem">
-        <label>ชื่อ Agent (ตรงกับที่สมัคร)</label>
-        <input type="text" id="recoverAgentName" placeholder="เช่น MyTradingBot" style="width:100%;padding:0.6rem 0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem">
-      </div>
-      <div id="recoverError" class="error-msg"></div>
-      <div class="modal-footer">
-        <button class="btn btn-cancel" onclick="closeRecover()">ยกเลิก</button>
-        <button class="btn btn-primary" id="recoverBtn" onclick="doRecover()">กู้คืน Key →</button>
-      </div>
-    </div>
-    <div id="recoverResult" style="display:none;margin-top:1rem">
-      <div class="result-box" style="display:block">
-        <div style="color:var(--green);font-weight:700;margin-bottom:0.5rem">✅ กู้คืนสำเร็จ!</div>
-        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">API Key ใหม่ของคุณ (เก็บไว้ให้ดี จะไม่แสดงอีก):</div>
-        <code id="recoveredKey" style="font-size:0.8rem;word-break:break-all;color:var(--green)"></code>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="closeRecover()">ปิด</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
