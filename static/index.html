@@ -2,194 +2,681 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAF10lEQVRYhbWWbWxT5xXHf8+9fru2E5sAdhLICyRAKO+0hcC2Tquq7qVr1xemSdVA7bpKk9hQ22iapn3bvkwbG4NOXTU2qZro0D60XadunQbb2rWiRYIkJC1JMSN2Epsk2PH7y7Wv/eyDQ4hxQkwX/h/uvTrnPOf8n3PPc54jmAun02Mx1ENSiocQrAMcLAUEcaQcQiqvFvTocUC/oZqBRXN9XUrxe6BuSYIuCDksSqbH8vnI8CyBmeB/mktoMaiKlXXNBwDwhf5AsaQvsqICEUWW9uh6widwOj1mw3SZGncuhEKr51E2tx7CpNoRQMnIMDh6DP+1PyNlqTYKgoFCNna3alG0H4J4oJY1HvceujceY43ncULTpznr68E3cQKL6mRLyyHWrPgquUKEePZyLe68qsnmF2bN3Y9k260s3c5NbGnvwePuJhQ5zcejL5LWxyps7FYvm5qepWPF40RSF+gN/IypZN9iJN4RZps7CTjn02rWJrpavkO79wli6UE+8h9lOtV/S48Njo3sWP0CTXX3Epj+O+dHf0kyNzq/sSQmzDa3vFluMbnoXP0Mnc0HyOpBhsdfJhQ5tdhuKtBU3809q5/HrXXgm3qd3rGjZI1IlV0VgRbPI2zt+BFFI8Mn479hLPxW7YV1s3Oh0NHwMDubD2JW7Xzg/wm+8Ju3JnBP18/RLF7ODn/vdo/WgjApVh7sfImMPsE//9tToVOqWEvQ89eWLDiAUdLJ5qfmbTJVBO4UxJznXJiuf3z5cwMIoRKeOo2QBgD37XwLzdbEBwP7SaQusty9m/Wt38WhrUWKErncVQJXTzI++QZd7T20NT/J8MhhAldPYlId3L/r3wihcqb/GwAotpV85b6PmQyf4vzF58qy+ZjOlypV0djedRi71sboxEkCwROks34ctjYAphO9ACyr3wGAu24rQqizMoFAsSwr28Z7qzMwS6DqUJZhs3oxKXaSaR9Xxl/BKKYq9NFE30yw7TPvnRSMGDl9skxKB2GtgUCDt9yVv+j9UoU8mxsnlblCnWMd9+/6F6nsCJHYGUaCJ8gXIhSMWDkjWjt2Wyvu+m1EE/1k9RDehgcQ+UGE2YVRzJBID8/6rfoFuYyfXPoKI8HKXZakwdnBpxn2/4Jw7EM0ayPtzQfYtfm3VVlY7r4Xl3Mz0WQf04k+NKsHRWtEQZBIDCBnamx+AsnL5FI+LgVepFBI3jBUzEhZJBD6I71Dh/jPuYcoFnM4tHZMarmTR2d6f1vTk5gVK9F4P7FEH6oUmJ1rUBHE4ucr4lX9Api/CG2WRvZse5Vr0ffIZMewWb2oqo2cPjGbqWi8HMxlW0PJyJFMf0JJFshmAzhtbQh5o1gXJCAWmEnyhSiTkdMsq9+Jt+ELSFkgFj/PUODIrE1WD5HPTWK3eommBinJAlAO6rK2Iygxnay8zKpa8d71h3FYGnn30sElbcWPrH2ZlD7B2yPPV+iqauBq9D2W2dfz8Ja/sHb51xDi0zdLgcLGhkfZ3/VXVmob8CferbaZ7zq2mlxsWvVt7vI+RTof5ELwJQLRf9xW8Ja6PXymuYfltg4uhl/jTPAImVqu47mwWxrZvuogGzz7CKcHODd2hKn0rQeSlfa72Nv0Ai11u7kcfZv3xw8T1xcYSBYjcB0rHJvZ3fp9muu78UdPcS54lMRNI5nT0sTdjc+yqeEJJlMXeH/8p4RSvQt4nEtAc8eQuBa1BFa79tLd8gMatE4uRd7kXOjXlGSRHY1Ps3XFflK5MT4MHcMX/Vst7gASwmxzvwN8vtYVAoUNKx9j96rnMCvlsdwoZjgb/BVD4TeQ3Mb0JOkTZpvrGRC/q31VGSbFyjbvUwigf/IVjE9xZAX8WAAms+buRbLltj38PxDEC6ZipwIYSqm4D6g+I3cOUsC3SCbDCoCuJy+JkvpZkEN3PLQgLgT78tnY6wDqdXmxmA2XDP24qmqTCNxI6hDYlihsCslHQnC8YC5+s5hOzF6J/wORklhxOiJe2AAAAABJRU5ErkJggg==">
-  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAF10lEQVRYhbWWbWxT5xXHf8+9fru2E5sAdhLICyRAKO+0hcC2Tquq7qVr1xemSdVA7bpKk9hQ22iapn3bvkwbG4NOXTU2qZro0D60XadunQbb2rWiRYIkJC1JMSN2Epsk2PH7y7Wv/eyDQ4hxQkwX/h/uvTrnPOf8n3PPc54jmAun02Mx1ENSiocQrAMcLAUEcaQcQiqvFvTocUC/oZqBRXN9XUrxe6BuSYIuCDksSqbH8vnI8CyBmeB/mktoMaiKlXXNBwDwhf5AsaQvsqICEUWW9uh6widwOj1mw3SZGncuhEKr51E2tx7CpNoRQMnIMDh6DP+1PyNlqTYKgoFCNna3alG0H4J4oJY1HvceujceY43ncULTpznr68E3cQKL6mRLyyHWrPgquUKEePZyLe68qsnmF2bN3Y9k260s3c5NbGnvwePuJhQ5zcejL5LWxyps7FYvm5qepWPF40RSF+gN/IypZN9iJN4RZps7CTjn02rWJrpavkO79wli6UE+8h9lOtV/S48Njo3sWP0CTXX3Epj+O+dHf0kyNzq/sSQmzDa3vFluMbnoXP0Mnc0HyOpBhsdfJhQ5tdhuKtBU3809q5/HrXXgm3qd3rGjZI1IlV0VgRbPI2zt+BFFI8Mn479hLPxW7YV1s3Oh0NHwMDubD2JW7Xzg/wm+8Ju3JnBP18/RLF7ODn/vdo/WgjApVh7sfImMPsE//9tToVOqWEvQ89eWLDiAUdLJ5qfmbTJVBO4UxJznXJiuf3z5cwMIoRKeOo2QBgD37XwLzdbEBwP7SaQusty9m/Wt38WhrUWKErncVQJXTzI++QZd7T20NT/J8MhhAldPYlId3L/r3wihcqb/GwAotpV85b6PmQyf4vzF58qy+ZjOlypV0djedRi71sboxEkCwROks34ctjYAphO9ACyr3wGAu24rQqizMoFAsSwr28Z7qzMwS6DqUJZhs3oxKXaSaR9Xxl/BKKYq9NFE30yw7TPvnRSMGDl9skxKB2GtgUCDt9yVv+j9UoU8mxsnlblCnWMd9+/6F6nsCJHYGUaCJ8gXIhSMWDkjWjt2Wyvu+m1EE/1k9RDehgcQ+UGE2YVRzJBID8/6rfoFuYyfXPoKI8HKXZakwdnBpxn2/4Jw7EM0ayPtzQfYtfm3VVlY7r4Xl3Mz0WQf04k+NKsHRWtEQZBIDCBnamx+AsnL5FI+LgVepFBI3jBUzEhZJBD6I71Dh/jPuYcoFnM4tHZMarmTR2d6f1vTk5gVK9F4P7FEH6oUmJ1rUBHE4ucr4lX9Api/CG2WRvZse5Vr0ffIZMewWb2oqo2cPjGbqWi8HMxlW0PJyJFMf0JJFshmAzhtbQh5o1gXJCAWmEnyhSiTkdMsq9+Jt+ELSFkgFj/PUODIrE1WD5HPTWK3eommBinJAlAO6rK2Iygxnay8zKpa8d71h3FYGnn30sElbcWPrH2ZlD7B2yPPV+iqauBq9D2W2dfz8Ja/sHb51xDi0zdLgcLGhkfZ3/VXVmob8CferbaZ7zq2mlxsWvVt7vI+RTof5ELwJQLRf9xW8Ja6PXymuYfltg4uhl/jTPAImVqu47mwWxrZvuogGzz7CKcHODd2hKn0rQeSlfa72Nv0Ai11u7kcfZv3xw8T1xcYSBYjcB0rHJvZ3fp9muu78UdPcS54lMRNI5nT0sTdjc+yqeEJJlMXeH/8p4RSvQt4nEtAc8eQuBa1BFa79tLd8gMatE4uRd7kXOjXlGSRHY1Ps3XFflK5MT4MHcMX/Vst7gASwmxzvwN8vtYVAoUNKx9j96rnMCvlsdwoZjgb/BVD4TeQ3Mb0JOkTZpvrGRC/q31VGSbFyjbvUwigf/IVjE9xZAX8WAAms+buRbLltj38PxDEC6ZipwIYSqm4D6g+I3cOUsC3SCbDCoCuJy+JkvpZkEN3PLQgLgT78tnY6wDqdXmxmA2XDP24qmqTCNxI6hDYlihsCslHQnC8YC5+s5hOzF6J/wORklhxOiJe2AAAAABJRU5ErkJggg==">
-  <meta property="og:title" content="HSW — Thai Customs Intelligence API">
-  <meta property="og:description" content="ระบบจำแนกพิกัดศุลกากร HS Code สำหรับ AI Agent และธุรกิจการค้าระหว่างประเทศ">
-  <meta property="og:image" content="/static/logo/logo-dark.svg">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="HSW — Thai Customs Intelligence">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI TO AI HOLDING — Thai Customs Intelligence API</title>
+<meta property="og:title" content="AI TO AI HOLDING — Thai Customs Intelligence">
+<meta property="og:description" content="ระบบจำแนกพิกัดศุลกากร HS Code สำหรับ AI Agent และธุรกิจการค้าระหว่างประเทศ">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --bg: #0a0e1a; --card: #111827; --border: #1f2937;
-    --accent: #6366f1; --accent2: #8b5cf6; --green: #10b981;
-    --text: #f9fafb; --muted: #9ca3af;
-  }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+:root {
+  --bg:      #060810;
+  --bg2:     #0c1120;
+  --card:    #0f1623;
+  --card2:   #141d2e;
+  --border:  #1e2a42;
+  --border2: #253047;
+  --accent:  #6366f1;
+  --accent2: #8b5cf6;
+  --accent3: #a78bfa;
+  --green:   #10b981;
+  --green2:  #059669;
+  --amber:   #f59e0b;
+  --red:     #ef4444;
+  --text:    #f1f5f9;
+  --text2:   #cbd5e1;
+  --muted:   #64748b;
+  --muted2:  #475569;
+  --glow:    rgba(99,102,241,0.35);
+  --glow2:   rgba(139,92,246,0.25);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 
-  /* NAV */
-  nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(10,14,26,0.95); backdrop-filter: blur(10px); z-index: 100; flex-wrap: wrap; gap: 0.75rem; }
-  .logo { font-size: 1.1rem; font-weight: 700; }
-  .logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-  .btn { padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; display: inline-block; }
-  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  .btn-outline:hover { border-color: var(--accent); color: var(--text); }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-  .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; border-radius: 10px; }
-  .btn-green { background: var(--green); color: white; }
-  .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
-  @keyframes spin { to { transform: rotate(360deg); } }
+html { scroll-behavior: smooth; }
 
-  /* LANG SWITCHER */
-  .lang-switcher { display: flex; gap: 0.25rem; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.25rem; }
-  .lang-btn { background: transparent; border: none; color: var(--muted); font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
-  .lang-btn:hover { color: var(--text); }
-  .lang-btn.active { background: var(--accent); color: white; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter','Noto Sans Thai','Noto Sans SC','Noto Sans JP',system-ui,sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  /* HERO */
-  .hero { text-align: center; padding: 5rem 2rem 4rem; max-width: 860px; margin: 0 auto; }
-  .badge { display: inline-block; padding: 0.35rem 1rem; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); border-radius: 999px; font-size: 0.8rem; color: var(--accent); margin-bottom: 1.5rem; }
-  .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.2; margin-bottom: 1.25rem; }
-  .hero h1 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero p { font-size: 1.15rem; color: var(--muted); line-height: 1.7; margin-bottom: 2.5rem; max-width: 640px; margin-left: auto; margin-right: auto; }
-  .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+/* ─── BACKGROUND GRID ─── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.12), transparent),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.08), transparent);
+}
 
-  /* STATS */
-  .stats { display: flex; justify-content: center; gap: 3rem; padding: 2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-  .stat { text-align: center; }
-  .stat-num { font-size: 1.75rem; font-weight: 800; }
-  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+/* ─── NAV ─── */
+nav {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 0 2rem; height: 64px;
+  background: rgba(6,8,16,0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top:0; z-index:100;
+  position:relative; z-index:100;
+}
+.nav-logo {
+  display:flex; align-items:center; gap:10px;
+  text-decoration:none; flex-shrink:0;
+}
+.nav-links { display:flex; gap:0.6rem; align-items:center; }
 
-  /* SECTIONS */
-  .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
-  .section-title { text-align: center; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
-  .section-sub { text-align: center; color: var(--muted); margin-bottom: 3rem; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
-  .card { cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; } .card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(99,102,241,0.2); } .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; transition: border-color 0.2s; }
-  .card:hover { border-color: var(--accent); }
-  .card-icon { font-size: 1.75rem; margin-bottom: 1rem; }
-  .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
-  .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+/* ─── LOGO SVG ─── */
+.logo-mark { flex-shrink:0; }
 
-  /* PRICING */
-  .pricing-card { background: var(--card); border: 1px solid var(--accent); border-radius: 16px; padding: 2.5rem; max-width: 420px; margin: 0 auto; text-align: center; }
-  .price { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
-  .price span { font-size: 1rem; color: var(--muted); font-weight: 400; }
-  .price-desc { color: var(--muted); margin: 0.5rem 0 1.5rem; }
-  .feature-list { list-style: none; text-align: left; margin-bottom: 2rem; }
-  .feature-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
-  .feature-list li::before { content: "✓"; color: var(--green); font-weight: 700; }
+/* ─── LANG SWITCHER ─── */
+.lang-switcher {
+  display:flex; gap:2px;
+  background: rgba(15,22,35,0.8);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 3px;
+}
+.lang-btn {
+  background:transparent; border:none;
+  color:var(--muted); font-size:0.78rem; font-weight:600;
+  padding: 4px 10px; border-radius: 7px;
+  cursor:pointer; transition:all 0.18s;
+  font-family:inherit;
+}
+.lang-btn:hover { color:var(--text2); background:rgba(99,102,241,0.1); }
+.lang-btn.active { background:var(--accent); color:#fff; box-shadow:0 0 12px var(--glow); }
 
-  /* HOW IT WORKS */
-  .steps { display: flex; flex-direction: column; gap: 1rem; max-width: 640px; margin: 0 auto; }
-  .step { display: flex; gap: 1.25rem; align-items: flex-start; }
-  .step-num { background: var(--accent); color: white; width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; }
-  .step-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .step-content p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+/* ─── BUTTONS ─── */
+.btn {
+  padding: 0.5rem 1.25rem; border-radius:9px;
+  font-size:0.875rem; font-weight:600; cursor:pointer;
+  border:none; transition:all 0.2s; text-decoration:none;
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:inherit;
+}
+.btn-ghost {
+  background:transparent; border:1px solid var(--border2);
+  color:var(--muted);
+}
+.btn-ghost:hover { border-color:var(--accent); color:var(--text); background:rgba(99,102,241,0.08); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color:#fff; box-shadow: 0 0 20px var(--glow);
+}
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 24px var(--glow); filter:brightness(1.1); }
+.btn-primary:active { transform:translateY(0); }
+.btn-lg { padding:0.8rem 2rem; font-size:1rem; border-radius:12px; }
+.btn-xl { padding:0.95rem 2.4rem; font-size:1.05rem; border-radius:13px; }
+.btn-outline-accent {
+  background:transparent;
+  border:1px solid rgba(99,102,241,0.4);
+  color:var(--accent3);
+}
+.btn-outline-accent:hover { background:rgba(99,102,241,0.1); border-color:var(--accent); }
+.btn-green {
+  background:linear-gradient(135deg,var(--green2),var(--green));
+  color:#fff; box-shadow:0 0 20px rgba(16,185,129,0.3);
+}
+.btn-green:hover { transform:translateY(-1px); filter:brightness(1.1); }
 
-  /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
-  .modal-overlay.show { display: flex; }
-  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 460px; margin: 1rem; }
-  .modal h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .modal p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
-  .form-group { margin-bottom: 1rem; }
-  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
-  .form-group input, .form-group select { width: 100%; padding: 0.65rem 0.9rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; }
-  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
-  .modal-footer { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
-  .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); flex: 1; }
-  .result-box { background: var(--bg); border: 1px solid var(--green); border-radius: 10px; padding: 1.25rem; margin-top: 1rem; display: none; }
-  .result-box .key { font-family: monospace; font-size: 0.8rem; color: var(--green); word-break: break-all; background: rgba(16,185,129,0.1); padding: 0.5rem; border-radius: 6px; margin-top: 0.5rem; }
-  .result-box .warn { color: #f59e0b; font-size: 0.8rem; margin-top: 0.5rem; }
-  .error-msg { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+/* ─── HERO ─── */
+.hero-wrap {
+  position:relative; z-index:1;
+  min-height: calc(100vh - 64px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding: 5rem 2rem 4rem;
+  text-align:center;
+}
 
-  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
-  footer a { color: var(--accent); text-decoration: none; }
+/* Floating orbs */
+.orb {
+  position:absolute; border-radius:50%;
+  filter:blur(80px); pointer-events:none; z-index:0;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+.orb-1 { width:400px;height:400px; background:rgba(99,102,241,0.12); top:-100px; left:-100px; animation-delay:0s; }
+.orb-2 { width:300px;height:300px; background:rgba(139,92,246,0.1); top:40%; right:-80px; animation-delay:-3s; }
+.orb-3 { width:200px;height:200px; background:rgba(99,102,241,0.08); bottom:10%; left:20%; animation-delay:-6s; }
+@keyframes orbFloat {
+  0%,100% { transform:translateY(0) scale(1); }
+  50%      { transform:translateY(-30px) scale(1.05); }
+}
+
+.hero-inner { position:relative; z-index:1; max-width:820px; }
+
+.badge-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 18px; margin-bottom:2rem;
+  background:rgba(99,102,241,0.1);
+  border:1px solid rgba(99,102,241,0.3);
+  border-radius:999px; font-size:0.82rem; color:var(--accent3);
+  letter-spacing:0.02em;
+}
+.badge-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--accent); box-shadow:0 0 8px var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+.hero-logo-wrap {
+  margin-bottom: 2rem;
+  display:inline-block;
+  filter: drop-shadow(0 0 40px rgba(99,102,241,0.5));
+  animation: heroLogoFloat 6s ease-in-out infinite;
+}
+@keyframes heroLogoFloat {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)}
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  font-weight:900; line-height:1.1;
+  letter-spacing:-0.03em;
+  margin-bottom:1.5rem;
+}
+.grad-text {
+  background: linear-gradient(135deg, #818cf8, #a78bfa, #c4b5fd);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub {
+  font-size:1.1rem; color:var(--text2);
+  line-height:1.75; max-width:600px;
+  margin:0 auto 2.5rem;
+}
+.hero-tagline {
+  font-size:0.95rem; color:var(--muted);
+  line-height:1.7; max-width:560px;
+  margin:0 auto 2.5rem;
+  border-top:1px solid var(--border); padding-top:1.5rem;
+}
+.hero-cta { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  position:relative; z-index:1;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  background:rgba(15,22,35,0.6); backdrop-filter:blur(10px);
+  padding:2rem 2rem;
+}
+.stats-inner {
+  max-width:900px; margin:0 auto;
+  display:flex; justify-content:center; gap:0; flex-wrap:wrap;
+}
+.stat-item {
+  flex:1; min-width:160px; text-align:center;
+  padding:1rem 1.5rem;
+  border-right:1px solid var(--border);
+}
+.stat-item:last-child { border-right:none; }
+.stat-num {
+  font-size:2rem; font-weight:800;
+  background:linear-gradient(135deg,#e2e8f0,#a78bfa);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.stat-label { font-size:0.78rem; color:var(--muted); margin-top:4px; letter-spacing:0.03em; }
+
+/* ─── SECTIONS ─── */
+.section {
+  position:relative; z-index:1;
+  padding:5rem 2rem; max-width:1140px; margin:0 auto;
+}
+.section-eyebrow {
+  font-size:0.75rem; font-weight:700; letter-spacing:0.12em;
+  color:var(--accent); text-transform:uppercase;
+  margin-bottom:0.75rem; text-align:center;
+}
+.section-title {
+  font-size:clamp(1.6rem,3vw,2.2rem); font-weight:800;
+  text-align:center; margin-bottom:0.75rem;
+  letter-spacing:-0.02em;
+}
+.section-sub { text-align:center; color:var(--muted); margin-bottom:3.5rem; font-size:1rem; line-height:1.7; }
+
+/* ─── FEATURE GRID ─── */
+.grid-3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.25rem; }
+
+.feat-card {
+  background:linear-gradient(135deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:16px; padding:2rem;
+  transition:all 0.3s; cursor:pointer;
+  position:relative; overflow:hidden;
+}
+.feat-card::before {
+  content:''; position:absolute; inset:0; border-radius:16px;
+  background:linear-gradient(135deg,rgba(99,102,241,0.05),transparent);
+  opacity:0; transition:opacity 0.3s;
+}
+.feat-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:0 12px 40px rgba(99,102,241,0.2); }
+.feat-card:hover::before { opacity:1; }
+.feat-icon {
+  width:48px; height:48px; border-radius:12px; margin-bottom:1.25rem;
+  background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2));
+  border:1px solid rgba(99,102,241,0.3);
+  display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+}
+.feat-card h3 { font-size:1rem; font-weight:700; margin-bottom:0.6rem; }
+.feat-card p { color:var(--muted); font-size:0.875rem; line-height:1.7; }
+
+/* ─── HOW IT WORKS ─── */
+.how-wrap {
+  background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(139,92,246,0.04));
+  border:1px solid var(--border); border-radius:24px; padding:3.5rem 3rem;
+}
+.steps { display:flex; flex-direction:column; gap:1.5rem; max-width:640px; margin:0 auto; }
+.step { display:flex; gap:1.25rem; align-items:flex-start; }
+.step-num {
+  width:36px; height:36px; border-radius:10px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:0.9rem; color:#fff;
+  box-shadow:0 0 16px var(--glow); margin-top:2px;
+}
+.step h4 { font-size:1rem; font-weight:700; margin-bottom:0.3rem; }
+.step p { color:var(--muted); font-size:0.875rem; line-height:1.65; }
+
+/* ─── PRICING ─── */
+.pricing-wrap {
+  max-width:480px; margin:0 auto;
+  background:linear-gradient(135deg,var(--card),var(--card2));
+  border:1px solid rgba(99,102,241,0.4);
+  border-radius:24px; padding:3rem;
+  text-align:center;
+  box-shadow: 0 0 60px rgba(99,102,241,0.15);
+  position:relative; overflow:hidden;
+}
+.pricing-wrap::before {
+  content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,0.15),transparent 70%);
+  pointer-events:none;
+}
+.price-tag {
+  font-size:3.2rem; font-weight:900; line-height:1;
+  background:linear-gradient(135deg,#818cf8,#c4b5fd);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.price-unit { font-size:1rem; color:var(--muted); font-weight:400; }
+.price-desc { color:var(--muted); margin:0.5rem 0 2rem; font-size:0.9rem; }
+
+.feature-list { list-style:none; text-align:left; margin-bottom:2rem; }
+.feature-list li {
+  display:flex; align-items:center; gap:10px;
+  padding:0.65rem 0; border-bottom:1px solid var(--border);
+  color:var(--text2); font-size:0.875rem;
+}
+.feature-list li:last-child { border-bottom:none; }
+.feature-list li::before {
+  content:"✓"; color:var(--green); font-weight:800; font-size:0.9rem; flex-shrink:0;
+}
+
+/* ─── DISCLAIMER ─── */
+.disclaimer {
+  max-width:860px; margin:0 auto 4rem;
+  padding:1.5rem 2rem;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--border); border-radius:14px;
+  font-size:0.82rem; color:var(--muted); line-height:1.75;
+  position:relative; z-index:1;
+}
+.disclaimer strong { color:var(--text2); }
+
+/* ─── FOOTER ─── */
+footer {
+  position:relative; z-index:1;
+  border-top:1px solid var(--border);
+  padding:2.5rem 2rem; text-align:center;
+  color:var(--muted); font-size:0.83rem;
+}
+footer a { color:var(--accent); text-decoration:none; }
+footer a:hover { color:var(--accent3); }
+
+/* ─── MODALS ─── */
+.overlay {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center;
+}
+.overlay.show { display:flex; }
+.modal-box {
+  background:var(--card); border:1px solid var(--border2);
+  border-radius:20px; padding:2.25rem; width:100%;
+  max-width:460px; margin:1rem;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-box h2 { font-size:1.4rem; font-weight:800; margin-bottom:0.4rem; }
+.modal-box > p { color:var(--muted); font-size:0.875rem; margin-bottom:1.75rem; }
+.fg { margin-bottom:1rem; }
+.fg label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:5px; font-weight:500; }
+.fg input,.fg select {
+  width:100%; padding:0.65rem 0.9rem;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:9px; color:var(--text); font-size:0.9rem;
+  font-family:inherit; transition:border-color 0.2s;
+}
+.fg input:focus,.fg select:focus { outline:none; border-color:var(--accent); }
+.modal-row { display:flex; gap:0.75rem; margin-top:1.5rem; }
+.btn-cancel { background:transparent; border:1px solid var(--border2); color:var(--muted); flex:1; }
+.btn-cancel:hover { border-color:var(--border); color:var(--text2); }
+.err-msg { color:#f87171; font-size:0.82rem; margin-top:0.5rem; display:none; }
+
+.result-box {
+  background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.3);
+  border-radius:12px; padding:1.25rem; margin-top:1rem; display:none;
+}
+.key-display {
+  font-family:monospace; font-size:0.78rem; color:var(--green);
+  word-break:break-all; background:rgba(16,185,129,0.08);
+  padding:0.6rem 0.75rem; border-radius:8px; margin-top:0.5rem;
+}
+.warn-text { color:var(--amber); font-size:0.78rem; margin-top:0.4rem; }
+
+/* Sandbox result */
+#sandboxResult {
+  display:none; margin-top:1rem;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; padding:1rem;
+  font-family:monospace; font-size:0.78rem; color:var(--green);
+  white-space:pre-wrap; word-break:break-all;
+  max-height:320px; overflow:auto;
+}
+
+/* Toast */
+#sessionToast {
+  display:none; position:fixed; bottom:1.5rem; left:50%;
+  transform:translateX(-50%);
+  background:var(--card2); border:1px solid var(--amber);
+  color:var(--amber); padding:0.8rem 1.75rem;
+  border-radius:12px; font-size:0.875rem; z-index:9999;
+  box-shadow:0 4px 24px rgba(0,0,0,0.4); text-align:center;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:640px) {
+  nav { padding:0 1rem; }
+  .hero-wrap { padding:3.5rem 1.25rem 3rem; }
+  .stat-item { border-right:none; border-bottom:1px solid var(--border); }
+  .stat-item:last-child { border-bottom:none; }
+  .section { padding:3.5rem 1.25rem; }
+  .how-wrap { padding:2rem 1.25rem; }
+  .pricing-wrap { padding:2rem 1.5rem; }
+  .modal-box { padding:1.75rem 1.25rem; border-radius:16px; }
+  .hero h1 { letter-spacing:-0.02em; }
+}
 </style>
 </head>
 <body>
 
+<!-- ═══ NAV ═══ -->
 <nav>
-  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;line-height:1">
-    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
-      <rect width="32" height="32" rx="7" fill="#111827"/>
-      <polygon points="16,3 27,9 27,21 16,27 5,21 5,9" fill="#0a0e1a" stroke="url(#ng)" stroke-width="1.2"/>
-      <text x="16" y="20" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="11" letter-spacing="-0.3" fill="url(#ng)">HSW</text>
+  <a href="/" class="nav-logo">
+    <!-- LOGO MARK -->
+    <svg class="logo-mark" width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6366f1"/>
+          <stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+        <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#818cf8"/>
+          <stop offset="100%" stop-color="#c4b5fd"/>
+        </linearGradient>
+        <filter id="glow1">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="36" height="36" rx="9" fill="#0f1623"/>
+      <rect x="0.5" y="0.5" width="35" height="35" rx="8.5" fill="none" stroke="url(#lg1)" stroke-width="1" opacity="0.5"/>
+      <!-- Hexagon -->
+      <polygon points="18,4 30,11 30,25 18,32 6,25 6,11" fill="none" stroke="url(#lg1)" stroke-width="1.4" stroke-linejoin="round"/>
+      <!-- Inner hex -->
+      <polygon points="18,9 25,13 25,21 18,25 11,21 11,13" fill="rgba(99,102,241,0.12)"/>
+      <!-- Circuit lines -->
+      <line x1="18" y1="4" x2="18" y2="9" stroke="url(#lg1)" stroke-width="1.2" opacity="0.7"/>
+      <line x1="30" y1="11" x2="25" y2="13" stroke="url(#lg1)" stroke-width="1.2" opacity="0.7"/>
+      <line x1="30" y1="25" x2="25" y2="21" stroke="url(#lg1)" stroke-width="1.2" opacity="0.7"/>
+      <!-- HSW text -->
+      <text x="18" y="21" text-anchor="middle"
+        font-family="'Inter',system-ui,sans-serif" font-weight="800"
+        font-size="9" letter-spacing="-0.3" fill="url(#lg2)" filter="url(#glow1)">HSW</text>
+      <!-- Corner dots -->
+      <circle cx="18" cy="4" r="1.5" fill="#6366f1"/>
+      <circle cx="30" cy="11" r="1.5" fill="#6366f1" opacity="0.7"/>
+      <circle cx="30" cy="25" r="1.5" fill="#8b5cf6" opacity="0.7"/>
+      <circle cx="18" cy="32" r="1.5" fill="#8b5cf6"/>
+      <circle cx="6" cy="25" r="1.5" fill="#6366f1" opacity="0.5"/>
+      <circle cx="6" cy="11" r="1.5" fill="#6366f1" opacity="0.5"/>
     </svg>
-    <span style="display:flex;flex-direction:column;gap:1px">
-      <span style="font-size:1rem;font-weight:800;color:#f9fafb;letter-spacing:-0.3px;line-height:1">AI<span style="color:#6366f1">TO</span>AI</span>
-      <span style="font-size:0.65rem;color:#6b7280;letter-spacing:0.08em;font-weight:500;line-height:1">CUSTOMS INTELLIGENCE</span>
+    <span style="display:flex;flex-direction:column;gap:1px;line-height:1">
+      <span style="font-size:0.95rem;font-weight:800;color:var(--text);letter-spacing:-0.02em">
+        AI<span style="color:var(--accent)">TO</span>AI
+      </span>
+      <span style="font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;font-weight:600;text-transform:uppercase">Customs Intelligence</span>
     </span>
   </a>
+
   <div class="nav-links">
-    <!-- Language Switcher -->
     <div class="lang-switcher">
       <button class="lang-btn active" onclick="setLang('th')">TH</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
       <button class="lang-btn" onclick="setLang('zh')">中文</button>
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
     </div>
-    <a href="/docs" class="btn btn-outline" target="_blank" data-i18n="nav_docs">API Docs</a>
+    <a href="/docs" class="btn btn-ghost" target="_blank" data-i18n="nav_docs">API Docs</a>
     <a id="navLoginBtn" href="/dashboard" class="btn btn-primary" data-i18n="nav_login">Client Login</a>
   </div>
 </nav>
 
-<div class="hero">
-  <div style="margin-bottom:1.5rem">
-    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block" aria-label="HSW logo">
-      <defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
-      <rect width="64" height="64" rx="14" fill="#111827"/>
-      <circle cx="32" cy="32" r="28" fill="none" stroke="#6366f1" stroke-width="0.8" opacity="0.3" stroke-dasharray="8 4"/>
-      <polygon points="32,8 52,19 52,43 32,54 12,43 12,19" fill="#0a0e1a" stroke="url(#hg)" stroke-width="1.5"/>
-      <text x="32" y="38" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="18" letter-spacing="-0.5" fill="url(#hg)">HSW</text>
-    </svg>
-  </div>
-  <div class="badge" data-i18n="badge">🇹🇭 Thai Customs Intelligence · AI-to-AI Economy</div>
-  <p style="font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.75rem;letter-spacing:0.02em" data-i18n="hero_subbadge">ระบบบริการเพื่ออำนวยความสะดวก<br>และส่งเสริมธุรกิจการค้าระหว่างประเทศ</p>
-  <h1 data-i18n="hero_title_html"></h1>
-  <p data-i18n="hero_desc"></p>
-  <p style="font-size:1rem;color:var(--muted);margin-top:-1.5rem;margin-bottom:2rem;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;letter-spacing:0.01em" data-i18n="hero_tagline">ระบบอัจฉริยะที่ให้บริการ เพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ ด้วยเทคโนโลยี AI ที่แม่นยำ รวดเร็ว และเชื่อถือได้</p>
-  <div class="hero-cta">
-    <button id="heroCtaMain" class="btn btn-primary btn-lg" onclick="openRegister()" data-i18n="cta_register">เริ่มต้นฟรี — รับ API Key</button>
-    <button class="btn btn-outline btn-lg" onclick="openSandboxDemo()" data-i18n="cta_try">ทดลองใช้ฟรี</button>
+<!-- ═══ HERO ═══ -->
+<div class="hero-wrap">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-inner">
+    <!-- Hero Logo -->
+    <div class="hero-logo-wrap">
+      <svg width="88" height="88" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hlg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="50%" stop-color="#8b5cf6"/>
+            <stop offset="100%" stop-color="#a78bfa"/>
+          </linearGradient>
+          <linearGradient id="hlg2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c4b5fd"/>
+            <stop offset="100%" stop-color="#818cf8"/>
+          </linearGradient>
+          <filter id="heroGlow">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="outerGlow">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.39 0 0 0 0 0.40 0 0 0 0 0.95 0 0 0 0.6 0"/>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect width="88" height="88" rx="20" fill="#0f1623"/>
+        <rect x="1" y="1" width="86" height="86" rx="19" fill="none" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <!-- Outer ring -->
+        <circle cx="44" cy="44" r="38" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="1" stroke-dasharray="4 6"/>
+        <!-- Main hexagon -->
+        <polygon points="44,10 70,26 70,58 44,74 18,58 18,26"
+          fill="rgba(99,102,241,0.1)" stroke="url(#hlg)" stroke-width="2" stroke-linejoin="round"
+          filter="url(#outerGlow)"/>
+        <!-- Inner hex -->
+        <polygon points="44,22 60,31 60,49 44,58 28,49 28,31"
+          fill="rgba(99,102,241,0.08)"/>
+        <!-- Circuit nodes -->
+        <circle cx="44" cy="10" r="3" fill="#6366f1" filter="url(#heroGlow)"/>
+        <circle cx="70" cy="26" r="2.5" fill="#7c3aed" opacity="0.8"/>
+        <circle cx="70" cy="58" r="2.5" fill="#8b5cf6" opacity="0.8"/>
+        <circle cx="44" cy="74" r="3" fill="#a78bfa" filter="url(#heroGlow)"/>
+        <circle cx="18" cy="58" r="2.5" fill="#6366f1" opacity="0.7"/>
+        <circle cx="18" cy="26" r="2.5" fill="#6366f1" opacity="0.7"/>
+        <!-- Connector lines -->
+        <line x1="44" y1="10" x2="44" y2="22" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="70" y1="26" x2="60" y2="31" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="70" y1="58" x2="60" y2="49" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="44" y1="74" x2="44" y2="58" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="18" y1="58" x2="28" y2="49" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="18" y1="26" x2="28" y2="31" stroke="url(#hlg)" stroke-width="1.5" opacity="0.6"/>
+        <!-- HSW text -->
+        <text x="44" y="50" text-anchor="middle"
+          font-family="'Inter',system-ui,sans-serif" font-weight="900"
+          font-size="22" letter-spacing="-1" fill="url(#hlg2)" filter="url(#heroGlow)">HSW</text>
+      </svg>
+    </div>
+
+    <div class="badge-pill">
+      <span class="badge-dot"></span>
+      <span data-i18n="badge">🇹🇭 Thai Customs Intelligence · AI-to-AI Economy</span>
+    </div>
+
+    <p style="font-size:1.05rem;font-weight:600;color:var(--text2);margin-bottom:0.75rem;letter-spacing:0.01em;line-height:1.6" data-i18n="hero_subbadge">ระบบบริการเพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ</p>
+
+    <h1 data-i18n="hero_title_html"><span class="grad-text">ระบบจำแนกพิกัดศุลกากร</span><br>สำหรับ AI Agent</h1>
+
+    <p class="hero-sub" data-i18n="hero_desc">API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ</p>
+
+    <p class="hero-tagline" data-i18n="hero_tagline">ระบบอัจฉริยะที่ให้บริการ เพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ ด้วยเทคโนโลยี AI ที่แม่นยำ รวดเร็ว และเชื่อถือได้</p>
+
+    <div class="hero-cta">
+      <button id="heroCtaMain" class="btn btn-primary btn-xl" onclick="openRegister()" data-i18n="cta_register">เริ่มต้นฟรี — รับ API Key</button>
+      <button class="btn btn-outline-accent btn-xl" onclick="openSandboxDemo()" data-i18n="cta_try">ทดลองใช้ฟรี</button>
+    </div>
   </div>
 </div>
 
-<div class="stats">
-  <div class="stat"><div class="stat-num">6,000+</div><div class="stat-label" data-i18n="stat_hs">HS Code รองรับ</div></div>
-  <div class="stat"><div class="stat-num">13</div><div class="stat-label">ความตกลง FTA</div></div>
-  <div class="stat"><div class="stat-num">$0.50</div><div class="stat-label" data-i18n="stat_price">ต่อ 1 รายการ</div></div>
-  <div class="stat"><div class="stat-num">&lt;2s</div><div class="stat-label" data-i18n="stat_speed">Response time</div></div>
+<!-- ═══ STATS ═══ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">12,247+</div>
+      <div class="stat-label" data-i18n="stat_hs">HS Code ที่รองรับ</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">13</div>
+      <div class="stat-label" data-i18n="stat_fta">ความตกลง FTA</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">$0.50</div>
+      <div class="stat-label" data-i18n="stat_price">ต่อ 1 รายการ</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">&lt;2s</div>
+      <div class="stat-label" data-i18n="stat_speed">Response time</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">21</div>
+      <div class="stat-label" data-i18n="stat_halal">ประเทศ Halal</div>
+    </div>
+  </div>
 </div>
 
+<!-- ═══ FEATURES ═══ -->
 <div class="section">
+  <div class="section-eyebrow" data-i18n="why_eyebrow">CAPABILITIES</div>
   <div class="section-title" data-i18n="why_title">ทำไมต้องเลือกเรา</div>
   <div class="section-sub" data-i18n="why_sub">ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง</div>
   <div class="grid-3">
-    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">🎯</div><h3 data-i18n="f1_title">HS Code Classification</h3><p data-i18n="f1_desc">จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p></div>
-    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">💰</div><h3 data-i18n="f2_title">คำนวณภาษีอัตโนมัติ</h3><p data-i18n="f2_desc">คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p></div>
-    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">⚡</div><h3 data-i18n="f3_title">AI-Native API</h3><p data-i18n="f3_desc">รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p></div>
-    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">🔒</div><h3 data-i18n="f4_title">Prepaid Credit</h3><p data-i18n="f4_desc">ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p></div>
-    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">📋</div><h3 data-i18n="f5_title">OGA Compliance Check</h3><p data-i18n="f5_desc">ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p></div>
-    <div class="card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})" style="cursor:pointer" title="ดูวิธีเริ่มต้นใช้งาน"><div class="card-icon">🌏</div><h3 data-i18n="f6_title">ASEAN Ready</h3><p data-i18n="f6_desc">รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p></div>
+    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
+      <div class="feat-icon">🎯</div>
+      <h3 data-i18n="f1_title">HS Code Classification</h3>
+      <p data-i18n="f1_desc">จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p>
+    </div>
+    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
+      <div class="feat-icon">💰</div>
+      <h3 data-i18n="f2_title">คำนวณภาษีอัตโนมัติ</h3>
+      <p data-i18n="f2_desc">คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p>
+    </div>
+    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
+      <div class="feat-icon">⚡</div>
+      <h3 data-i18n="f3_title">AI-Native API</h3>
+      <p data-i18n="f3_desc">รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p>
+    </div>
+    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
+      <div class="feat-icon">🔐</div>
+      <h3 data-i18n="f4_title">Prepaid Credit</h3>
+      <p data-i18n="f4_desc">ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p>
+    </div>
+    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
+      <div class="feat-icon">📋</div>
+      <h3 data-i18n="f5_title">OGA Compliance Check</h3>
+      <p data-i18n="f5_desc">ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p>
+    </div>
+    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
+      <div class="feat-icon">🌏</div>
+      <h3 data-i18n="f6_title">ASEAN Ready</h3>
+      <p data-i18n="f6_desc">รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p>
+    </div>
   </div>
 </div>
 
-<div class="section" id="how-to" style="background:var(--card);border-radius:16px;border:1px solid var(--border);padding:3rem 2rem;">
-  <div class="section-title" data-i18n="how_title">วิธีเริ่มต้นใช้งาน</div>
-  <div class="section-sub" data-i18n="how_sub">4 ขั้นตอน เริ่มได้ใน 2 นาที</div>
-  <div class="steps">
-    <div class="step"><div class="step-num">1</div><div class="step-content"><h4 data-i18n="s1_title">สมัครรับ API Key ฟรี</h4><p data-i18n="s1_desc">ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที</p></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content"><h4 data-i18n="s2_title">ทดลองใช้ Sandbox ฟรี</h4><p data-i18n="s2_desc">POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย</p></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content"><h4 data-i18n="s3_title">เติม Credit เพื่อใช้ Production</h4><p data-i18n="s3_desc">เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท</p></div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content"><h4 data-i18n="s4_title">เรียก API ได้เลย</h4><p data-i18n="s4_desc">POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ</p></div></div>
+<!-- ═══ HOW IT WORKS ═══ -->
+<div class="section" id="how-to">
+  <div class="how-wrap">
+    <div class="section-eyebrow" data-i18n="how_eyebrow">GET STARTED</div>
+    <div class="section-title" data-i18n="how_title">วิธีเริ่มต้นใช้งาน</div>
+    <div class="section-sub" data-i18n="how_sub">4 ขั้นตอน เริ่มได้ใน 2 นาที</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4 data-i18n="s1_title">สมัครรับ API Key ฟรี</h4>
+          <p data-i18n="s1_desc">ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4 data-i18n="s2_title">ทดลองใช้ Sandbox ฟรี</h4>
+          <p data-i18n="s2_desc">POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4 data-i18n="s3_title">เติม Credit เพื่อใช้ Production</h4>
+          <p data-i18n="s3_desc">เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h4 data-i18n="s4_title">เรียก API ได้เลย</h4>
+          <p data-i18n="s4_desc">POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- ═══ PRICING ═══ -->
 <div class="section">
+  <div class="section-eyebrow" data-i18n="price_eyebrow">PRICING</div>
   <div class="section-title" data-i18n="price_title">ราคา</div>
   <div class="section-sub" data-i18n="price_sub">ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง</div>
-  <div class="pricing-card">
-    <div class="price">$0.50 <span data-i18n="per_item">/ query</span></div>
-    <div class="price-desc" data-i18n="price_desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</div>
+  <div class="pricing-wrap">
+    <div class="price-tag">$0.50 <span class="price-unit" data-i18n="per_item">/ query</span></div>
+    <p class="price-desc" data-i18n="price_desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</p>
     <ul class="feature-list">
       <li data-i18n="pf1">HS Code Classification พร้อม Confidence Score</li>
       <li data-i18n="pf2">คำนวณภาษีนำเข้า + VAT อัตโนมัติ</li>
@@ -204,41 +691,46 @@
   </div>
 </div>
 
-
-<!-- LEGAL DISCLAIMER -->
-<div style="max-width:860px;margin:2rem auto;padding:1.5rem 2rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;font-size:0.82rem;color:var(--muted);line-height:1.7">
-  <p style="font-weight:600;color:var(--text);margin-bottom:0.5rem">⚠️ <span data-i18n="disclaimer_title">ข้อจำกัดความรับผิดชอบ</span></p>
-  <p data-i18n="disclaimer_body">ข้อมูลที่ได้จากระบบนี้ — รวมถึงพิกัดศุลกากร (HS Code) อัตราภาษี ใบอนุญาต OGA และสถานะ Halal — มีวัตถุประสงค์เพื่อ <strong>อำนวยความสะดวกในการค้นหาข้อมูลเบื้องต้นเท่านั้น</strong> ไม่ถือเป็นคำวินิจฉัย คำตัดสิน หรือคำแนะนำทางกฎหมายแต่อย่างใด ผู้ใช้งานควรตรวจสอบกับกรมศุลกากร หน่วยงาน OGA ที่เกี่ยวข้อง หรือผู้เชี่ยวชาญด้านกฎหมายศุลกากรก่อนดำเนินการทางการค้าทุกครั้ง AI TO AI HOLDING ไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการนำข้อมูลนี้ไปใช้โดยไม่ตรวจสอบเพิ่มเติม</p>
+<!-- ═══ DISCLAIMER ═══ -->
+<div class="disclaimer">
+  <p style="font-weight:700;color:var(--text2);margin-bottom:0.5rem">⚠️ <span data-i18n="disclaimer_title">ข้อจำกัดความรับผิดชอบ</span></p>
+  <p data-i18n="disclaimer_body">ข้อมูลที่ได้จากระบบนี้ — รวมถึงพิกัดศุลกากร (HS Code) อัตราภาษี ใบอนุญาต OGA และสถานะ Halal — มีวัตถุประสงค์เพื่อ <strong>อำนวยความสะดวกในการค้นหาข้อมูลเบื้องต้นเท่านั้น</strong> ไม่ถือเป็นคำวินิจฉัย คำตัดสิน หรือคำแนะนำทางกฎหมายแต่อย่างใด ผู้ใช้งานควรตรวจสอบกับกรมศุลกากร หน่วยงาน OGA ที่เกี่ยวข้อง หรือผู้เชี่ยวชาญด้านกฎหมายศุลกากรก่อนดำเนินการทางการค้าทุกครั้ง</p>
 </div>
+
+<!-- ═══ FOOTER ═══ -->
 <footer>
-  <div style="margin-bottom:1.25rem">
-    <svg width="48" height="48" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;opacity:0.7" aria-hidden="true">
-      <defs><linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
-      <rect width="64" height="64" rx="14" fill="#111827"/>
-      <polygon points="32,8 52,19 52,43 32,54 12,43 12,19" fill="#0a0e1a" stroke="url(#fg)" stroke-width="1.5"/>
-      <text x="32" y="38" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="18" letter-spacing="-0.5" fill="url(#fg)">HSW</text>
+  <div style="margin-bottom:1.5rem">
+    <svg width="44" height="44" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" style="opacity:0.7">
+      <defs>
+        <linearGradient id="flg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+      </defs>
+      <rect width="36" height="36" rx="9" fill="#0f1623"/>
+      <polygon points="18,4 30,11 30,25 18,32 6,25 6,11" fill="none" stroke="url(#flg)" stroke-width="1.4"/>
+      <text x="18" y="21" text-anchor="middle" font-family="'Inter',sans-serif" font-weight="800" font-size="9" fill="url(#flg)">HSW</text>
     </svg>
-    <p style="margin-top:0.5rem;font-weight:700;color:#6366f1;letter-spacing:0.05em;font-size:0.85rem">AI TO AI HOLDING</p>
+    <p style="margin-top:0.5rem;font-weight:700;color:var(--accent);letter-spacing:0.06em;font-size:0.82rem">AI TO AI HOLDING</p>
   </div>
-  <p>© 2026 AI TO AI HOLDING · <a href="/docs">API Documentation</a> · <a href="/.well-known/ai-plugin.json">AI Plugin Manifest</a></p>
+  <p>© 2026 AI TO AI HOLDING · <a href="/docs">API Documentation</a> · <a href="/.well-known/ai-plugin.json">AI Plugin</a></p>
   <p style="margin-top:0.5rem" data-i18n="footer_sub">Customs Intelligence Division · Built for AI Agents</p>
 </footer>
 
-<!-- REGISTER MODAL -->
-<div class="modal-overlay" id="registerModal">
-  <div class="modal">
+<!-- ═══ REGISTER MODAL ═══ -->
+<div class="overlay" id="registerModal">
+  <div class="modal-box">
     <h2 data-i18n="reg_title">สมัครรับ API Key</h2>
     <p data-i18n="reg_sub">ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที</p>
     <div id="registerForm">
-      <div class="form-group">
+      <div class="fg">
         <label data-i18n="reg_name">ชื่อ AI Agent / ระบบของคุณ</label>
-        <input type="text" id="agentName" data-i18n-placeholder="reg_name_ph" placeholder="เช่น MyTradingBot" />
+        <input type="text" id="agentName" data-i18n-placeholder="reg_name_ph" placeholder="เช่น MyTradingBot"/>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Email</label>
-        <input type="email" id="email" placeholder="your@email.com" />
+        <input type="email" id="email" placeholder="your@email.com"/>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label data-i18n="reg_type">ประเภทงาน</label>
         <select id="profession">
           <option value="IMPORT_AI" data-i18n="prof_import">นำเข้าสินค้า (Import)</option>
@@ -248,270 +740,279 @@
           <option value="UNKNOWN" data-i18n="prof_other">อื่นๆ</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label data-i18n="reg_sys">ระบบ AI ที่ใช้ (ไม่บังคับ)</label>
-        <input type="text" id="originSystem" placeholder="Claude, GPT-4, LangChain..." />
+        <input type="text" id="originSystem" placeholder="Claude, GPT-4, LangChain..."/>
       </div>
-      <div id="errorMsg" class="error-msg"></div>
-      <p style="text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--muted)">
-        มี Key แล้วแต่ลืม? <a href="#" onclick="closeRegister();openRecover();return false;" style="color:var(--purple);text-decoration:underline">กู้คืน API Key</a>
+      <div id="errorMsg" class="err-msg"></div>
+      <p style="text-align:center;margin-top:1rem;font-size:0.82rem;color:var(--muted)">
+        มี Key แล้วแต่ลืม? <a href="#" onclick="closeRegister();openRecover();return false;" style="color:var(--accent3);text-decoration:underline">กู้คืน API Key</a>
       </p>
-      <div class="modal-footer">
+      <div class="modal-row">
         <button class="btn btn-cancel btn-lg" onclick="closeRegister()" data-i18n="cancel">ยกเลิก</button>
         <button class="btn btn-primary btn-lg" style="flex:2" onclick="doRegister()" id="registerBtn" data-i18n="reg_submit">สมัครเลย</button>
       </div>
     </div>
     <div class="result-box" id="resultBox">
-      <div style="color:var(--green);font-weight:600;margin-bottom:0.5rem" data-i18n="reg_success">✅ สมัครสำเร็จ!</div>
-      <div style="font-size:0.85rem;color:var(--muted)" data-i18n="reg_key_label">API Key ของคุณ:</div>
-      <div class="key" id="resultKey"></div>
-      <div class="warn" data-i18n="reg_warn">⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก</div>
-      <div style="margin-top:1rem;display:flex;gap:0.75rem;">
-        <button class="btn btn-outline" style="flex:1" onclick="copyKey()" data-i18n="copy">📋 Copy Key</button>
-        <a href="/dashboard" class="btn btn-primary" style="flex:1;text-align:center" data-i18n="go_dashboard">ไปที่ Dashboard →</a>
+      <div style="color:var(--green);font-weight:700;margin-bottom:0.4rem" data-i18n="reg_success">✅ สมัครสำเร็จ!</div>
+      <div style="font-size:0.82rem;color:var(--muted)" data-i18n="reg_key_label">API Key ของคุณ:</div>
+      <div class="key-display" id="resultKey"></div>
+      <div class="warn-text" data-i18n="reg_warn">⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก</div>
+      <div style="margin-top:1rem;display:flex;gap:0.75rem">
+        <button class="btn btn-ghost" style="flex:1" onclick="copyKey()" data-i18n="copy">📋 Copy Key</button>
+        <a href="/dashboard" class="btn btn-primary" style="flex:1;justify-content:center" data-i18n="go_dashboard">Dashboard →</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SANDBOX DEMO MODAL -->
-<div class="modal-overlay" id="sandboxModal">
-  <div class="modal" style="max-width:540px">
+<!-- ═══ SANDBOX MODAL ═══ -->
+<div class="overlay" id="sandboxModal">
+  <div class="modal-box" style="max-width:540px">
     <h2 data-i18n="sandbox_title">🧪 ทดลอง Sandbox ฟรี</h2>
     <p data-i18n="sandbox_sub">ไม่ต้อง API Key ไม่ต้องเติม credit</p>
-    <div class="form-group">
+    <div class="fg">
       <label data-i18n="sandbox_label">คำบรรยายสินค้า</label>
-      <input type="text" id="sandboxDesc" data-i18n-placeholder="sandbox_ph" placeholder="เช่น iPhone 15 Pro Max 256GB" style="font-size:1rem;padding:0.75rem" />
-      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
-        <div style="flex:1">
-          <label style="font-size:0.78rem;color:var(--muted)">ถิ่นกำเนิดสินค้า</label>
-          <select id="sandboxOrigin" style="width:100%;padding:0.5rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:0.85rem">
+      <input type="text" id="sandboxDesc" data-i18n-placeholder="sandbox_ph" placeholder="เช่น iPhone 15 Pro Max 256GB" style="font-size:1rem;padding:0.75rem"/>
+    </div>
+    <div style="display:flex;gap:0.75rem;margin-top:0.75rem">
+      <div style="flex:1">
+        <div class="fg">
+          <label style="font-size:0.78rem">ถิ่นกำเนิดสินค้า</label>
+          <select id="sandboxOrigin">
             <option value="">ไม่ระบุ</option>
-            <option value="CN">🇨🇳 จีน (CN)</option>
-            <option value="JP">🇯🇵 ญี่ปุ่น (JP)</option>
-            <option value="US">🇺🇸 สหรัฐฯ (US)</option>
-            <option value="KR">🇰🇷 เกาหลีใต้ (KR)</option>
-            <option value="TW">🇹🇼 ไต้หวัน (TW)</option>
-            <option value="DE">🇩🇪 เยอรมนี (DE)</option>
-            <option value="GB">🇬🇧 อังกฤษ (GB)</option>
-            <option value="TH">🇹🇭 ไทย (TH)</option>
-            <option value="VN">🇻🇳 เวียดนาม (VN)</option>
-            <option value="IN">🇮🇳 อินเดีย (IN)</option>
+            <option value="CN">🇨🇳 จีน</option>
+            <option value="JP">🇯🇵 ญี่ปุ่น</option>
+            <option value="US">🇺🇸 สหรัฐฯ</option>
+            <option value="KR">🇰🇷 เกาหลีใต้</option>
+            <option value="TW">🇹🇼 ไต้หวัน</option>
+            <option value="DE">🇩🇪 เยอรมนี</option>
+            <option value="GB">🇬🇧 อังกฤษ</option>
+            <option value="TH">🇹🇭 ไทย</option>
+            <option value="VN">🇻🇳 เวียดนาม</option>
+            <option value="IN">🇮🇳 อินเดีย</option>
           </select>
         </div>
-        <div style="flex:1">
-          <label style="font-size:0.78rem;color:var(--muted)">ปลายทาง (สำหรับ Halal)</label>
-          <select id="sandboxDest" style="width:100%;padding:0.5rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:0.85rem">
-            <option value="TH">🇹🇭 ไทย (TH)</option>
-            <option value="SA">🇸🇦 ซาอุฯ (SA)</option>
-            <option value="AE">🇦🇪 UAE (AE)</option>
-            <option value="MY">🇲🇾 มาเลเซีย (MY)</option>
-            <option value="ID">🇮🇩 อินโดนีเซีย (ID)</option>
-            <option value="QA">🇶🇦 กาตาร์ (QA)</option>
-            <option value="EG">🇪🇬 อียิปต์ (EG)</option>
-            <option value="JP">🇯🇵 ญี่ปุ่น (JP)</option>
-            <option value="US">🇺🇸 สหรัฐฯ (US)</option>
-            <option value="DE">🇩🇪 เยอรมนี (DE)</option>
+      </div>
+      <div style="flex:1">
+        <div class="fg">
+          <label style="font-size:0.78rem">ปลายทาง (สำหรับ Halal)</label>
+          <select id="sandboxDest">
+            <option value="TH">🇹🇭 ไทย</option>
+            <option value="SA">🇸🇦 ซาอุฯ</option>
+            <option value="AE">🇦🇪 UAE</option>
+            <option value="MY">🇲🇾 มาเลเซีย</option>
+            <option value="ID">🇮🇩 อินโดนีเซีย</option>
+            <option value="QA">🇶🇦 กาตาร์</option>
+            <option value="JP">🇯🇵 ญี่ปุ่น</option>
+            <option value="US">🇺🇸 สหรัฐฯ</option>
+            <option value="DE">🇩🇪 เยอรมนี</option>
           </select>
         </div>
       </div>
     </div>
-    <div id="sandboxError" class="error-msg"></div>
-    <div class="modal-footer">
+    <div id="sandboxError" class="err-msg"></div>
+    <div class="modal-row">
       <button class="btn btn-cancel btn-lg" onclick="closeSandbox()" data-i18n="cancel">ยกเลิก</button>
       <button class="btn btn-green btn-lg" style="flex:2" onclick="doSandbox()" id="sandboxBtn" data-i18n="sandbox_btn">จำแนก HS Code →</button>
     </div>
-    <div id="sandboxResult" style="display:none;margin-top:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.8rem;color:var(--green);white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto"></div>
+    <div id="sandboxResult"></div>
   </div>
 </div>
 
-
-<!-- Recover Key Modal -->
-<div class="modal-overlay" id="recoverModal">
-  <div class="modal">
+<!-- ═══ RECOVER MODAL ═══ -->
+<div class="overlay" id="recoverModal">
+  <div class="modal-box">
     <h2>🔑 ลืม API Key?</h2>
     <p>ยืนยันตัวตนด้วย Email และชื่อ Agent ที่ใช้สมัคร — ระบบจะออก Key ใหม่ให้</p>
     <div id="recoverForm">
-      <div class="form-group">
+      <div class="fg">
         <label>Email ที่ใช้สมัคร</label>
-        <input type="email" id="recoverEmail" placeholder="your@email.com" style="width:100%;padding:0.6rem 0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem">
+        <input type="email" id="recoverEmail" placeholder="your@email.com"/>
       </div>
-      <div class="form-group" style="margin-top:1rem">
+      <div class="fg">
         <label>ชื่อ Agent (ตรงกับที่สมัคร)</label>
-        <input type="text" id="recoverAgentName" placeholder="เช่น MyTradingBot" style="width:100%;padding:0.6rem 0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem">
+        <input type="text" id="recoverAgentName" placeholder="เช่น MyTradingBot"/>
       </div>
-      <div id="recoverError" class="error-msg"></div>
-      <div class="modal-footer">
-        <button class="btn btn-cancel" onclick="closeRecover()">ยกเลิก</button>
-        <button class="btn btn-primary" id="recoverBtn" onclick="doRecover()">กู้คืน Key →</button>
+      <div id="recoverError" class="err-msg"></div>
+      <div class="modal-row">
+        <button class="btn btn-cancel btn-lg" onclick="closeRecover()">ยกเลิก</button>
+        <button class="btn btn-primary btn-lg" style="flex:2" id="recoverBtn" onclick="doRecover()">กู้คืน Key →</button>
       </div>
     </div>
     <div id="recoverResult" style="display:none;margin-top:1rem">
       <div class="result-box" style="display:block">
-        <div style="color:var(--green);font-weight:700;margin-bottom:0.5rem">✅ กู้คืนสำเร็จ!</div>
-        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">API Key ใหม่ของคุณ (เก็บไว้ให้ดี จะไม่แสดงอีก):</div>
-        <code id="recoveredKey" style="font-size:0.8rem;word-break:break-all;color:var(--green)"></code>
+        <div style="color:var(--green);font-weight:700;margin-bottom:0.4rem">✅ กู้คืนสำเร็จ!</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.4rem">API Key ใหม่ของคุณ (เก็บไว้ให้ดี จะไม่แสดงอีก):</div>
+        <code id="recoveredKey" style="font-size:0.78rem;word-break:break-all;color:var(--green)"></code>
       </div>
       <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="closeRecover()">ปิด</button>
     </div>
   </div>
 </div>
+
+<div id="sessionToast">⚠️ Session หมดอายุ กรุณาล็อคอินใหม่</div>
+
 <script>
 const API = 'https://web-production-c9da4.up.railway.app';
 
 // ── i18n DATA ─────────────────────────────────────────────────
 const i18n = {
   th: {
-    nav_docs: 'API Docs', nav_login: 'Client Login',
-    badge: '🇹🇭 Thai Customs Intelligence · AI-to-AI Economy',
-    hero_title_html: 'ระบบจำแนกพิกัดศุลกากร<br><span>สำหรับ AI Agent</span>',
-    hero_desc: 'API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ',
-    hero_tagline: 'ระบบอัจฉริยะที่ให้บริการ เพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ ด้วยเทคโนโลยี AI ที่แม่นยำ รวดเร็ว และเชื่อถือได้',
-    cta_register: 'เริ่มต้นฟรี — รับ API Key', cta_try: 'ทดลองใช้ฟรี',
-    stat_hs: 'HS Code ที่รองรับ', stat_uptime: 'ให้บริการตลอดเวลา', stat_price: 'ต่อ 1 รายการ', stat_speed: 'Response time',
-    why_title: 'ทำไมต้องเลือกเรา', why_sub: 'ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง',
-    f1_title: 'HS Code Classification', f1_desc: 'จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง',
-    f2_title: 'คำนวณภาษีอัตโนมัติ', f2_desc: 'คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน',
-    f3_title: 'AI-Native API', f3_desc: 'รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ',
-    f4_title: 'Prepaid Credit', f4_desc: 'ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน',
-    f5_title: 'OGA Compliance Check', f5_desc: 'ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า',
-    f6_title: 'ASEAN Ready', f6_desc: 'รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก',
-    how_title: 'วิธีเริ่มต้นใช้งาน', how_sub: '4 ขั้นตอน เริ่มได้ใน 2 นาที',
-    hero_subbadge: 'ระบบบริการเพื่ออำนวยความสะดวก'<br>'และส่งเสริมธุรกิจการค้าระหว่างประเทศ',
-    s1_title: 'สมัครรับ API Key ฟรี', s1_desc: 'ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที',
-    s2_title: 'ทดลองใช้ Sandbox ฟรี', s2_desc: 'POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย',
-    s3_title: 'เติม Credit เพื่อใช้ Production', s3_desc: 'เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท',
-    s4_title: 'เรียก API ได้เลย', s4_desc: 'POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ',
-    price_title: 'ราคา', price_sub: 'ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง',
-    per_item: '/ query', price_desc: 'จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร',
+    nav_docs:'API Docs', nav_login:'Client Login',
+    badge:'🇹🇭 Thai Customs Intelligence · AI-to-AI Economy',
+    hero_subbadge:'ระบบบริการเพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ',
+    hero_title_html:'<span class="grad-text">ระบบจำแนกพิกัดศุลกากร</span><br>สำหรับ AI Agent',
+    hero_desc:'API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ',
+    hero_tagline:'ระบบอัจฉริยะที่ให้บริการ เพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ ด้วยเทคโนโลยี AI ที่แม่นยำ รวดเร็ว และเชื่อถือได้',
+    cta_register:'เริ่มต้นฟรี — รับ API Key', cta_try:'ทดลองใช้ฟรี',
+    stat_hs:'HS Code ที่รองรับ', stat_fta:'ความตกลง FTA', stat_price:'ต่อ 1 รายการ', stat_speed:'Response time', stat_halal:'ประเทศ Halal',
+    why_eyebrow:'CAPABILITIES', why_title:'ทำไมต้องเลือกเรา', why_sub:'ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง',
+    f1_title:'HS Code Classification', f1_desc:'จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง',
+    f2_title:'คำนวณภาษีอัตโนมัติ', f2_desc:'คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน',
+    f3_title:'AI-Native API', f3_desc:'รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ',
+    f4_title:'Prepaid Credit', f4_desc:'ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน',
+    f5_title:'OGA Compliance Check', f5_desc:'ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า',
+    f6_title:'ASEAN Ready', f6_desc:'รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก',
+    how_eyebrow:'GET STARTED', how_title:'วิธีเริ่มต้นใช้งาน', how_sub:'4 ขั้นตอน เริ่มได้ใน 2 นาที',
+    s1_title:'สมัครรับ API Key ฟรี', s1_desc:'ไม่ต้องใช้บัตรเครดิต ไม่มีค่าสมัคร รับ API Key ทันที',
+    s2_title:'ทดลองใช้ Sandbox ฟรี', s2_desc:'POST /v1/sandbox/classify ไม่ต้องเติม credit ทดสอบได้เลย',
+    s3_title:'เติม Credit เพื่อใช้ Production', s3_desc:'เติมขั้นต่ำ $5 ผ่าน Stripe ปลอดภัย รองรับบัตรเครดิตทุกประเภท',
+    s4_title:'เรียก API ได้เลย', s4_desc:'POST /v1/customs/classify พร้อม X-API-Key header ระบบจะหักค่าบริการอัตโนมัติ',
+    price_eyebrow:'PRICING', price_title:'ราคา', price_sub:'ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง',
+    per_item:'/ query', price_desc:'จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร',
     pf1:'HS Code Classification พร้อม Confidence Score', pf2:'คำนวณภาษีนำเข้า + VAT อัตโนมัติ', pf3:'OGA Compliance Check', pf4:'อ้างอิงกฎหมายทุกผลลัพธ์', pf5:'Sandbox ฟรี (ไม่ต้องใช้ API Key)', pf6:'รองรับ MCP, GPT Actions, LangChain', pf7:'FTA 13 ความตกลง — หาอัตราภาษีดีสุดอัตโนมัติ', pf8:'Halal Engine 21 ประเทศ',
     disclaimer_title:'ข้อจำกัดความรับผิดชอบ', disclaimer_body:'ข้อมูลที่ได้จากระบบนี้ รวมถึงพิกัดศุลกากร อัตราภาษี ใบอนุญาต OGA และสถานะ Halal มีวัตถุประสงค์เพื่ออำนวยความสะดวกในการค้นหาข้อมูลเบื้องต้นเท่านั้น ไม่ถือเป็นคำวินิจฉัยหรือคำแนะนำทางกฎหมาย ควรตรวจสอบกับกรมศุลกากรหรือผู้เชี่ยวชาญก่อนดำเนินการทางการค้าทุกครั้ง',
-    footer_sub: 'Customs Intelligence Division · Built for AI Agents',
-    reg_title: 'สมัครรับ API Key', reg_sub: 'ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที',
-    reg_name: 'ชื่อ AI Agent / ระบบของคุณ', reg_name_ph: 'เช่น MyTradingBot, Claude-Customs',
-    reg_type: 'ประเภทงาน', reg_sys: 'ระบบ AI ที่ใช้ (ไม่บังคับ)',
-    prof_import: 'นำเข้าสินค้า (Import)', prof_export: 'ส่งออกสินค้า (Export)', prof_broker: 'ตัวแทนศุลกากร (Broker)', prof_other: 'อื่นๆ',
-    cancel: 'ยกเลิก', reg_submit: 'สมัครเลย',
-    reg_success: '✅ สมัครสำเร็จ!', reg_key_label: 'API Key ของคุณ:', reg_warn: '⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก',
-    copy: '📋 Copy Key', go_dashboard: 'ไปที่ Dashboard →',
-    sandbox_title: '🧪 ทดลอง Sandbox ฟรี', sandbox_sub: 'ไม่ต้อง API Key ไม่ต้องเติม credit',
-    sandbox_label: 'คำบรรยายสินค้า', sandbox_ph: 'เช่น iPhone 15 Pro Max 256GB', sandbox_btn: 'จำแนก HS Code →',
+    footer_sub:'Customs Intelligence Division · Built for AI Agents',
+    reg_title:'สมัครรับ API Key', reg_sub:'ฟรี ไม่ต้องใช้บัตรเครดิต รับ key ทันที',
+    reg_name:'ชื่อ AI Agent / ระบบของคุณ', reg_name_ph:'เช่น MyTradingBot',
+    reg_type:'ประเภทงาน', reg_sys:'ระบบ AI ที่ใช้ (ไม่บังคับ)',
+    prof_import:'นำเข้าสินค้า (Import)', prof_export:'ส่งออกสินค้า (Export)', prof_broker:'ตัวแทนศุลกากร (Broker)', prof_other:'อื่นๆ',
+    cancel:'ยกเลิก', reg_submit:'สมัครเลย',
+    reg_success:'✅ สมัครสำเร็จ!', reg_key_label:'API Key ของคุณ:', reg_warn:'⚠️ บันทึก key นี้ไว้ให้ดี จะไม่แสดงอีก',
+    copy:'📋 Copy Key', go_dashboard:'Dashboard →',
+    sandbox_title:'🧪 ทดลอง Sandbox ฟรี', sandbox_sub:'ไม่ต้อง API Key ไม่ต้องเติม credit',
+    sandbox_label:'คำบรรยายสินค้า', sandbox_ph:'เช่น iPhone 15 Pro Max 256GB', sandbox_btn:'จำแนก HS Code →',
   },
   en: {
-    nav_docs: 'API Docs', nav_login: 'Client Login',
-    badge: '🇹🇭 Thai Customs Intelligence · AI-to-AI Economy',
-    hero_title_html: 'Thai Customs Classification<br><span>for AI Agents</span>',
-    hero_desc: 'Intelligent API for HS Code classification and import/export duty calculation for Thailand. Real legal references, high accuracy — built for AI agents and automated systems.',
-    hero_tagline: 'An intelligent platform serving to facilitate and promote international trade — powered by AI that is accurate, fast, and reliable.',
-    hero_subbadge: 'A Service Platform to Facilitate<br>and Promote International Trade',
-    cta_register: 'Get Started Free — API Key', cta_try: 'Try Free Sandbox',
-    stat_hs: 'HS Codes Supported', stat_uptime: 'Always Online', stat_price: 'per item', stat_speed: 'Response time',
-    why_title: 'Why Choose Us', why_sub: 'Built exclusively for AI Agents, not humans',
-    f1_title: 'HS Code Classification', f1_desc: 'Classify Harmonized System Codes (6–10 digits) with Confidence Score and Thai customs law citations every time.',
-    f2_title: 'Automatic Tax Calculation', f2_desc: 'Calculate import duties, VAT, and other fees automatically under current Thai law.',
-    f3_title: 'AI-Native API', f3_desc: 'Supports MCP Protocol, GPT Actions, LangChain, and Function Calling. AI agents discover us automatically.',
-    f4_title: 'Prepaid Credit', f4_desc: 'No contracts. Top up credit in advance, pay only for what you use. No monthly fees.',
-    f5_title: 'OGA Compliance Check', f5_desc: 'Checks which agencies (FDA, TIS, etc.) your goods must pass before import.',
-    f6_title: 'ASEAN Ready', f6_desc: 'Supports cross-border trade within ASEAN and RCEP, expanding globally.',
-    how_title: 'How to Get Started', how_sub: '4 steps, ready in 2 minutes',
-    s1_title: 'Get a Free API Key', s1_desc: 'No credit card required. No sign-up fee. Receive your API Key instantly.',
-    s2_title: 'Try the Free Sandbox', s2_desc: 'POST /v1/sandbox/classify — no credit needed, test right away.',
-    s3_title: 'Top Up Credit for Production', s3_desc: 'Minimum $5 via Stripe. Secure, supports all major credit cards.',
-    s4_title: 'Call the API', s4_desc: 'POST /v1/customs/classify with X-API-Key header. Credits deducted automatically.',
-    price_title: 'Pricing', price_sub: 'No monthly fee. Pay only for what you use.',
-    per_item: '/ item', price_desc: 'Pay-as-you-go. No sign-up fee.',
-    pf1:'HS Code Classification with Confidence Score', pf2:'Import Duty + VAT Calculation', pf3:'OGA Compliance Check', pf4:'Legal citations in every result', pf5:'Free sandbox (no API Key needed)', pf6:'MCP, GPT Actions, LangChain support', pf7:'FTA 13 Agreements — auto best-rate calculation', pf8:'Halal Engine covering 21 countries',
-    footer_sub: 'Customs Intelligence Division · Built for AI Agents',
-    reg_title: 'Get Your API Key', reg_sub: 'Free. No credit card. Instant key.',
-    reg_name: 'Your AI Agent / System Name', reg_name_ph: 'e.g. MyTradingBot, Claude-Customs',
-    reg_type: 'Work Type', reg_sys: 'AI System Used (optional)',
-    prof_import: 'Import', prof_export: 'Export', prof_broker: 'Customs Broker', prof_other: 'Other',
-    cancel: 'Cancel', reg_submit: 'Register Now',
-    reg_success: '✅ Registration Successful!', reg_key_label: 'Your API Key:', reg_warn: '⚠️ Save this key — it will not be shown again.',
-    copy: '📋 Copy Key', go_dashboard: 'Go to Dashboard →',
-    sandbox_title: '🧪 Free Sandbox Trial', sandbox_sub: 'No API Key needed. No credit required.',
-    sandbox_label: 'Product Description', sandbox_ph: 'e.g. iPhone 15 Pro Max 256GB', sandbox_btn: 'Classify HS Code →',
+    nav_docs:'API Docs', nav_login:'Client Login',
+    badge:'🇹🇭 Thai Customs Intelligence · AI-to-AI Economy',
+    hero_subbadge:'A Platform to Facilitate and Promote International Trade',
+    hero_title_html:'Thai Customs Classification<br><span class="grad-text">for AI Agents</span>',
+    hero_desc:'Intelligent API for HS Code classification and import/export duty calculation for Thailand. Real legal references, high accuracy — built for AI agents and automated systems.',
+    hero_tagline:'An intelligent platform serving to facilitate and promote international trade — powered by AI that is accurate, fast, and reliable.',
+    cta_register:'Get Started Free — API Key', cta_try:'Try Free Sandbox',
+    stat_hs:'HS Codes Supported', stat_fta:'FTA Agreements', stat_price:'per query', stat_speed:'Response time', stat_halal:'Halal Countries',
+    why_eyebrow:'CAPABILITIES', why_title:'Why Choose Us', why_sub:'Built for businesses, developers, and AI Agents — every response cites real legal sources.',
+    f1_title:'HS Code Classification', f1_desc:'Classify 6–10 digit Harmonized System Codes with Confidence Score and Thai customs law citations.',
+    f2_title:'Automatic Tax Calculation', f2_desc:'Calculate import duties, VAT, and other fees automatically under current Thai law.',
+    f3_title:'AI-Native API', f3_desc:'Supports MCP Protocol, GPT Actions, LangChain, and Function Calling. AI agents discover us automatically.',
+    f4_title:'Prepaid Credit', f4_desc:'No contracts. Top up credit in advance, pay only for what you use. No monthly fees.',
+    f5_title:'OGA Compliance Check', f5_desc:'Checks which agencies (FDA, TIS, etc.) your goods must pass before import.',
+    f6_title:'ASEAN Ready', f6_desc:'Supports ASEAN and RCEP cross-border trade, expanding globally.',
+    how_eyebrow:'GET STARTED', how_title:'How to Get Started', how_sub:'4 steps, ready in 2 minutes.',
+    s1_title:'Get a Free API Key', s1_desc:'No credit card. No sign-up fee. Receive your API Key instantly.',
+    s2_title:'Try the Free Sandbox', s2_desc:'POST /v1/sandbox/classify — no credit needed, test right away.',
+    s3_title:'Top Up Credit for Production', s3_desc:'Minimum $5 via Stripe. Secure, supports all major credit cards.',
+    s4_title:'Call the API', s4_desc:'POST /v1/customs/classify with X-API-Key header. Credits deducted automatically.',
+    price_eyebrow:'PRICING', price_title:'Pricing', price_sub:'No monthly fee. Pay only for what you use.',
+    per_item:'/ item', price_desc:'Pay-as-you-go. No sign-up fee.',
+    pf1:'HS Code Classification with Confidence Score', pf2:'Import Duty + VAT Calculation', pf3:'OGA Compliance Check', pf4:'Legal citations in every result', pf5:'Free sandbox (no API Key needed)', pf6:'MCP, GPT Actions, LangChain support', pf7:'FTA 13 Agreements — auto best-rate', pf8:'Halal Engine covering 21 countries',
+    disclaimer_title:'Disclaimer', disclaimer_body:'Information from this system — including HS codes, tax rates, OGA licenses, and Halal status — is for preliminary reference only and does not constitute legal advice or official rulings. Always verify with Thai Customs or qualified experts before making trade decisions.',
+    footer_sub:'Customs Intelligence Division · Built for AI Agents',
+    reg_title:'Get Your API Key', reg_sub:'Free. No credit card. Instant key.',
+    reg_name:'Your AI Agent / System Name', reg_name_ph:'e.g. MyTradingBot',
+    reg_type:'Work Type', reg_sys:'AI System Used (optional)',
+    prof_import:'Import', prof_export:'Export', prof_broker:'Customs Broker', prof_other:'Other',
+    cancel:'Cancel', reg_submit:'Register Now',
+    reg_success:'✅ Registration Successful!', reg_key_label:'Your API Key:', reg_warn:'⚠️ Save this key — it will not be shown again.',
+    copy:'📋 Copy Key', go_dashboard:'Dashboard →',
+    sandbox_title:'🧪 Free Sandbox', sandbox_sub:'No API Key. No credit required.',
+    sandbox_label:'Product Description', sandbox_ph:'e.g. iPhone 15 Pro Max 256GB', sandbox_btn:'Classify HS Code →',
   },
   zh: {
-    nav_docs: 'API 文档', nav_login: '客户登录',
-    badge: '🇹🇭 泰国海关智能 · AI对AI经济',
-    hero_title_html: '泰国海关商品分类<br><span>专为AI智能体设计</span>',
-    hero_desc: '智能API，用于泰国HS商品编码分类和进出口关税计算。引用真实法律法规，高精度，专为AI智能体和自动化系统构建。',
-    hero_tagline: '智能平台，致力于促进和推动国际贸易——由精准、快速、可靠的AI驱动。',
-    hero_subbadge: '服务平台，促进和推动<br>国际贸易便利化',
-    cta_register: '免费开始 — 获取API Key', cta_try: '免费试用沙盒',
-    stat_hs: '支持的HS编码', stat_uptime: '全天候服务', stat_price: '每项', stat_speed: '响应时间',
-    why_title: '为什么选择我们', why_sub: '专为AI智能体设计，而非人类',
-    f1_title: 'HS编码分类', f1_desc: '分类6-10位HS编码，附带置信度评分和泰国海关法律引用。',
-    f2_title: '自动税费计算', f2_desc: '按现行泰国法律自动计算进口关税、增值税及其他费用。',
-    f3_title: 'AI原生API', f3_desc: '支持MCP协议、GPT Actions、LangChain和Function Calling，AI智能体自动发现我们。',
-    f4_title: '预付信用', f4_desc: '无合同约束，提前充值，只为实际使用付费，无月费。',
-    f5_title: 'OGA合规检查', f5_desc: '检查货物进口前需通过哪些机构审批（FDA、TIS等）。',
-    f6_title: '东盟就绪', f6_desc: '支持东盟和RCEP跨境贸易，向全球扩展。',
-    how_title: '如何开始', how_sub: '4个步骤，2分钟内准备就绪',
-    s1_title: '免费获取API Key', s1_desc: '无需信用卡，无注册费，即时获得API Key。',
-    s2_title: '试用免费沙盒', s2_desc: 'POST /v1/sandbox/classify，无需充值，立即测试。',
-    s3_title: '充值信用用于生产', s3_desc: '最低$5，通过Stripe安全支付，支持所有主流信用卡。',
-    s4_title: '调用API', s4_desc: '发送POST /v1/customs/classify带X-API-Key标头，系统自动扣除费用。',
-    price_title: '定价', price_sub: '无月费，只为使用付费',
-    per_item: '/ 项', price_desc: '按使用付费，无注册费。',
-    pf1:'HS编码分类含置信度', pf2:'进口关税+增值税计算', pf3:'OGA合规检查', pf4:'每项结果附法律引用', pf5:'免费沙盒（无需API Key）', pf6:'支持MCP、GPT Actions、LangChain', pf7:'FTA 13个协定 — 自动计算最优税率', pf8:'清真认证引擎 覆盖21个国家',
-    footer_sub: '海关情报部门 · 为AI智能体构建',
-    reg_title: '获取您的API Key', reg_sub: '免费，无需信用卡，即时获得。',
-    reg_name: '您的AI智能体/系统名称', reg_name_ph: '例如 MyTradingBot',
-    reg_type: '工作类型', reg_sys: '使用的AI系统（可选）',
-    prof_import: '进口', prof_export: '出口', prof_broker: '报关行', prof_other: '其他',
-    cancel: '取消', reg_submit: '立即注册',
-    reg_success: '✅ 注册成功！', reg_key_label: '您的API Key：', reg_warn: '⚠️ 请保存此Key，不会再次显示。',
-    copy: '📋 复制Key', go_dashboard: '前往控制台 →',
-    sandbox_title: '🧪 免费沙盒试用', sandbox_sub: '无需API Key，无需充值',
-    sandbox_label: '商品描述', sandbox_ph: '例如 iPhone 15 Pro Max 256GB', sandbox_btn: '分类HS编码 →',
+    nav_docs:'API文档', nav_login:'客户登录',
+    badge:'🇹🇭 泰国海关智能 · AI对AI经济',
+    hero_subbadge:'促进和推动国际贸易便利化的服务平台',
+    hero_title_html:'泰国海关商品分类<br><span class="grad-text">专为AI智能体设计</span>',
+    hero_desc:'用于泰国HS商品编码分类和进出口关税计算的智能API。引用真实法律法规，高精度，专为AI智能体和自动化系统构建。',
+    hero_tagline:'智能平台，致力于促进和推动国际贸易——由精准、快速、可靠的AI驱动。',
+    cta_register:'免费开始 — 获取API Key', cta_try:'免费试用沙盒',
+    stat_hs:'支持的HS编码', stat_fta:'FTA协定', stat_price:'每项', stat_speed:'响应时间', stat_halal:'清真国家',
+    why_eyebrow:'核心功能', why_title:'为什么选择我们', why_sub:'专为AI智能体、开发者和贸易商设计 — 每次响应均附法律引用。',
+    f1_title:'HS编码分类', f1_desc:'分类6-10位HS编码，附带置信度评分和泰国海关法律引用。',
+    f2_title:'自动税费计算', f2_desc:'按现行泰国法律自动计算进口关税、增值税及其他费用。',
+    f3_title:'AI原生API', f3_desc:'支持MCP协议、GPT Actions、LangChain和Function Calling，AI智能体自动发现。',
+    f4_title:'预付信用', f4_desc:'无合同约束，提前充值，只为实际使用付费，无月费。',
+    f5_title:'OGA合规检查', f5_desc:'检查货物进口前需通过哪些机构审批（FDA、TIS等）。',
+    f6_title:'东盟就绪', f6_desc:'支持东盟和RCEP跨境贸易，向全球扩展。',
+    how_eyebrow:'开始使用', how_title:'如何开始', how_sub:'4个步骤，2分钟内准备就绪。',
+    s1_title:'免费获取API Key', s1_desc:'无需信用卡，无注册费，即时获得API Key。',
+    s2_title:'试用免费沙盒', s2_desc:'POST /v1/sandbox/classify，无需充值，立即测试。',
+    s3_title:'充值信用用于生产', s3_desc:'最低$5，通过Stripe安全支付，支持所有主流信用卡。',
+    s4_title:'调用API', s4_desc:'发送POST /v1/customs/classify带X-API-Key标头，系统自动扣除费用。',
+    price_eyebrow:'定价', price_title:'定价', price_sub:'无月费，只为使用付费。',
+    per_item:'/ 项', price_desc:'按使用付费，无注册费。',
+    pf1:'HS编码分类含置信度', pf2:'进口关税+增值税计算', pf3:'OGA合规检查', pf4:'每项结果附法律引用', pf5:'免费沙盒（无需API Key）', pf6:'支持MCP、GPT Actions、LangChain', pf7:'FTA 13个协定 — 自动最优税率', pf8:'清真认证引擎覆盖21个国家',
+    disclaimer_title:'免责声明', disclaimer_body:'本系统提供的信息（包括HS编码、税率、OGA许可和清真状态）仅供参考，不构成法律建议或官方裁定。在做出任何贸易决策前，请务必咨询泰国海关或专业人士。',
+    footer_sub:'海关情报部门 · 为AI智能体构建',
+    reg_title:'获取您的API Key', reg_sub:'免费，无需信用卡，即时获得。',
+    reg_name:'您的AI智能体/系统名称', reg_name_ph:'例如 MyTradingBot',
+    reg_type:'工作类型', reg_sys:'使用的AI系统（可选）',
+    prof_import:'进口', prof_export:'出口', prof_broker:'报关行', prof_other:'其他',
+    cancel:'取消', reg_submit:'立即注册',
+    reg_success:'✅ 注册成功！', reg_key_label:'您的API Key：', reg_warn:'⚠️ 请保存此Key，不会再次显示。',
+    copy:'📋 复制Key', go_dashboard:'前往控制台 →',
+    sandbox_title:'🧪 免费沙盒试用', sandbox_sub:'无需API Key，无需充值',
+    sandbox_label:'商品描述', sandbox_ph:'例如 iPhone 15 Pro Max 256GB', sandbox_btn:'分类HS编码 →',
   },
   ja: {
-    nav_docs: 'APIドキュメント', nav_login: 'クライアントログイン',
-    badge: '🇹🇭 タイ税関インテリジェンス · AI-to-AI経済',
-    hero_title_html: 'タイ税関品目分類<br><span>AIエージェント向け</span>',
-    hero_desc: 'タイ向けHSコード分類と輸出入関税計算のためのインテリジェントAPI。実際の法律を引用、高精度。AIエージェントおよび自動化システム向けに構築。',
-    hero_tagline: '国際貿易を円滑化・促進するインテリジェントプラットフォーム — 精確・高速・信頼性の高いAI技術で支える。',
-    hero_subbadge: '国際貿易を円滑化・促進する<br>サービスプラットフォーム',
-    cta_register: '無料で始める — APIキー取得', cta_try: '無料サンドボックスを試す',
-    stat_hs: '対応HSコード数', stat_uptime: '24時間稼働', stat_price: '1件あたり', stat_speed: '応答時間',
-    why_title: 'なぜ私たちを選ぶのか', why_sub: '人間ではなくAIエージェント専用に設計',
-    f1_title: 'HSコード分類', f1_desc: '6〜10桁のHSコードを分類。信頼スコアとタイ税関法の引用付き。',
-    f2_title: '自動税額計算', f2_desc: '現行タイ法律に基づき輸入関税・付加価値税・その他費用を自動計算。',
-    f3_title: 'AIネイティブAPI', f3_desc: 'MCPプロトコル、GPT Actions、LangChain、Function Callingに対応。AIエージェントが自動検出。',
-    f4_title: 'プリペイドクレジット', f4_desc: '契約不要。前払いクレジット方式。使用分のみ支払い。月額費用なし。',
-    f5_title: 'OGAコンプライアンスチェック', f5_desc: '輸入前にFDA・TISなどの機関の審査が必要かチェック。',
-    f6_title: 'ASEAN対応', f6_desc: 'ASEAN・RCEPの越境貿易に対応。グローバル展開中。',
-    how_title: '始め方', how_sub: '4ステップ、2分で準備完了',
-    s1_title: '無料でAPIキーを取得', s1_desc: 'クレジットカード不要。登録料なし。すぐにAPIキーを受け取れます。',
-    s2_title: '無料サンドボックスを試す', s2_desc: 'POST /v1/sandbox/classify — クレジット不要で今すぐテスト。',
-    s3_title: 'クレジットをチャージして本番利用', s3_desc: '最低$5からStripeで安全にチャージ。主要クレジットカード対応。',
-    s4_title: 'APIを呼び出す', s4_desc: 'POST /v1/customs/classifyにX-API-Keyヘッダーで呼び出し。自動課金。',
-    price_title: '料金', price_sub: '月額費用なし。使用分のみ支払い。',
-    per_item: '/ 件', price_desc: '従量課金。登録料なし。',
+    nav_docs:'APIドキュメント', nav_login:'ログイン',
+    badge:'🇹🇭 タイ税関インテリジェンス · AI-to-AI経済',
+    hero_subbadge:'国際貿易を円滑化・促進するサービスプラットフォーム',
+    hero_title_html:'タイ税関品目分類<br><span class="grad-text">AIエージェント向け</span>',
+    hero_desc:'タイ向けHSコード分類と輸出入関税計算のためのインテリジェントAPI。実際の法律を引用、高精度。AIエージェントおよび自動化システム向け。',
+    hero_tagline:'国際貿易を円滑化・促進するインテリジェントプラットフォーム — 精確・高速・信頼性の高いAI技術で支える。',
+    cta_register:'無料で始める — APIキー取得', cta_try:'無料サンドボックス',
+    stat_hs:'対応HSコード数', stat_fta:'FTA協定数', stat_price:'1件あたり', stat_speed:'応答時間', stat_halal:'ハラール対応国',
+    why_eyebrow:'機能', why_title:'なぜ私たちを選ぶのか', why_sub:'ビジネス、開発者、AIエージェントに対応 — 全レスポンスに法的引用を付与。',
+    f1_title:'HSコード分類', f1_desc:'6〜10桁のHSコードを分類。信頼スコアとタイ税関法の引用付き。',
+    f2_title:'自動税額計算', f2_desc:'現行タイ法律に基づき輸入関税・付加価値税・その他費用を自動計算。',
+    f3_title:'AIネイティブAPI', f3_desc:'MCPプロトコル、GPT Actions、LangChain対応。AIエージェントが自動検出。',
+    f4_title:'プリペイドクレジット', f4_desc:'契約不要。前払いクレジット方式。使用分のみ支払い。月額費用なし。',
+    f5_title:'OGAコンプライアンス', f5_desc:'輸入前にFDA・TISなどの機関の審査が必要かチェック。',
+    f6_title:'ASEAN対応', f6_desc:'ASEAN・RCEPの越境貿易に対応。グローバル展開中。',
+    how_eyebrow:'始め方', how_title:'始め方', how_sub:'4ステップ、2分で準備完了。',
+    s1_title:'無料でAPIキーを取得', s1_desc:'クレジットカード不要。登録料なし。すぐにAPIキーを受け取れます。',
+    s2_title:'無料サンドボックスを試す', s2_desc:'POST /v1/sandbox/classify — クレジット不要で今すぐテスト。',
+    s3_title:'クレジットをチャージ', s3_desc:'最低$5からStripeで安全にチャージ。主要クレジットカード対応。',
+    s4_title:'APIを呼び出す', s4_desc:'POST /v1/customs/classifyにX-API-Keyヘッダーで呼び出し。自動課金。',
+    price_eyebrow:'料金', price_title:'料金', price_sub:'月額費用なし。使用分のみ支払い。',
+    per_item:'/ 件', price_desc:'従量課金。登録料なし。',
     pf1:'信頼スコア付きHSコード分類', pf2:'輸入関税+VAT自動計算', pf3:'OGAコンプライアンスチェック', pf4:'全結果に法的引用', pf5:'無料サンドボックス（APIキー不要）', pf6:'MCP・GPT Actions・LangChain対応', pf7:'FTA 13協定 — 最適税率を自動算出', pf8:'ハラール認証エンジン 21カ国対応',
-    disclaimer_title:'免責事項', disclaimer_body:'本システムが提供する情報（HSコード、税率、OGA許可、ハラール認証状況を含む）は、あくまで参考情報の提供を目的としており、法的助言または公式裁定を構成するものではありません。いかなる貿易上の意思決定を行う前にも、タイ税関当局、関係OGA機関、または資格を有する通関専門家に確認されることを強くお勧めします。',
-    footer_sub: '税関インテリジェンス部門 · AIエージェントのために構築',
-    reg_title: 'APIキーを取得', reg_sub: '無料。クレジットカード不要。即時発行。',
-    reg_name: 'AIエージェント/システム名', reg_name_ph: '例: MyTradingBot',
-    reg_type: '業務タイプ', reg_sys: '使用AIシステム（任意）',
-    prof_import: '輸入', prof_export: '輸出', prof_broker: '通関業者', prof_other: 'その他',
-    cancel: 'キャンセル', reg_submit: '今すぐ登録',
-    reg_success: '✅ 登録成功！', reg_key_label: 'あなたのAPIキー：', reg_warn: '⚠️ このキーを保存してください。再表示されません。',
-    copy: '📋 キーをコピー', go_dashboard: 'ダッシュボードへ →',
-    sandbox_title: '🧪 無料サンドボックス', sandbox_sub: 'APIキー不要。クレジット不要。',
-    sandbox_label: '商品説明', sandbox_ph: '例: iPhone 15 Pro Max 256GB', sandbox_btn: 'HSコードを分類 →',
+    disclaimer_title:'免責事項', disclaimer_body:'本システムが提供する情報（HSコード、税率、OGA許可、ハラール認証状況を含む）は参考情報のみであり、法的助言または公式裁定を構成するものではありません。貿易上の意思決定前に、タイ税関当局または専門家に必ずご確認ください。',
+    footer_sub:'税関インテリジェンス部門 · AIエージェントのために構築',
+    reg_title:'APIキーを取得', reg_sub:'無料。クレジットカード不要。即時発行。',
+    reg_name:'AIエージェント/システム名', reg_name_ph:'例: MyTradingBot',
+    reg_type:'業務タイプ', reg_sys:'使用AIシステム（任意）',
+    prof_import:'輸入', prof_export:'輸出', prof_broker:'通関業者', prof_other:'その他',
+    cancel:'キャンセル', reg_submit:'今すぐ登録',
+    reg_success:'✅ 登録成功！', reg_key_label:'あなたのAPIキー：', reg_warn:'⚠️ このキーを保存してください。再表示されません。',
+    copy:'📋 コピー', go_dashboard:'ダッシュボードへ →',
+    sandbox_title:'🧪 無料サンドボックス', sandbox_sub:'APIキー不要。クレジット不要。',
+    sandbox_label:'商品説明', sandbox_ph:'例: iPhone 15 Pro Max 256GB', sandbox_btn:'HSコードを分類 →',
   },
 };
 
-// ── LANG ENGINE ───────────────────────────────────────────────
+// ── LANG ENGINE ──────────────────────────────────────────────
 let currentLang = 'th';
+
+const HTML_KEYS = new Set(['hero_title_html','hero_subbadge','disclaimer_body']);
 
 function detectLang() {
   const saved = localStorage.getItem('aitai_lang');
   if (saved && i18n[saved]) return saved;
-  const nav = navigator.language || navigator.userLanguage || 'th';
+  const nav = (navigator.language || '').toLowerCase();
   if (nav.startsWith('zh')) return 'zh';
   if (nav.startsWith('ja')) return 'ja';
   if (nav.startsWith('th')) return 'th';
@@ -519,284 +1020,227 @@ function detectLang() {
 }
 
 function setLang(lang) {
+  if (!i18n[lang]) return;
   currentLang = lang;
   localStorage.setItem('aitai_lang', lang);
   document.documentElement.lang = lang;
 
-  // update buttons
+  // update active button
   document.querySelectorAll('.lang-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.trim() === langBtnLabel(lang));
+    const map = {th:'TH',en:'EN',zh:'中文',ja:'日本語'};
+    b.classList.toggle('active', b.textContent.trim() === map[lang]);
   });
 
   const t = i18n[lang];
-
-  // update all data-i18n elements
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (!t[key]) return;
-    if (key === 'hero_title_html') {
+    if (HTML_KEYS.has(key)) {
       el.innerHTML = t[key];
-      // re-apply gradient span
-      const span = el.querySelector('span');
-      if (span) span.style.cssText = 'background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent';
+      // re-apply gradient to any span.grad-text
+      el.querySelectorAll('.grad-text').forEach(s => {
+        s.style.cssText = 'background:linear-gradient(135deg,#818cf8,#a78bfa,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+      });
     } else {
       el.textContent = t[key];
     }
   });
 
-  // update placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     if (t[key]) el.placeholder = t[key];
   });
 }
 
-function langBtnLabel(lang) {
-  return { th:'TH', en:'EN', zh:'中文', ja:'日本語' }[lang];
-}
-
-// ── MODAL ─────────────────────────────────────────────────────
+// ── MODALS ───────────────────────────────────────────────────
 function openRegister() { document.getElementById('registerModal').classList.add('show'); }
 function closeRegister() { document.getElementById('registerModal').classList.remove('show'); }
+
 function openSandboxDemo() {
-  // ถ้า logged in แล้ว → ไป dashboard ตรง ไม่เปลืองโควต้า sandbox
-  if (localStorage.getItem('aitai_key')) {
-    window.location.href = '/dashboard';
-    return;
-  }
+  if (localStorage.getItem('aitai_key')) { window.location.href='/dashboard'; return; }
   document.getElementById('sandboxModal').classList.add('show');
 }
 function closeSandbox() { document.getElementById('sandboxModal').classList.remove('show'); }
 
+function openRecover() {
+  document.getElementById('recoverForm').style.display='block';
+  document.getElementById('recoverResult').style.display='none';
+  document.getElementById('recoverError').style.display='none';
+  document.getElementById('recoverEmail').value='';
+  document.getElementById('recoverAgentName').value='';
+  document.getElementById('recoverModal').classList.add('show');
+}
+function closeRecover() { document.getElementById('recoverModal').classList.remove('show'); }
+
+['registerModal','sandboxModal','recoverModal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', e => { if (e.target===el) el.classList.remove('show'); });
+});
+
+// ── REGISTER ─────────────────────────────────────────────────
 async function doRegister() {
   const btn = document.getElementById('registerBtn');
   const err = document.getElementById('errorMsg');
-  err.style.display = 'none';
+  err.style.display='none';
   const t = i18n[currentLang];
-  btn.textContent = '...';
-  btn.disabled = true;
+  btn.textContent='...'; btn.disabled=true;
 
   const body = {
     agent_name: document.getElementById('agentName').value.trim(),
     contact_email: document.getElementById('email').value.trim(),
     profession: document.getElementById('profession').value,
-    origin_system: document.getElementById('originSystem').value.trim() || null,
+    origin_system: document.getElementById('originSystem').value.trim()||null,
   };
-
-  if (!body.agent_name || !body.contact_email) {
-    err.textContent = currentLang === 'th' ? 'กรุณากรอกชื่อและ Email' : 'Please enter name and email';
-    err.style.display = 'block';
-    btn.textContent = t.reg_submit;
-    btn.disabled = false;
-    return;
+  if (!body.agent_name||!body.contact_email) {
+    err.textContent = currentLang==='th'?'กรุณากรอกชื่อและ Email':'Please enter name and email';
+    err.style.display='block'; btn.textContent=t.reg_submit; btn.disabled=false; return;
   }
-
   try {
-    const res = await fetch(API + '/v1/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const res = await fetch(API+'/v1/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Error');
+    if (!res.ok) throw new Error(data.detail||'Error');
     document.getElementById('resultKey').textContent = data.api_key;
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('resultBox').style.display = 'block';
-    localStorage.setItem('aitai_key', data.api_key);
+    document.getElementById('registerForm').style.display='none';
+    document.getElementById('resultBox').style.display='block';
+    localStorage.setItem('aitai_key',data.api_key);
   } catch(e) {
-    err.textContent = e.message;
-    err.style.display = 'block';
-    btn.textContent = t.reg_submit;
-    btn.disabled = false;
+    err.textContent=e.message; err.style.display='block';
+    btn.textContent=t.reg_submit; btn.disabled=false;
   }
 }
+function copyKey() { navigator.clipboard.writeText(document.getElementById('resultKey').textContent); }
 
-function copyKey() {
-  navigator.clipboard.writeText(document.getElementById('resultKey').textContent);
-}
-
+// ── SANDBOX ──────────────────────────────────────────────────
 async function doSandbox() {
   const desc = document.getElementById('sandboxDesc').value.trim();
   const result = document.getElementById('sandboxResult');
   const btn = document.getElementById('sandboxBtn');
-  if (!desc) { result.style.display='block'; result.innerHTML='<span style="color:#f59e0b">⚠️ กรุณาพิมพ์ชื่อสินค้าก่อน</span>'; return; }
-  btn.disabled = true;
-  btn.textContent = '⏳ กำลังค้นหา...';
-  result.style.display = 'block';
-  // ส่ง description ไปใน URL เพื่อ pre-fill ที่ dashboard
-  const dashLink = document.getElementById('sandboxDashLink');
-  if (dashLink) {
-    const desc = document.getElementById('sandboxDesc').value.trim();
-    dashLink.href = '/dashboard?q=' + encodeURIComponent(desc);
+  if (!desc) {
+    result.style.display='block';
+    result.innerHTML='<span style="color:#f59e0b">⚠️ กรุณาพิมพ์ชื่อสินค้าก่อน</span>';
+    return;
   }
-  result.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#94a3b8"><span style="font-size:1.3rem;animation:spin 1s linear infinite;display:inline-block">⏳</span> กำลังวิเคราะห์สินค้า รอสักครู่...</div>';
+  btn.disabled=true; btn.textContent='⏳...';
+  result.style.display='block';
+  result.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8"><span style="font-size:1.2rem;display:inline-block;animation:spin 1s linear infinite">⏳</span> กำลังวิเคราะห์...</div>';
   try {
-    const res = await fetch(API + '/v1/sandbox/classify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        client_id: 'sandbox-demo',
-        destination_country: document.getElementById('sandboxDest')?.value || 'TH',
-        items: [{
-          description: desc,
-          origin_country: document.getElementById('sandboxOrigin')?.value || undefined,
-          quantity: 1,
-          unit_price: 100
+    const res = await fetch(API+'/v1/sandbox/classify',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        client_id:'sandbox-demo',
+        destination_country: document.getElementById('sandboxDest')?.value||'TH',
+        items:[{
+          description:desc,
+          origin_country:document.getElementById('sandboxOrigin')?.value||undefined,
+          quantity:1, unit_price:100
         }]
       })
     });
     const data = await res.json();
     if (!res.ok) {
-      const msg = data.detail?.message || data.message || data.error || JSON.stringify(data);
-      result.innerHTML = '<span style="color:#f87171">❌ ' + msg + '</span>';
+      const msg = data.detail?.message||data.message||data.error||JSON.stringify(data);
+      result.innerHTML='<span style="color:#f87171">❌ '+msg+'</span>';
     } else {
-      const item = data.items && data.items[0];
-      if (!item) { result.innerHTML = '<span style="color:#f87171">❌ ไม่พบผลลัพธ์</span>'; return; }
-      const conf = Math.round((item.confidence_score||0)*100);
-      const confColor = conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
-      const ogaBadge = item.oga_required
-        ? `<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ OGA: ${(item.oga_agencies||[]).join(', ')||'ต้องขออนุญาต'}</span>`
-        : '<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง OGA</span>';
-      const halalBadge = item.halal_required
-        ? `<span style="background:rgba(239,68,68,.12);color:#f87171;padding:2px 8px;border-radius:4px;font-size:11px">🕌 ต้อง Halal (${item.halal_risk_level||''})</span>`
-        : '<span style="background:rgba(16,185,129,.08);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง Halal</span>';
-      const ftaBadge = item.fta_eligible && item.fta_form
-        ? `<span style="background:rgba(16,185,129,.12);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">🤝 ${item.fta_form}</span>`
-        : '';
-      const savingLine = item.fta_saving_amount > 0
-        ? `<div style="font-size:11px;color:#10b981">💚 ประหยัดภาษีได้ ~${item.fta_saving_amount.toLocaleString()} บาท</div>` : '';
-      const importLine = item.import_total_estimate != null
-        ? `<div style="font-size:11px;color:#818cf8">💰 อากร+VAT รวมประมาณ ${item.import_total_estimate.toLocaleString()} บาท</div>` : '';
-      const descLine = item.hs_description_th
-        ? `<div style="font-size:13px;color:#e2e8f0">${item.hs_description_th}</div><div style="font-size:11px;color:#64748b">${item.hs_description||''}</div>`
-        : `<div style="font-size:13px;color:#94a3b8">${item.hs_description||''}</div>`;
-      const rem = data.summary?.free_calls_remaining ?? '';
-      result.innerHTML = `
+      const item = data.items&&data.items[0];
+      if (!item) { result.innerHTML='<span style="color:#f87171">❌ ไม่พบผลลัพธ์</span>'; return; }
+      const conf=Math.round((item.confidence_score||0)*100);
+      const confColor=conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
+      const ogaBadge=item.oga_required
+        ?`<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ OGA: ${(item.oga_agencies||[]).join(', ')||'ต้องขออนุญาต'}</span>`
+        :'<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง OGA</span>';
+      const halalBadge=item.halal_required
+        ?`<span style="background:rgba(239,68,68,.12);color:#f87171;padding:2px 8px;border-radius:4px;font-size:11px">🕌 Halal (${item.halal_risk_level||''})</span>`
+        :'<span style="background:rgba(16,185,129,.08);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง Halal</span>';
+      const ftaBadge=item.fta_eligible&&item.fta_form
+        ?`<span style="background:rgba(16,185,129,.12);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">🤝 ${item.fta_form}</span>`:'';
+      const savingLine=item.fta_saving_amount>0
+        ?`<div style="font-size:11px;color:#10b981">💚 ประหยัดภาษีได้ ~${item.fta_saving_amount.toLocaleString()} บาท</div>`:'';
+      const importLine=item.import_total_estimate!=null
+        ?`<div style="font-size:11px;color:#818cf8">💰 อากร+VAT ~${item.import_total_estimate.toLocaleString()} บาท</div>`:'';
+      const descLine=item.hs_description_th
+        ?`<div style="font-size:13px;color:#e2e8f0">${item.hs_description_th}</div><div style="font-size:11px;color:#64748b">${item.hs_description||''}</div>`
+        :`<div style="font-size:13px;color:#94a3b8">${item.hs_description||''}</div>`;
+      result.innerHTML=`
         <div style="display:flex;flex-direction:column;gap:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
             <span style="font-size:1.4rem;font-weight:700;color:#e2e8f0">🏷️ ${item.hs_code||'—'}</span>
             <span style="font-weight:700;color:${confColor}">${conf}% ความมั่นใจ</span>
           </div>
           ${descLine}
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
             ${ogaBadge}${halalBadge}${ftaBadge}
             <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">อากร ${Math.round((item.duty_rate||0)*100)}%</span>
             <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">VAT ${Math.round((item.vat_rate||0)*100)}%</span>
           </div>
           ${savingLine}${importLine}
           <div style="font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">${item.source_reference||''}</div>
-          <div style="font-size:11px;color:#f59e0b">${data.disclaimer||''}</div>
-          <a href="/dashboard?q=${encodeURIComponent(desc)}" style="display:inline-block;background:#6366f1;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มและ Candidates → Dashboard</a>
+          <a href="/dashboard?q=${encodeURIComponent(desc)}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มใน Dashboard →</a>
         </div>`;
     }
   } catch(e) {
-    result.innerHTML = '<span style="color:#f87171">❌ เชื่อมต่อไม่ได้: ' + e.message + '</span>';
+    result.innerHTML='<span style="color:#f87171">❌ '+e.message+'</span>';
   }
-  btn.disabled = false;
-  btn.textContent = 'จำแนก HS Code →';
+  btn.disabled=false;
+  btn.textContent=i18n[currentLang].sandbox_btn||'จำแนก HS Code →';
 }
-
-// close modals on backdrop click
-['registerModal','sandboxModal','recoverModal'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('show');
-  });
-});
-
 
 // ── RECOVER KEY ───────────────────────────────────────────────
-function openRecover() {
-  document.getElementById('recoverForm').style.display = 'block';
-  document.getElementById('recoverResult').style.display = 'none';
-  document.getElementById('recoverError').style.display = 'none';
-  document.getElementById('recoverEmail').value = '';
-  document.getElementById('recoverAgentName').value = '';
-  document.getElementById('recoverModal').classList.add('show');
-}
-function closeRecover() { document.getElementById('recoverModal').classList.remove('show'); }
-
 async function doRecover() {
-  const btn = document.getElementById('recoverBtn');
-  const err = document.getElementById('recoverError');
-  err.style.display = 'none';
-  const email = document.getElementById('recoverEmail').value.trim();
-  const agent = document.getElementById('recoverAgentName').value.trim();
-  if (!email || !agent) {
-    err.textContent = 'กรุณากรอก Email และชื่อ Agent';
-    err.style.display = 'block';
-    return;
-  }
-  btn.textContent = '...';
-  btn.disabled = true;
+  const btn=document.getElementById('recoverBtn');
+  const err=document.getElementById('recoverError');
+  err.style.display='none';
+  const email=document.getElementById('recoverEmail').value.trim();
+  const agent=document.getElementById('recoverAgentName').value.trim();
+  if (!email||!agent) { err.textContent='กรุณากรอก Email และชื่อ Agent'; err.style.display='block'; return; }
+  btn.textContent='...'; btn.disabled=true;
   try {
-    const res = await fetch(API + '/v1/recover-key', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_email: email, agent_name: agent }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      err.textContent = data.detail?.message || data.message || 'ไม่พบบัญชีที่ตรงกัน';
-      err.style.display = 'block';
-    } else {
-      document.getElementById('recoverResult').style.display = 'block';
-      document.getElementById('recoveredKey').textContent = data.api_key || '';
-    }
-  } catch(e) {
-    err.textContent = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
-    err.style.display = 'block';
-  } finally {
-    btn.textContent = i18n[currentLang]?.recover_btn || 'กู้คืน Key →';
-    btn.disabled = false;
-  }
+    const res=await fetch(API+'/v1/recover-key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact_email:email,agent_name:agent})});
+    const data=await res.json();
+    if (!res.ok) { err.textContent=data.detail?.message||data.message||'ไม่พบบัญชีที่ตรงกัน'; err.style.display='block'; }
+    else { document.getElementById('recoverResult').style.display='block'; document.getElementById('recoveredKey').textContent=data.api_key||''; }
+  } catch(e) { err.textContent='เกิดข้อผิดพลาด กรุณาลองใหม่'; err.style.display='block'; }
+  finally { btn.textContent='กู้คืน Key →'; btn.disabled=false; }
 }
 
-
-// ── PERSISTENT LOGIN CHECK ─────────────────────────────────────
+// ── SESSION CHECK ─────────────────────────────────────────────
 function checkSavedSession() {
-  const key = localStorage.getItem('aitai_key');
-  const agent = localStorage.getItem('aitai_agent');
-  const btn = document.getElementById('navLoginBtn');
-  const heroCta = document.getElementById('heroCtaMain');
+  const key=localStorage.getItem('aitai_key');
+  const agent=localStorage.getItem('aitai_agent');
+  const btn=document.getElementById('navLoginBtn');
+  const heroCta=document.getElementById('heroCtaMain');
 
-  // Session expired redirect
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('session_expired') === '1') {
-    const toast = document.getElementById('sessionToast');
-    if (toast) { toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 5000); }
-    // ล้าง URL โดยไม่ reload
-    history.replaceState({}, '', window.location.pathname);
+  const params=new URLSearchParams(window.location.search);
+  if (params.get('session_expired')==='1') {
+    document.getElementById('sessionToast').style.display='block';
+    setTimeout(()=>{ document.getElementById('sessionToast').style.display='none'; },5000);
+    history.replaceState({},'',window.location.pathname);
   }
-
   if (!key) return;
-  const name = (agent && agent.length <= 18) ? agent : 'Dashboard';
-
-  // Nav button → สีเขียว + ชื่อ
+  const name=(agent&&agent.length<=18)?agent:'Dashboard';
   if (btn) {
-    btn.innerHTML = '<span style="font-size:0.68rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">ยินดีต้อนรับ</span>' + name;
-    btn.href = '/dashboard';
-    btn.style.cssText += ';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
+    btn.innerHTML='<span style="font-size:0.65rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">ยินดีต้อนรับ</span>'+name;
+    btn.href='/dashboard';
+    btn.style.cssText+=';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
     btn.removeAttribute('data-i18n');
   }
-
-  // Hero CTA หลัก → เปลี่ยนเป็น "เข้าสู่ Dashboard"
   if (heroCta) {
-    heroCta.textContent = '🚀 เข้าสู่ Dashboard →';
-    heroCta.onclick = () => window.location.href = '/dashboard';
-    heroCta.style.background = 'linear-gradient(135deg,#059669,#10b981)';
+    heroCta.textContent='🚀 เข้าสู่ Dashboard →';
+    heroCta.onclick=()=>window.location.href='/dashboard';
+    heroCta.style.background='linear-gradient(135deg,#059669,#10b981)';
     heroCta.removeAttribute('data-i18n');
   }
 }
+
+// ── SPIN ANIMATION (for sandbox loading) ──────────────────────
+const styleEl=document.createElement('style');
+styleEl.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(styleEl);
+
 window.addEventListener('load', () => {
   setLang(detectLang());
   checkSavedSession();
 });
 </script>
-
-
-<div id="sessionToast" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #f59e0b;color:#f59e0b;padding:0.75rem 1.5rem;border-radius:10px;font-size:0.9rem;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center">
-  ⚠️ Session หมดอายุ กรุณาล็อคอินใหม่
-</div>
 </body>
 </html>
