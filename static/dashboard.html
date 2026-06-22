@@ -716,6 +716,21 @@ function showDashboard(data) {
   document.getElementById('navAgent').textContent = data.agent_name || 'Agent';
   document.getElementById('keyDisplay').textContent = currentKey;
   updateBalance(data);
+
+  // Pre-fill จาก ?q= (มาจาก sandbox หน้าแรก)
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('q');
+  if (q) {
+    const inp = document.getElementById('sandboxInput');
+    if (inp) {
+      inp.value = decodeURIComponent(q);
+      // switch ไป tab sandbox แล้ว trigger classify อัตโนมัติ
+      inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      inp.focus();
+      setTimeout(() => doSandbox(), 400);
+    }
+    history.replaceState({}, '', window.location.pathname);
+  }
 }
 
 function updateBalance(data) {

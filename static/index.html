@@ -525,7 +525,14 @@ function langBtnLabel(lang) {
 // ── MODAL ─────────────────────────────────────────────────────
 function openRegister() { document.getElementById('registerModal').classList.add('show'); }
 function closeRegister() { document.getElementById('registerModal').classList.remove('show'); }
-function openSandboxDemo() { document.getElementById('sandboxModal').classList.add('show'); }
+function openSandboxDemo() {
+  // ถ้า logged in แล้ว → ไป dashboard ตรง ไม่เปลืองโควต้า sandbox
+  if (localStorage.getItem('aitai_key')) {
+    window.location.href = '/dashboard';
+    return;
+  }
+  document.getElementById('sandboxModal').classList.add('show');
+}
 function closeSandbox() { document.getElementById('sandboxModal').classList.remove('show'); }
 
 async function doRegister() {
@@ -583,6 +590,12 @@ async function doSandbox() {
   btn.disabled = true;
   btn.textContent = '⏳ กำลังค้นหา...';
   result.style.display = 'block';
+  // ส่ง description ไปใน URL เพื่อ pre-fill ที่ dashboard
+  const dashLink = document.getElementById('sandboxDashLink');
+  if (dashLink) {
+    const desc = document.getElementById('sandboxDesc').value.trim();
+    dashLink.href = '/dashboard?q=' + encodeURIComponent(desc);
+  }
   result.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#94a3b8"><span style="font-size:1.3rem;animation:spin 1s linear infinite;display:inline-block">⏳</span> กำลังวิเคราะห์สินค้า รอสักครู่...</div>';
   try {
     const res = await fetch(API + '/v1/sandbox/classify', {
@@ -617,7 +630,7 @@ async function doSandbox() {
           </div>
           <div style="font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">${item.source_reference||''}</div>
           <div style="font-size:11px;color:#f59e0b">${data.disclaimer||''}</div>
-          <a href="/dashboard" style="display:inline-block;background:#6366f1;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มและ Candidates → Dashboard</a>
+          <a href="/dashboard" id="sandboxDashLink" style="display:inline-block;background:#6366f1;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มและ Candidates → Dashboard</a>
         </div>`;
     }
   } catch(e) {
