@@ -156,47 +156,75 @@ async def register_client(req: RegisterRequest):
 
 @router.post("/recover-key", summary="กู้คืน API Key ด้วย email + ชื่อ Agent")
 async def recover_key(req: RecoverKeyRequest):
-    p1, p2 = _ph(1), _ph(2)
+    email = req.contact_email.strip()
+    name  = req.agent_name.strip()
 
-    db = await _get_db()
-    try:
-        async with db.execute(
-            f"SELECT id, agent_name, contact_email, status FROM client_agents "
-            f"WHERE contact_email = {p1} AND LOWER(agent_name) = LOWER({p2})",
-            (req.contact_email.strip(), req.agent_name.strip())
-        ) as cur:
-            row = await cur.fetchone()
-
-        if not row:
-            raise HTTPException(404, {
-                "error": "NOT_FOUND",
-                "message": "ไม่พบบัญชีที่ตรงกับ email และชื่อ Agent ที่ระบุ"
-            })
-
-        if row["status"] != "ACTIVE":
-            raise HTTPException(403, {
-                "error": "ACCOUNT_SUSPENDED",
-                "message": "บัญชีนี้ถูกระงับ ติดต่อ support"
-            })
-
-        new_key  = _generate_api_key()
-        new_hint = new_key[-8:]
-
-        await db.execute(
-            f"UPDATE client_agents SET api_key_hint = {p1} WHERE id = {p2}",
-            (new_hint, row["id"])
-        )
-        await db.commit()  # commit UPDATE ก่อน — audit ต้องไม่ block
-
-        await _audit(db, 'TRANSACTION', row["id"], 'KEY_RECOVERED',
-                     f'{{"email":"{req.contact_email}","new_hint":"...{new_hint}"}}')
+    if USE_POSTGRES:
+        # ── PostgreSQL: ใช้ asyncpg pool โดยตรง (ข้าม db_adapter) ────────────
+        from db_adapter import get_pool
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT id, agent_name, contact_email, status FROM client_agents "
+                "WHERE contact_email = $1 AND LOWER(agent_name) = LOWER($2)",
+                email, name
+            )
+            if not row:
+                raise HTTPException(404, {
+                    "error": "NOT_FOUND",
+                    "message": "ไม่พบบัญชีที่ตรงกับ email และชื่อ Agent ที่ระบุ"
+                })
+            if row["status"] != "ACTIVE":
+                raise HTTPException(403, {
+                    "error": "ACCOUNT_SUSPENDED",
+                    "message": "บัญชีนี้ถูกระงับ ติดต่อ support"
+                })
+            new_key  = _generate_api_key()
+            new_hint = new_key[-8:]
+            await conn.execute(
+                "UPDATE client_agents SET api_key_hint = $1 WHERE id = $2",
+                new_hint, row["id"]
+            )
+            try:
+                ev_id = str(uuid.uuid4())
+                now   = datetime.now(timezone.utc).isoformat()
+                evidence_hash = hashlib.sha256(
+                    f"{ev_id}{row['id']}KEY_RECOVERED{email}".encode()).hexdigest()
+                await conn.execute(
+                    "INSERT INTO audit_events (id, event_type, actor_id, action, payload, evidence_hash, occurred_at) "
+                    "VALUES ($1,$2,$3,$4,$5,$6,$7)",
+                    ev_id, 'TRANSACTION', row["id"], 'KEY_RECOVERED',
+                    f'{{"email":"{email}","new_hint":"...{new_hint}"}}',
+                    evidence_hash, now
+                )
+            except Exception as ae:
+                print(f"[AUDIT] recover_key audit warning: {ae}")
+    else:
+        # ── SQLite fallback ───────────────────────────────────────────────────
+        p1, p2 = _ph(1), _ph(2)
+        db = await _get_db()
         try:
+            async with db.execute(
+                f"SELECT id, agent_name, contact_email, status FROM client_agents "
+                f"WHERE contact_email = {p1} AND LOWER(agent_name) = LOWER({p2})",
+                (email, name)
+            ) as cur:
+                row = await cur.fetchone()
+            if not row:
+                raise HTTPException(404, {"error": "NOT_FOUND", "message": "ไม่พบบัญชี"})
+            if row["status"] != "ACTIVE":
+                raise HTTPException(403, {"error": "ACCOUNT_SUSPENDED", "message": "บัญชีถูกระงับ"})
+            new_key  = _generate_api_key()
+            new_hint = new_key[-8:]
+            await db.execute(f"UPDATE client_agents SET api_key_hint = {p1} WHERE id = {p2}",
+                             (new_hint, row["id"]))
             await db.commit()
-        except Exception:
-            pass
-
-    finally:
-        await db.close()
+            await _audit(db, 'TRANSACTION', row["id"], 'KEY_RECOVERED',
+                         f'{{"email":"{email}","new_hint":"...{new_hint}"}}')
+            try: await db.commit()
+            except Exception: pass
+        finally:
+            await db.close()
 
     return {
         "success": True,
