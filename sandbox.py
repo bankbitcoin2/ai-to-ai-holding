@@ -118,6 +118,11 @@ class ResultItem(BaseModel):
     oga_note_th: Optional[str] = None
     oga_note_en: Optional[str] = None
     oga_risk_level: Optional[str] = None
+    # Halal
+    halal_required: bool = False
+    halal_risk_level: Optional[str] = None
+    halal_authority: Optional[str] = None
+    halal_note: Optional[str] = None
     # FTA info
     fta_eligible: bool = False
     fta_form: Optional[str] = None
@@ -146,6 +151,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
 
     from cache_service import cache_get, cache_set as _cache_set
     from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db, _fta_note_th
+    from knowledge_service import lookup_tax_rate, check_restricted, check_halal
 
     results, duties, scores = [], 0.0, []
     _t_start = time.time()
@@ -226,6 +232,11 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 oga = check_restricted(cls.hs_code or "")
             except Exception:
                 oga = {"is_restricted": False, "requires_permits": []}
+            _halal: dict = {"halal_required": False, "risk_level": "NONE"}
+            try:
+                _halal = check_halal(cls.hs_code or "", body.destination_country or "TH")
+            except Exception:
+                pass
             if da: duties += da
             scores.append(cls.confidence_score)
             candidates_out = [
@@ -270,6 +281,10 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 fta_note_th=_fta_note_th(_fta_info.get("form")),
                 fta_eligible_countries=_fta_info.get("all_eligible_countries", []),
                 fta_details=_fta_info.get("fta_details", []),
+                halal_required=bool(_halal.get("halal_required")),
+                halal_risk_level=_halal.get("risk_level"),
+                halal_authority=(_halal.get("destination_info") or {}).get("authority"),
+                halal_note=_halal.get("notes"),
                 notes=cls.notes,
                 candidates=candidates_out,
             ))
@@ -310,6 +325,8 @@ async def sandbox_classify(body: SandboxReq, req: Request):
             "avg_confidence_score": avg,
             "total_duty_estimate": round(duties, 2),
             "oga_flagged": sum(1 for r in results if r.oga_required),
+            "halal_flagged": sum(1 for r in results if r.halal_required),
+            "fta_eligible": sum(1 for r in results if r.fta_eligible),
             "ready_for_production": avg >= 0.75,
             "free_calls_used_today": used,
             "free_calls_remaining": rem,

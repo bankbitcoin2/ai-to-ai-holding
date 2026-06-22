@@ -263,17 +263,11 @@ except ImportError:
 
 
 def _hs_prefix(hs_code: str) -> str:
-    """Normalise HS code → digit-only 6-char prefix for prefix search."""
     return hs_code.replace(" ", "").replace(".", "").replace("-", "")[:6]
 
 
 def get_hs_description(hs_code: str) -> dict:
-    """
-    Return {'th': ..., 'en': ...} from bundled AHTN 2022 data.
-    Strategy:
-      1. Exact match via bundled get_description() (handles 8-digit exact + padded)
-      2. Prefix search: find first 8-digit key starting with 6-digit prefix
-    """
+    """Return {'th': ..., 'en': ...} — exact match then prefix search."""
     if _HS_DESC_OK and _hs_desc:
         try:
             r = _hs_desc.get_description(hs_code)
@@ -290,33 +284,31 @@ def get_hs_description(hs_code: str) -> dict:
     return {"th": None, "en": None}
 
 
-def get_fta_form(hs_code: str, origin_country: str) -> dict:
-    """
-    Return FTA form info for hs_code from origin_country.
-    {'eligible': True, 'form': 'FORM RCEP', 'all_eligible_countries': [...],
-     'fta_details': [{'country': ..., 'form': ..., 'note_th': ...}]}
-    """
-    if _FTA_ELIG_OK and _fta_elig:
-        try:
-            form = _fta_form_prefix(hs_code, origin_country)
-            eligible_all = _fta_eligible_prefix(hs_code)
-            fta_details = [
-                {"country": c, "form": f, "note_th": _fta_note_th(f)}
-                for c, f in eligible_all
-            ]
-            return {
-                "eligible": form is not None,
-                "form": form,
-                "all_eligible_countries": [c for c, _ in eligible_all],
-                "fta_details": fta_details,
-            }
-        except Exception:
-            pass
-    return {"eligible": False, "form": None, "all_eligible_countries": [], "fta_details": []}
+_FTA_NOTE_TH = {
+    "FORM RCEP":  "RCEP — ลดภาษีนำเข้าสำหรับสินค้าที่มีถิ่นกำเนิดในกลุ่มประเทศ RCEP",
+    "FORM AANZ":  "AANZ — FTA ไทย-ออสเตรเลีย-นิวซีแลนด์",
+    "FORM JTEPA": "JTEPA — FTA ไทย-ญี่ปุ่น",
+    "FORM TAFTA": "TAFTA — FTA ไทย-ออสเตรเลีย",
+    "FORM D":     "ATIGA (FORM D) — FTA อาเซียน",
+    "FORM E":     "ACFTA (FORM E) — FTA อาเซียน-จีน",
+    "FORM AK":    "AKFTA (FORM AK) — FTA อาเซียน-เกาหลีใต้",
+    "FORM AI":    "AIFTA (FORM AI) — FTA อาเซียน-อินเดีย",
+}
+
+def _fta_note_th(form: Optional[str]) -> Optional[str]:
+    if not form:
+        return None
+    return _FTA_NOTE_TH.get(form, form)
+
+
+def _build_fta_details(country_form_pairs: list, origin_country: str) -> list:
+    cc_origin = (origin_country or "").strip().upper()[:2]
+    details = [{"country": cc, "form": f, "note_th": _fta_note_th(f)} for cc, f in country_form_pairs]
+    details.sort(key=lambda d: (0 if d["country"] == cc_origin else 1, d["country"]))
+    return details
 
 
 def _fta_form_prefix(hs_code: str, origin_country: str) -> Optional[str]:
-    """Lookup FTA form with prefix search to handle varying key lengths (6/8/9/10 digit)."""
     db = _fta_elig._load()
     cc = _fta_elig._normalize_country(origin_country)
     country_db = db.get(cc)
@@ -338,7 +330,6 @@ def _fta_form_prefix(hs_code: str, origin_country: str) -> Optional[str]:
 
 
 def _fta_eligible_prefix(hs_code: str) -> list:
-    """Get all (country, form) pairs with prefix-aware lookup."""
     db = _fta_elig._load()
     clean = hs_code.replace(" ", "").replace(".", "").replace("-", "")
     prefix6 = clean[:6]
@@ -366,21 +357,21 @@ def _fta_eligible_prefix(hs_code: str) -> list:
     return result
 
 
-_FTA_NOTE_TH = {
-    "FORM RCEP":  "RCEP — ลดภาษีนำเข้าสำหรับสินค้าที่มีถิ่นกำเนิดในกลุ่มประเทศ RCEP",
-    "FORM AANZ":  "AANZ — FTA ไทย-ออสเตรเลีย-นิวซีแลนด์",
-    "FORM JTEPA": "JTEPA — FTA ไทย-ญี่ปุ่น",
-    "FORM TAFTA": "TAFTA — FTA ไทย-ออสเตรเลีย",
-    "FORM D":     "ATIGA (FORM D) — FTA อาเซียน",
-    "FORM E":     "ACFTA (FORM E) — FTA อาเซียน-จีน",
-    "FORM AK":    "AKFTA (FORM AK) — FTA อาเซียน-เกาหลีใต้",
-    "FORM AI":    "AIFTA (FORM AI) — FTA อาเซียน-อินเดีย",
-}
-
-def _fta_note_th(form: Optional[str]) -> Optional[str]:
-    if not form:
-        return None
-    return _FTA_NOTE_TH.get(form, form)
+def get_fta_form(hs_code: str, origin_country: str) -> dict:
+    if _FTA_ELIG_OK and _fta_elig:
+        try:
+            form = _fta_form_prefix(hs_code, origin_country)
+            eligible_all = _fta_eligible_prefix(hs_code)
+            fta_details = _build_fta_details(eligible_all, origin_country)
+            return {
+                "eligible": form is not None,
+                "form": form,
+                "all_eligible_countries": [d["country"] for d in fta_details],
+                "fta_details": fta_details,
+            }
+        except Exception:
+            pass
+    return {"eligible": False, "form": None, "all_eligible_countries": [], "fta_details": []}
 
 
 async def get_hs_description_db(hs_code: str) -> dict:
@@ -436,10 +427,15 @@ async def get_fta_form_db(hs_code: str, origin_country: str) -> dict:
                             "SELECT country_code, fta_form FROM fta_eligibility WHERE hs_code = $1",
                             clean[:length]
                         )
+                        fta_details = _build_fta_details(
+                            [(r["country_code"], r["fta_form"]) for r in all_rows],
+                            origin_country
+                        )
                         return {
                             "eligible": True,
                             "form": row["fta_form"],
-                            "all_eligible_countries": [r["country_code"] for r in all_rows],
+                            "all_eligible_countries": [d["country"] for d in fta_details],
+                            "fta_details": fta_details,
                             "source": "db"
                         }
     except Exception:
