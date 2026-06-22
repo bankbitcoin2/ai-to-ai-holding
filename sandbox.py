@@ -349,31 +349,79 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     )
 
 # ── Feedback Endpoint ─────────────────────────────────────────────────────────
-class FeedbackReq(BaseModel):
-    log_id: str
-    status: str     # CONFIRMED | REJECTED | AMENDED
-    amended_hs_code: Optional[str] = None
-    feedback_by: str = "client"
 
-@router.post("/feedback", summary="ส่ง feedback ผล HS Classification")
+class FeedbackReq(BaseModel):
+    log_id: str = Field(..., description="log_id จาก classify response candidates")
+    status: str = Field(..., description="CONFIRMED | REJECTED | AMENDED")
+    amended_hs_code: Optional[str] = Field(None, description="HS code ที่ถูกต้อง (กรณี AMENDED)")
+    feedback_by: str = Field("client", description="ผู้ส่ง feedback")
+
+
+@router.post("/feedback", summary="ส่ง feedback ผล HS Classification — ปรับ learning loop")
 async def sandbox_feedback(body: FeedbackReq):
+    """
+    ส่ง feedback กลับระบบ:
+    - CONFIRMED  → boost confidence +0.05, source → CONFIRMED
+    - REJECTED   → reduce confidence -0.10, source → REJECTED
+    - AMENDED    → บันทึก hs_code ที่ถูกต้อง, source → CONFIRMED
+    ผลถูก process ทันทีผ่าน cache_feedback_queue
+    """
     if body.status not in ("CONFIRMED", "REJECTED", "AMENDED"):
         raise HTTPException(400, detail={"error": "INVALID_STATUS",
             "message": "status must be CONFIRMED | REJECTED | AMENDED"})
     try:
-        from database import get_db
         from cache_classification import submit_feedback
-        async with get_db() as db:
-                        ok = await submit_feedback(db, body.log_id, body.status,
-                                       body.amended_hs_code, body.feedback_by)
+        ok = await submit_feedback(None, body.log_id, body.status,
+                                   body.amended_hs_code, body.feedback_by)
         if not ok:
             raise HTTPException(404, detail={"error": "LOG_NOT_FOUND",
-                "message": f"log_id {body.log_id} not found"})
-        return {"received": True, "log_id": body.log_id, "action": body.status}
+                "message": f"log_id '{body.log_id}' not found or invalid"})
+        return {
+            "received": True,
+            "log_id": body.log_id,
+            "action": body.status,
+            "effect": (
+                "confidence boosted → CONFIRMED" if body.status == "CONFIRMED"
+                else "confidence reduced → REJECTED" if body.status == "REJECTED"
+                else f"cache updated with hs_code={body.amended_hs_code} → CONFIRMED"
+            ),
+        }
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(500, detail={"error": "FEEDBACK_ERROR", "message": str(e)})
+
+
+# ── Halal Countries Endpoint ──────────────────────────────────────────────────
+
+@router.get("/halal-countries", summary="รายชื่อประเทศที่ต้องการ Halal Certification (21 ประเทศ)")
+async def halal_countries(region: Optional[str] = None):
+    """
+    คืนรายชื่อ 21 ประเทศที่กำหนดให้สินค้าต้องมี Halal Certification
+    พร้อม authority และ region
+    - region filter: GCC | SEA | Middle East | South Asia | North Africa | West Africa
+    """
+    try:
+        from halal_engine import HALAL_MANDATORY_COUNTRIES
+        data = [
+            {
+                "code":      code,
+                "name":      info["name"],
+                "region":    info["region"],
+                "authority": info["authority"],
+            }
+            for code, info in HALAL_MANDATORY_COUNTRIES.items()
+            if (region is None or info["region"].lower() == region.lower())
+        ]
+        regions = sorted({info["region"] for info in HALAL_MANDATORY_COUNTRIES.values()})
+        return {
+            "total":     len(data),
+            "regions":   regions,
+            "countries": data,
+        }
+    except Exception as e:
+        raise HTTPException(500, detail={"error": "HALAL_ENGINE_ERROR", "message": str(e)})
+
 
 # ── CKAN Probe Endpoint (debug) ───────────────────────────────────────────────
 @router.get("/probe-ckan", summary="Probe CKAN tariff resource fields")
@@ -384,67 +432,3 @@ async def probe_ckan(hs: str = "6802"):
         return result
     except Exception as e:
         return {"error": str(e)}
-
-
-# ── Feedback endpoint ─────────────────────────────────────────────────────────
-
-class FeedbackReq(BaseModel):
-    session_id: str = Field(..., description="sandbox_session_id จาก classify response")
-    description: str = Field(..., description="product description ที่ใช้ classify")
-    hs_code: str = Field(..., description="HS code ที่ user ยืนยันว่าถูกต้อง")
-    origin_country: Optional[str] = None
-    note: Optional[str] = None
-
-
-@router.post("/feedback", summary="ยืนยัน HS Code — เพิ่ม confidence ใน cache")
-async def sandbox_feedback(body: FeedbackReq):
-    """
-    User ยืนยันผลที่ถูกต้อง → อัปเดต cache ให้มี source='user_confirmed'
-    ใช้เป็น training signal สำหรับ DB-first lookup ในอนาคต
-    """
-    try:
-        from db_adapter import get_pool, USE_POSTGRES
-        if not USE_POSTGRES:
-            return {"status": "ok", "message": "feedback noted (dev mode)"}
-
-        import uuid as _uuid, hashlib
-        from datetime import datetime, timezone
-
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-            # อัปเดต cache entry ถ้ามี — เพิ่ม confidence + mark source
-            cache_key = hashlib.sha256(
-                f"{body.description.lower().strip()}:{(body.origin_country or '').upper()}".encode()
-            ).hexdigest()
-
-            existing = await conn.fetchrow(
-                "SELECT id FROM hs_classification_cache WHERE cache_key = $1", cache_key
-            )
-            if existing:
-                await conn.execute(
-                    "UPDATE hs_classification_cache SET "
-                    "confidence_score = LEAST(confidence_score + 0.05, 1.0), "
-                    "source = 'user_confirmed' "
-                    "WHERE cache_key = $1",
-                    cache_key
-                )
-            else:
-                # สร้าง cache entry ใหม่จาก feedback
-                await conn.execute(
-                    "INSERT INTO hs_classification_cache "
-                    "(id, cache_key, hs_code, hs_description, confidence_score, source, created_at) "
-                    "VALUES ($1,$2,$3,$4,$5,'user_confirmed',$6) "
-                    "ON CONFLICT (cache_key) DO NOTHING",
-                    str(_uuid.uuid4()), cache_key, body.hs_code,
-                    body.note or "", 0.92,
-                    datetime.now(timezone.utc).isoformat()
-                )
-
-        return {
-            "status": "ok",
-            "message": "ขอบคุณ — ยืนยัน HS Code แล้ว ระบบจะจดจำสำหรับ query ต่อไป",
-            "hs_code": body.hs_code,
-            "effect": "cache confidence updated"
-        }
-    except Exception as e:
-        return {"status": "error", "message": str(e)}

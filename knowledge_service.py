@@ -380,19 +380,21 @@ async def get_hs_description_db(hs_code: str) -> dict:
     ถ้าไม่มีหรือ error → fallback bundled
     """
     clean = hs_code.replace(" ","").replace(".","").strip()
-    # Try DB first
+    # Try DB first (multi-length: 8→6→4 digit prefix)
     try:
         from database import USE_POSTGRES
         if USE_POSTGRES:
             from db_adapter import get_pool
             pool = await get_pool()
             async with pool.acquire() as conn:
-                row = await conn.fetchrow(
-                    "SELECT desc_th, desc_en FROM hs_code_master WHERE REPLACE(TRIM(hs_code), '.', '') LIKE $1",
-                    clean[:6] + '%'
-                )
-                if row:
-                    return {"th": row["desc_th"], "en": row["desc_en"], "source": "db"}
+                for length in [8, 6, 4]:
+                    row = await conn.fetchrow(
+                        "SELECT desc_th, desc_en FROM hs_code_master "
+                        "WHERE hs_code LIKE $1 LIMIT 1",
+                        clean[:length] + '%'
+                    )
+                    if row and (row["desc_th"] or row["desc_en"]):
+                        return {"th": row["desc_th"], "en": row["desc_en"], "source": "db"}
     except Exception:
         pass
     # Fallback: bundled
@@ -416,27 +418,57 @@ async def get_fta_form_db(hs_code: str, origin_country: str) -> dict:
             cc = _ALIASES.get(origin_country.strip().upper(), origin_country.strip().upper()[:2])
             pool = await get_pool()
             async with pool.acquire() as conn:
-                # Try 8-digit, 6-digit
-                for length in [8, 6]:
+                # Try multi-length: 10→9→8→7→6 (country key formats vary)
+                for length in [10, 9, 8, 7, 6]:
+                    if len(clean) < length:
+                        continue
                     row = await conn.fetchrow(
-                        "SELECT fta_form FROM fta_eligibility WHERE hs_code = $1 AND country_code = $2",
-                        clean[:length], cc
+                        "SELECT fta_form FROM fta_eligibility "
+                        "WHERE hs_code = $1 AND country_code = $2",
+                        clean[:length], cc,
                     )
                     if row:
                         all_rows = await conn.fetch(
-                            "SELECT country_code, fta_form FROM fta_eligibility WHERE hs_code = $1",
-                            clean[:length]
+                            "SELECT country_code, fta_form FROM fta_eligibility "
+                            "WHERE hs_code = $1",
+                            clean[:length],
                         )
                         fta_details = _build_fta_details(
                             [(r["country_code"], r["fta_form"]) for r in all_rows],
-                            origin_country
+                            origin_country,
                         )
                         return {
                             "eligible": True,
                             "form": row["fta_form"],
                             "all_eligible_countries": [d["country"] for d in fta_details],
                             "fta_details": fta_details,
-                            "source": "db"
+                            "source": "db",
+                        }
+                # ไม่เจอ exact match — ลอง prefix scan (LIKE)
+                for length in [8, 6]:
+                    if len(clean) < length:
+                        continue
+                    row = await conn.fetchrow(
+                        "SELECT hs_code, fta_form FROM fta_eligibility "
+                        "WHERE hs_code LIKE $1 AND country_code = $2 LIMIT 1",
+                        clean[:length] + '%', cc,
+                    )
+                    if row:
+                        all_rows = await conn.fetch(
+                            "SELECT country_code, fta_form FROM fta_eligibility "
+                            "WHERE hs_code LIKE $1",
+                            clean[:length] + '%',
+                        )
+                        fta_details = _build_fta_details(
+                            [(r["country_code"], r["fta_form"]) for r in all_rows],
+                            origin_country,
+                        )
+                        return {
+                            "eligible": True,
+                            "form": row["fta_form"],
+                            "all_eligible_countries": [d["country"] for d in fta_details],
+                            "fta_details": fta_details,
+                            "source": "db",
                         }
     except Exception:
         pass

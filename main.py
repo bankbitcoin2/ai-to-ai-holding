@@ -42,47 +42,64 @@ from chairman_router import router as chairman_router
 
 
 async def _auto_seed():
-    """Seed hs_code_master + fta_eligibility ถ้าตารางว่าง — รันครั้งเดียวอัตโนมัติ"""
+    """
+    Seed hs_code_master + fta_eligibility ถ้าตารางว่าง — รันครั้งเดียวอัตโนมัติ
+    แต่ละตารางถูกตรวจอิสระ — fta จะถูก seed แม้ hs_code_master มีข้อมูลแล้ว
+    """
     from database import USE_POSTGRES
     if not USE_POSTGRES:
         return
     try:
         from db_adapter import get_pool
+        import pathlib
         pool = await get_pool()
         async with pool.acquire() as conn:
-            # Apply schema ก่อน
-            schema_path = __import__('pathlib').Path(__file__).parent / 'schema_hs_master.sql'
+            # Apply schema ก่อนเสมอ (CREATE TABLE IF NOT EXISTS — safe)
+            schema_path = pathlib.Path(__file__).parent / "schema_hs_master.sql"
             if schema_path.exists():
-                await conn.execute(schema_path.read_text())
+                try:
+                    await conn.execute(schema_path.read_text())
+                except Exception as se:
+                    print(f"[SEED] schema apply warning: {se}")
 
-            # ตรวจว่า hs_code_master ว่างไหม
-            count = await conn.fetchval("SELECT COUNT(*) FROM hs_code_master")
-            if count and count > 0:
-                print(f"[SEED] hs_code_master already has {count} rows — skip")
-                return
+            # ── Seed hs_code_master ──────────────────────────────────────────
+            hs_count = await conn.fetchval("SELECT COUNT(*) FROM hs_code_master")
+            if not hs_count or hs_count == 0:
+                import hs_descriptions_bundled as _hd
+                desc_db = _hd._load()
+                desc_rows = [(k.strip(), v["th"], v["en"]) for k, v in desc_db.items()]
+                batch = 500
+                for i in range(0, len(desc_rows), batch):
+                    await conn.executemany(
+                        "INSERT INTO hs_code_master (hs_code, desc_th, desc_en) "
+                        "VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+                        desc_rows[i:i+batch],
+                    )
+                print(f"[SEED] hs_code_master: {len(desc_rows):,} rows inserted")
+            else:
+                print(f"[SEED] hs_code_master: {hs_count:,} rows exist — skip")
 
-            # Seed hs_descriptions
-            import hs_descriptions_bundled as _hd
-            import json, zlib, base64
-            desc_db = _hd._load()
-            desc_rows = [(k.strip(), v["th"], v["en"]) for k, v in desc_db.items()]
-            await conn.executemany(
-                "INSERT INTO hs_code_master (hs_code, desc_th, desc_en) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
-                desc_rows
-            )
-            print(f"[SEED] hs_code_master: {len(desc_rows)} rows inserted")
+            # ── Seed fta_eligibility ─────────────────────────────────────────
+            fta_count = await conn.fetchval("SELECT COUNT(*) FROM fta_eligibility")
+            if not fta_count or fta_count == 0:
+                import fta_eligibility_bundled as _fe
+                fta_db = _fe._load()
+                fta_rows = [
+                    (hs.strip(), cc, form)
+                    for cc, hs_map in fta_db.items()
+                    for hs, form in hs_map.items()
+                ]
+                batch = 1000
+                for i in range(0, len(fta_rows), batch):
+                    await conn.executemany(
+                        "INSERT INTO fta_eligibility (hs_code, country_code, fta_form) "
+                        "VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+                        fta_rows[i:i+batch],
+                    )
+                print(f"[SEED] fta_eligibility: {len(fta_rows):,} rows inserted")
+            else:
+                print(f"[SEED] fta_eligibility: {fta_count:,} rows exist — skip")
 
-            # Seed fta_eligibility
-            import fta_eligibility_bundled as _fe
-            fta_db = _fe._load()
-            fta_rows = [(hs.strip(), cc, form) for cc, hs_map in fta_db.items() for hs, form in hs_map.items()]
-            batch = 500
-            for i in range(0, len(fta_rows), batch):
-                await conn.executemany(
-                    "INSERT INTO fta_eligibility (hs_code, country_code, fta_form) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
-                    fta_rows[i:i+batch]
-                )
-            print(f"[SEED] fta_eligibility: {len(fta_rows)} rows inserted")
     except Exception as e:
         print(f"[SEED] Warning — auto-seed failed (non-fatal): {e}")
 
