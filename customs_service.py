@@ -86,7 +86,7 @@ async def process_invoice(
 
         # ── Cache lookup ──────────────────────────────────────
         from cache_service import cache_get as _cg, cache_set as _cs
-        from knowledge_service import get_hs_description as _get_desc
+        from knowledge_service import get_hs_description as _get_desc, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db
         _cached = await _cg(description, origin)
         if _cached:
             class _R:
@@ -112,6 +112,13 @@ async def process_invoice(
                 origin_country=origin,
                 additional_context=extra,
             )
+            # ── Enrich hs_description จาก DB ─────────────────
+            if result.hs_code and result.best:
+                _db_d = await _get_desc_db(result.hs_code)
+                if _db_d.get("th"):
+                    result.best.hs_description_th = _db_d["th"]
+                if _db_d.get("en") and not getattr(result.best, "hs_description", None):
+                    result.best.hs_description = _db_d["en"]
             # ── Save to cache ─────────────────────────────────
             if result.hs_code and result.confidence_score >= 0.75:
                 try:

@@ -135,7 +135,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     used, warn = _check(ip)
 
     from cache_service import cache_get, cache_set as _cache_set
-    from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta
+    from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db
 
     results, duties, scores = [], 0.0, []
     try:
@@ -164,6 +164,13 @@ async def sandbox_classify(body: SandboxReq, req: Request):
             else:
                 cls = await classify_item(description=item.description,
                                            origin_country=item.origin_country)
+                # ── Enrich hs_description จาก DB (hs_code_master) ──────────
+                if cls.hs_code and cls.best:
+                    _db_d = await _get_desc_db(cls.hs_code)
+                    if _db_d.get("th"):
+                        cls.best.hs_description_th = _db_d["th"]
+                    if _db_d.get("en") and not getattr(cls.best, "hs_description", None):
+                        cls.best.hs_description = _db_d["en"]
                 # ── Save to cache ─────────────────────────────
                 if cls.hs_code and cls.confidence_score >= 0.75:
                     try:
@@ -184,6 +191,16 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 tax = lookup_tax_rate(cls.hs_code or "", item.origin_country)
             except Exception:
                 tax = {"status": "unavailable"}
+            # ── Enrich FTA จาก DB (fta_eligibility) ──────────────────────
+            if cls.hs_code and item.origin_country:
+                try:
+                    _fta_db = await _get_fta_db(cls.hs_code, item.origin_country)
+                    if _fta_db.get("eligible"):
+                        tax["fta_form"] = _fta_db.get("form")
+                        tax["fta_eligible_countries"] = _fta_db.get("all_eligible_countries", [])
+                        tax["fta_source"] = _fta_db.get("source", "db")
+                except Exception:
+                    pass
             dr = _best_rate(tax)
             da = round(price * dr, 2) if price else None
             vr = float(tax.get("vat_rate") or 0.07)
