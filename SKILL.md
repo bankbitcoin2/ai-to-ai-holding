@@ -2,6 +2,12 @@
 name: ai-to-ai-holding
 description: >
   Project context skill for AI TO AI HOLDING — an AI-Native Corporation building
+  digital trade infrastructure on Railway + PostgreSQL. Use this skill whenever the
+  user mentions AI TO AI HOLDING, Chairman commands, Customs Intelligence Division,
+  Treasury, Kill Switch, HS Code, cache, normalize, FTA, halal, OGA, asyncpg,
+  or any architecture/bug fix for this project. Also trigger on signal codes [A] [B] [C].
+  Load at the start of every session involving this project.
+  (DEPRECATED description lines below — kept for backward compat)
   digital trade infrastructure. Use this skill whenever the user mentions AI TO AI
   HOLDING, Chairman commands, Customs Intelligence Division, Treasury Core, Kill Switch,
   HS Code classification pipeline, or any Phase 1 architecture decisions. Also trigger
