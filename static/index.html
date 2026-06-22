@@ -128,7 +128,7 @@
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
     </div>
     <a href="/docs" class="btn btn-outline" target="_blank" data-i18n="nav_docs">API Docs</a>
-    <a href="/dashboard" class="btn btn-primary" data-i18n="nav_login">Client Login</a>
+    <a id="navLoginBtn" href="/dashboard" class="btn btn-primary" data-i18n="nav_login">Client Login</a>
   </div>
 </nav>
 
@@ -683,6 +683,23 @@ async function doRecover() {
   }
 }
 
+
+// ── PERSISTENT LOGIN CHECK ─────────────────────────────────────
+function checkSavedSession() {
+  const key = localStorage.getItem('aitai_key');
+  const agent = localStorage.getItem('aitai_agent');
+  const btn = document.getElementById('navLoginBtn');
+  if (!btn || !key) return;
+  const name = (agent && agent.length <= 18) ? agent : 'Dashboard';
+  btn.innerHTML = '<span style="font-size:0.68rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">ยินดีต้อนรับ</span>' + name;
+  btn.href = '/dashboard';
+  btn.style.cssText += ';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
+  btn.removeAttribute('data-i18n');
+}
+window.addEventListener('load', () => {
+  setLang(detectLang());
+  checkSavedSession();
+});
 </script>
 
 </body>
