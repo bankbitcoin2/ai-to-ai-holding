@@ -4,6 +4,7 @@ sandbox.py — Free Trial Endpoint
 - Uses real Claude if ANTHROPIC_API_KEY set, else mock
 - All errors return JSON (no plain-text 500)
 """
+import asyncio
 import os, uuid, time
 from collections import defaultdict, deque
 from datetime import datetime, timezone, date
@@ -19,6 +20,8 @@ if _HAS_REAL_API:
     from classification_agent import classify_item
 else:
     from mock_classification_agent import classify_item
+
+_CLASSIFY_SEM = asyncio.Semaphore(5)
 
 def _best_rate(t: dict) -> float:
     if not t or t.get("status") in ("unavailable","error","no_data"):
@@ -140,70 +143,58 @@ async def sandbox_classify(body: SandboxReq, req: Request):
 
     results, duties, scores = [], 0.0, []
     _t_start = time.time()
+
+    # ── Phase 1: classify ทุก item parallel (cache-first, semaphore 5) ──
+    async def _classify_one_sb(item):
+        _cached = await cache_get(item.description, item.origin_country)
+        if _cached:
+            _db_d_c = await _get_desc_db(_cached.get("hs_code", ""))
+            _th_desc = _db_d_c.get("th") or None
+            _en_desc = _db_d_c.get("en") or _cached.get("hs_description")
+            _conf = float(_cached.get("confidence_score", 0.85))
+            _src = _cached.get("source_reference", "Cache")
+            _notes_c = _cached.get("notes")
+            _hs_c = _cached.get("hs_code")
+            class _FakeBest:
+                rank = 1; hs_code = _hs_c; hs_code_11 = None
+                hs_description = _en_desc; hs_description_th = _th_desc
+                confidence_score = _conf; source_reference = _src; notes = _notes_c
+            _best_inst = _FakeBest()
+            class _FakeCls:
+                hs_code = _hs_c; confidence_score = _conf
+                source_reference = _src; notes = _notes_c
+                best = _best_inst; candidates = [_best_inst]
+            return _FakeCls()
+        # Cache miss → Claude ผ่าน semaphore
+        async with _CLASSIFY_SEM:
+            cls = await classify_item(description=item.description,
+                                      origin_country=item.origin_country)
+        for _c in cls.candidates:
+            if _c.hs_code and not _c.hs_description_th:
+                try:
+                    _cd = await _get_desc_db(_c.hs_code)
+                    if _cd.get("th"): _c.hs_description_th = _cd["th"]
+                    if _cd.get("en") and not _c.hs_description: _c.hs_description = _cd["en"]
+                except Exception:
+                    pass
+        if cls.hs_code and cls.confidence_score >= 0.75:
+            try:
+                await _cache_set(
+                    description=item.description, origin_country=item.origin_country,
+                    hs_code=cls.hs_code,
+                    hs_description=cls.hs_description if hasattr(cls, "hs_description") else (cls.best.hs_description if cls.best else None),
+                    confidence_score=cls.confidence_score,
+                    source_reference=cls.source_reference, notes=cls.notes,
+                    model_used="claude" if _HAS_REAL_API else "mock",
+                )
+            except Exception as _ce:
+                print(f"[CACHE] save warning: {_ce}")
+        return cls
+
+    cls_results = await asyncio.gather(*[_classify_one_sb(item) for item in body.items])
+
     try:
-        for i, item in enumerate(body.items, 1):
-            # ── Cache lookup ──────────────────────────────────
-            _cached = await cache_get(item.description, item.origin_country)
-            if _cached:
-                # ── Enrich Thai desc จาก DB (async) ──────────────────────
-                _db_d_c = await _get_desc_db(_cached.get("hs_code", ""))
-                _th_desc = _db_d_c.get("th") or None
-                _en_desc = _db_d_c.get("en") or _cached.get("hs_description")
-                _conf = float(_cached.get("confidence_score", 0.85))
-                _src = _cached.get("source_reference", "Cache")
-                _notes_c = _cached.get("notes")
-                _hs_c = _cached.get("hs_code")
-
-                class _FakeBest:
-                    rank = 1
-                    hs_code = _hs_c
-                    hs_code_11 = None
-                    hs_description = _en_desc
-                    hs_description_th = _th_desc
-                    confidence_score = _conf
-                    source_reference = _src
-                    notes = _notes_c
-
-                _best_inst = _FakeBest()
-
-                class _FakeCls:
-                    hs_code = _hs_c
-                    confidence_score = _conf
-                    source_reference = _src
-                    notes = _notes_c
-                    best = _best_inst
-                    candidates = [_best_inst]
-
-                cls = _FakeCls()
-            else:
-                cls = await classify_item(description=item.description,
-                                           origin_country=item.origin_country)
-                # ── Enrich hs_description_th จาก DB สำหรับทุก candidate ──────
-                for _c in cls.candidates:
-                    if _c.hs_code and not _c.hs_description_th:
-                        try:
-                            _cd = await _get_desc_db(_c.hs_code)
-                            if _cd.get("th"):
-                                _c.hs_description_th = _cd["th"]
-                            if _cd.get("en") and not _c.hs_description:
-                                _c.hs_description = _cd["en"]
-                        except Exception:
-                            pass
-                # ── Save to cache ─────────────────────────────
-                if cls.hs_code and cls.confidence_score >= 0.75:
-                    try:
-                        await _cache_set(
-                            description=item.description,
-                            origin_country=item.origin_country,
-                            hs_code=cls.hs_code,
-                            hs_description=cls.hs_description if hasattr(cls, "hs_description") else (cls.best.hs_description if cls.best else None),
-                            confidence_score=cls.confidence_score,
-                            source_reference=cls.source_reference,
-                            notes=cls.notes,
-                            model_used="claude" if _HAS_REAL_API else "mock",
-                        )
-                    except Exception as _ce:
-                        print(f"[CACHE] save warning: {_ce}")
+        for i, (item, cls) in enumerate(zip(body.items, cls_results), 1):
             price = ((item.quantity or 1) * item.unit_price) if item.unit_price else None
             try:
                 tax = lookup_tax_rate(cls.hs_code or "", item.origin_country)
