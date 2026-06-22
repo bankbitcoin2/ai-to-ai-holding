@@ -148,7 +148,7 @@
   <p data-i18n="hero_desc"></p>
   <p style="font-size:1rem;color:var(--muted);margin-top:-1.5rem;margin-bottom:2rem;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;letter-spacing:0.01em" data-i18n="hero_tagline">ระบบอัจฉริยะที่ให้บริการ เพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ ด้วยเทคโนโลยี AI ที่แม่นยำ รวดเร็ว และเชื่อถือได้</p>
   <div class="hero-cta">
-    <button class="btn btn-primary btn-lg" onclick="openRegister()" data-i18n="cta_register">เริ่มต้นฟรี — รับ API Key</button>
+    <button id="heroCtaMain" class="btn btn-primary btn-lg" onclick="openRegister()" data-i18n="cta_register">เริ่มต้นฟรี — รับ API Key</button>
     <button class="btn btn-outline btn-lg" onclick="openSandboxDemo()" data-i18n="cta_try">ทดลองใช้ฟรี</button>
   </div>
 </div>
@@ -689,12 +689,35 @@ function checkSavedSession() {
   const key = localStorage.getItem('aitai_key');
   const agent = localStorage.getItem('aitai_agent');
   const btn = document.getElementById('navLoginBtn');
-  if (!btn || !key) return;
+  const heroCta = document.getElementById('heroCtaMain');
+
+  // Session expired redirect
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('session_expired') === '1') {
+    const toast = document.getElementById('sessionToast');
+    if (toast) { toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 5000); }
+    // ล้าง URL โดยไม่ reload
+    history.replaceState({}, '', window.location.pathname);
+  }
+
+  if (!key) return;
   const name = (agent && agent.length <= 18) ? agent : 'Dashboard';
-  btn.innerHTML = '<span style="font-size:0.68rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">ยินดีต้อนรับ</span>' + name;
-  btn.href = '/dashboard';
-  btn.style.cssText += ';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
-  btn.removeAttribute('data-i18n');
+
+  // Nav button → สีเขียว + ชื่อ
+  if (btn) {
+    btn.innerHTML = '<span style="font-size:0.68rem;opacity:0.75;display:block;line-height:1;margin-bottom:1px">ยินดีต้อนรับ</span>' + name;
+    btn.href = '/dashboard';
+    btn.style.cssText += ';background:linear-gradient(135deg,#059669,#10b981);font-size:0.82rem';
+    btn.removeAttribute('data-i18n');
+  }
+
+  // Hero CTA หลัก → เปลี่ยนเป็น "เข้าสู่ Dashboard"
+  if (heroCta) {
+    heroCta.textContent = '🚀 เข้าสู่ Dashboard →';
+    heroCta.onclick = () => window.location.href = '/dashboard';
+    heroCta.style.background = 'linear-gradient(135deg,#059669,#10b981)';
+    heroCta.removeAttribute('data-i18n');
+  }
 }
 window.addEventListener('load', () => {
   setLang(detectLang());
@@ -702,5 +725,9 @@ window.addEventListener('load', () => {
 });
 </script>
 
+
+<div id="sessionToast" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #f59e0b;color:#f59e0b;padding:0.75rem 1.5rem;border-radius:10px;font-size:0.9rem;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center">
+  ⚠️ Session หมดอายุ กรุณาล็อคอินใหม่
+</div>
 </body>
 </html>

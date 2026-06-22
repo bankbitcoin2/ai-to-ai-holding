@@ -691,7 +691,7 @@ async function doLogin() {
   const key = document.getElementById('keyInput').value.trim();
   const err = document.getElementById('loginError');
   err.style.display = 'none';
-  if (!key) { err.textContent = t('login_err_empty'); err.style.display = 'block'; return; }
+  if (!key) { err.textContent = t('login_err_empty'); err.style.display = 'block'; return false; }
 
   try {
     const res = await fetch(API + '/v1/billing/balance', { headers: { 'X-API-Key': key } });
@@ -702,9 +702,11 @@ async function doLogin() {
     localStorage.setItem('aitai_key', key);
     localStorage.setItem('aitai_agent', data.agent_name);
     showDashboard(data);
+    return true;
   } catch (e) {
     err.textContent = e.message;
     err.style.display = 'block';
+    return false;
   }
 }
 
@@ -969,7 +971,13 @@ window.addEventListener('load', async () => {
   const saved = localStorage.getItem('aitai_key');
   if (saved) {
     document.getElementById('keyInput').value = saved;
-    await doLogin();
+    const ok = await doLogin();
+    if (!ok) {
+      // Key ไม่ valid — ล้าง session แล้ว redirect กลับหน้าแรก
+      localStorage.removeItem('aitai_key');
+      localStorage.removeItem('aitai_agent');
+      window.location.href = '/?session_expired=1';
+    }
   }
 });
 
