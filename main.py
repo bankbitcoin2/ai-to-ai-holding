@@ -191,4 +191,7 @@ app.include_router(customs_router)
 app.include_router(sandbox_router)
 app.include_router(treasury_router)
 app.include_router(ceo_router)
-app.include_router
+app.include_router(wallet_router)
+app.include_router(kill_switch_router)
+app.include_router(billing_router)
+app.include_router(chairman_router)
