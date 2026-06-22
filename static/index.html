@@ -2,7 +2,14 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/logo/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="HSW — Thai Customs Intelligence API">
+  <meta property="og:description" content="ระบบจำแนกพิกัดศุลกากร HS Code สำหรับ AI Agent และธุรกิจการค้าระหว่างประเทศ">
+  <meta property="og:image" content="/static/logo/logo-dark.svg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="HSW — Thai Customs Intelligence">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI TO AI HOLDING — Thai Customs Intelligence API</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -99,7 +106,18 @@
 <body>
 
 <nav>
-  <div class="logo">🛃 AI<span>TO</span>AI <span style="color:var(--muted);font-weight:400">HOLDING</span></div>
+  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;line-height:1">
+    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+      <rect width="32" height="32" rx="7" fill="#111827"/>
+      <polygon points="16,3 27,9 27,21 16,27 5,21 5,9" fill="#0a0e1a" stroke="url(#ng)" stroke-width="1.2"/>
+      <text x="16" y="20" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="11" letter-spacing="-0.3" fill="url(#ng)">HSW</text>
+    </svg>
+    <span style="display:flex;flex-direction:column;gap:1px">
+      <span style="font-size:1rem;font-weight:800;color:#f9fafb;letter-spacing:-0.3px;line-height:1">AI<span style="color:#6366f1">TO</span>AI</span>
+      <span style="font-size:0.65rem;color:#6b7280;letter-spacing:0.08em;font-weight:500;line-height:1">CUSTOMS INTELLIGENCE</span>
+    </span>
+  </a>
   <div class="nav-links">
     <!-- Language Switcher -->
     <div class="lang-switcher">
@@ -114,6 +132,15 @@
 </nav>
 
 <div class="hero">
+  <div style="margin-bottom:1.5rem">
+    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block" aria-label="HSW logo">
+      <defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+      <rect width="64" height="64" rx="14" fill="#111827"/>
+      <circle cx="32" cy="32" r="28" fill="none" stroke="#6366f1" stroke-width="0.8" opacity="0.3" stroke-dasharray="8 4"/>
+      <polygon points="32,8 52,19 52,43 32,54 12,43 12,19" fill="#0a0e1a" stroke="url(#hg)" stroke-width="1.5"/>
+      <text x="32" y="38" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="18" letter-spacing="-0.5" fill="url(#hg)">HSW</text>
+    </svg>
+  </div>
   <div class="badge" data-i18n="badge">🇹🇭 Thai Customs Intelligence · AI-to-AI Economy</div>
   <p style="font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.75rem;letter-spacing:0.02em" data-i18n="hero_subbadge">ระบบบริการเพื่ออำนวยความสะดวก<br>และส่งเสริมธุรกิจการค้าระหว่างประเทศ</p>
   <h1 data-i18n="hero_title_html"></h1>
@@ -183,6 +210,15 @@
   <p data-i18n="disclaimer_body">ข้อมูลที่ได้จากระบบนี้ — รวมถึงพิกัดศุลกากร (HS Code) อัตราภาษี ใบอนุญาต OGA และสถานะ Halal — มีวัตถุประสงค์เพื่อ <strong>อำนวยความสะดวกในการค้นหาข้อมูลเบื้องต้นเท่านั้น</strong> ไม่ถือเป็นคำวินิจฉัย คำตัดสิน หรือคำแนะนำทางกฎหมายแต่อย่างใด ผู้ใช้งานควรตรวจสอบกับกรมศุลกากร หน่วยงาน OGA ที่เกี่ยวข้อง หรือผู้เชี่ยวชาญด้านกฎหมายศุลกากรก่อนดำเนินการทางการค้าทุกครั้ง AI TO AI HOLDING ไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการนำข้อมูลนี้ไปใช้โดยไม่ตรวจสอบเพิ่มเติม</p>
 </div>
 <footer>
+  <div style="margin-bottom:1.25rem">
+    <svg width="48" height="48" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;opacity:0.7" aria-hidden="true">
+      <defs><linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+      <rect width="64" height="64" rx="14" fill="#111827"/>
+      <polygon points="32,8 52,19 52,43 32,54 12,43 12,19" fill="#0a0e1a" stroke="url(#fg)" stroke-width="1.5"/>
+      <text x="32" y="38" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="18" letter-spacing="-0.5" fill="url(#fg)">HSW</text>
+    </svg>
+    <p style="margin-top:0.5rem;font-weight:700;color:#6366f1;letter-spacing:0.05em;font-size:0.85rem">AI TO AI HOLDING</p>
+  </div>
   <p>© 2026 AI TO AI HOLDING · <a href="/docs">API Documentation</a> · <a href="/.well-known/ai-plugin.json">AI Plugin Manifest</a></p>
   <p style="margin-top:0.5rem" data-i18n="footer_sub">Customs Intelligence Division · Built for AI Agents</p>
 </footer>
