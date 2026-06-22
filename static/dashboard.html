@@ -241,6 +241,24 @@
               <div id="rcOgaDetail" style="display:none;margin-top:0.6rem"></div>
             </div>
           </div>
+          <!-- HALAL -->
+          <div id="rcHalalWrap">
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.2rem">🕌 Halal</div>
+            <div id="rcHalal" style="font-size:0.9rem;font-weight:600">—</div>
+            <div id="rcHalalNote" style="display:none;font-size:0.78rem;color:var(--muted);margin-top:0.3rem"></div>
+          </div>
+          <!-- FTA -->
+          <div id="rcFtaWrap">
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.2rem">🤝 FTA</div>
+            <div id="rcFta" style="font-size:0.9rem;font-weight:600">—</div>
+            <div id="rcFtaDetail" style="display:none;margin-top:0.5rem"></div>
+          </div>
+          <!-- IMPORT TOTAL -->
+          <div id="rcImportWrap" style="display:none;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:0.75rem">
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.3rem">💰 ประมาณการค่าใช้จ่ายนำเข้ารวม</div>
+            <div id="rcImportTotal" style="font-size:1.1rem;font-weight:700;color:var(--accent)">—</div>
+            <div id="rcFtaSaving" style="display:none;font-size:0.82rem;color:var(--green);margin-top:0.3rem"></div>
+          </div>
           <div>
             <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.2rem" data-i18n="rc_source">แหล่งอ้างอิง</div>
             <div id="rcSource" style="font-size:0.8rem;color:var(--accent);line-height:1.5">—</div>
@@ -838,6 +856,72 @@ function renderCard(data) {
   }
 
   document.getElementById('rcSource').textContent = item.source_reference || '—';
+
+  // ── Halal ──────────────────────────────────────────────────────────────────
+  const halalEl = document.getElementById('rcHalal');
+  const halalNoteEl = document.getElementById('rcHalalNote');
+  if (item.halal_required) {
+    const hl = item.halal_risk_level || 'HIGH';
+    const hlColor = { HIGH: 'var(--red)', MEDIUM: 'var(--yellow)', LOW: 'var(--green)' }[hl] || 'var(--yellow)';
+    halalEl.innerHTML = `<span style="color:${hlColor}">🚫 ต้องมีใบรับรอง Halal</span> <span style="font-size:0.7rem;background:rgba(239,68,68,0.12);color:${hlColor};padding:1px 6px;border-radius:4px">${hl}</span>`;
+    if (item.halal_authority || item.halal_note) {
+      halalNoteEl.style.display = 'block';
+      halalNoteEl.innerHTML = [
+        item.halal_authority ? `<span style="font-weight:600">หน่วยงาน:</span> ${item.halal_authority}` : '',
+        item.halal_note ? item.halal_note : '',
+      ].filter(Boolean).join('<br>');
+    } else {
+      halalNoteEl.style.display = 'none';
+    }
+  } else {
+    halalEl.innerHTML = '<span style="color:var(--green)">✅ ไม่ต้องใบรับรอง Halal</span>';
+    halalNoteEl.style.display = 'none';
+  }
+
+  // ── FTA ────────────────────────────────────────────────────────────────────
+  const ftaEl = document.getElementById('rcFta');
+  const ftaDetailEl = document.getElementById('rcFtaDetail');
+  if (item.fta_eligible && item.fta_form) {
+    ftaEl.innerHTML = `<span style="color:var(--green)">✅ ${item.fta_form}</span>`;
+    if (item.fta_details && item.fta_details.length) {
+      ftaDetailEl.style.display = 'block';
+      ftaDetailEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:0.3rem">' +
+        item.fta_details.slice(0, 6).map(d =>
+          `<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.78rem">
+            <span style="font-weight:700;min-width:2rem">${d.country}</span>
+            <span style="color:var(--accent)">${d.form}</span>
+            <span style="color:var(--muted);flex:1">${d.note_th || ''}</span>
+          </div>`
+        ).join('') +
+        (item.fta_details.length > 6 ? `<div style="font-size:0.72rem;color:var(--muted)">...และอีก ${item.fta_details.length - 6} ประเทศ</div>` : '') +
+        '</div>';
+    } else {
+      ftaDetailEl.style.display = 'none';
+    }
+  } else if (item.fta_eligible_countries && item.fta_eligible_countries.length) {
+    ftaEl.innerHTML = `<span style="color:var(--green)">✅ มีสิทธิ์ FTA</span> <span style="font-size:0.75rem;color:var(--muted)">${item.fta_eligible_countries.slice(0,8).join(', ')}</span>`;
+    ftaDetailEl.style.display = 'none';
+  } else {
+    ftaEl.innerHTML = '<span style="color:var(--muted)">— ไม่พบสิทธิ์ FTA สำหรับถิ่นกำเนิดนี้</span>';
+    ftaDetailEl.style.display = 'none';
+  }
+
+  // ── Import Total Estimate ──────────────────────────────────────────────────
+  const importWrap = document.getElementById('rcImportWrap');
+  const importEl = document.getElementById('rcImportTotal');
+  const savingEl = document.getElementById('rcFtaSaving');
+  if (item.import_total_estimate != null) {
+    importWrap.style.display = 'block';
+    importEl.textContent = 'ประมาณ ' + item.import_total_estimate.toLocaleString() + ' บาท (อากร + VAT)';
+    if (item.fta_saving_amount && item.fta_saving_amount > 0) {
+      savingEl.style.display = 'block';
+      savingEl.textContent = '💚 ประหยัดได้ ~' + item.fta_saving_amount.toLocaleString() + ' บาท เมื่อใช้ ' + (item.fta_form || 'FTA');
+    } else {
+      savingEl.style.display = 'none';
+    }
+  } else {
+    importWrap.style.display = 'none';
+  }
 
   // notes
   const noteWrap = document.getElementById('rcNoteWrap');

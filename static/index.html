@@ -282,6 +282,39 @@
     <div class="form-group">
       <label data-i18n="sandbox_label">คำบรรยายสินค้า</label>
       <input type="text" id="sandboxDesc" data-i18n-placeholder="sandbox_ph" placeholder="เช่น iPhone 15 Pro Max 256GB" style="font-size:1rem;padding:0.75rem" />
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+        <div style="flex:1">
+          <label style="font-size:0.78rem;color:var(--muted)">ถิ่นกำเนิดสินค้า</label>
+          <select id="sandboxOrigin" style="width:100%;padding:0.5rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:0.85rem">
+            <option value="">ไม่ระบุ</option>
+            <option value="CN">🇨🇳 จีน (CN)</option>
+            <option value="JP">🇯🇵 ญี่ปุ่น (JP)</option>
+            <option value="US">🇺🇸 สหรัฐฯ (US)</option>
+            <option value="KR">🇰🇷 เกาหลีใต้ (KR)</option>
+            <option value="TW">🇹🇼 ไต้หวัน (TW)</option>
+            <option value="DE">🇩🇪 เยอรมนี (DE)</option>
+            <option value="GB">🇬🇧 อังกฤษ (GB)</option>
+            <option value="TH">🇹🇭 ไทย (TH)</option>
+            <option value="VN">🇻🇳 เวียดนาม (VN)</option>
+            <option value="IN">🇮🇳 อินเดีย (IN)</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label style="font-size:0.78rem;color:var(--muted)">ปลายทาง (สำหรับ Halal)</label>
+          <select id="sandboxDest" style="width:100%;padding:0.5rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:0.85rem">
+            <option value="TH">🇹🇭 ไทย (TH)</option>
+            <option value="SA">🇸🇦 ซาอุฯ (SA)</option>
+            <option value="AE">🇦🇪 UAE (AE)</option>
+            <option value="MY">🇲🇾 มาเลเซีย (MY)</option>
+            <option value="ID">🇮🇩 อินโดนีเซีย (ID)</option>
+            <option value="QA">🇶🇦 กาตาร์ (QA)</option>
+            <option value="EG">🇪🇬 อียิปต์ (EG)</option>
+            <option value="JP">🇯🇵 ญี่ปุ่น (JP)</option>
+            <option value="US">🇺🇸 สหรัฐฯ (US)</option>
+            <option value="DE">🇩🇪 เยอรมนี (DE)</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div id="sandboxError" class="error-msg"></div>
     <div class="modal-footer">
@@ -601,7 +634,16 @@ async function doSandbox() {
     const res = await fetch(API + '/v1/sandbox/classify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id: 'sandbox-demo', items: [{ description: desc, quantity: 1, unit_price: 100 }] })
+      body: JSON.stringify({
+        client_id: 'sandbox-demo',
+        destination_country: document.getElementById('sandboxDest')?.value || 'TH',
+        items: [{
+          description: desc,
+          origin_country: document.getElementById('sandboxOrigin')?.value || undefined,
+          quantity: 1,
+          unit_price: 100
+        }]
+      })
     });
     const data = await res.json();
     if (!res.ok) {
@@ -613,8 +655,21 @@ async function doSandbox() {
       const conf = Math.round((item.confidence_score||0)*100);
       const confColor = conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
       const ogaBadge = item.oga_required
-        ? '<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ ต้องมีใบอนุญาต: '+item.oga_agencies.join(', ')+'</span>'
-        : '<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้องขออนุญาต</span>';
+        ? `<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ OGA: ${(item.oga_agencies||[]).join(', ')||'ต้องขออนุญาต'}</span>`
+        : '<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง OGA</span>';
+      const halalBadge = item.halal_required
+        ? `<span style="background:rgba(239,68,68,.12);color:#f87171;padding:2px 8px;border-radius:4px;font-size:11px">🕌 ต้อง Halal (${item.halal_risk_level||''})</span>`
+        : '<span style="background:rgba(16,185,129,.08);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง Halal</span>';
+      const ftaBadge = item.fta_eligible && item.fta_form
+        ? `<span style="background:rgba(16,185,129,.12);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">🤝 ${item.fta_form}</span>`
+        : '';
+      const savingLine = item.fta_saving_amount > 0
+        ? `<div style="font-size:11px;color:#10b981">💚 ประหยัดภาษีได้ ~${item.fta_saving_amount.toLocaleString()} บาท</div>` : '';
+      const importLine = item.import_total_estimate != null
+        ? `<div style="font-size:11px;color:#818cf8">💰 อากร+VAT รวมประมาณ ${item.import_total_estimate.toLocaleString()} บาท</div>` : '';
+      const descLine = item.hs_description_th
+        ? `<div style="font-size:13px;color:#e2e8f0">${item.hs_description_th}</div><div style="font-size:11px;color:#64748b">${item.hs_description||''}</div>`
+        : `<div style="font-size:13px;color:#94a3b8">${item.hs_description||''}</div>`;
       const rem = data.summary?.free_calls_remaining ?? '';
       result.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:10px">
@@ -622,15 +677,16 @@ async function doSandbox() {
             <span style="font-size:1.4rem;font-weight:700;color:#e2e8f0">🏷️ ${item.hs_code||'—'}</span>
             <span style="font-weight:700;color:${confColor}">${conf}% ความมั่นใจ</span>
           </div>
-          <div style="font-size:13px;color:#94a3b8">${item.hs_description||''}</div>
+          ${descLine}
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            ${ogaBadge}
-            <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">ภาษี ${Math.round((item.duty_rate||0)*100)}%</span>
+            ${ogaBadge}${halalBadge}${ftaBadge}
+            <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">อากร ${Math.round((item.duty_rate||0)*100)}%</span>
             <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">VAT ${Math.round((item.vat_rate||0)*100)}%</span>
           </div>
+          ${savingLine}${importLine}
           <div style="font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">${item.source_reference||''}</div>
           <div style="font-size:11px;color:#f59e0b">${data.disclaimer||''}</div>
-          <a href="/dashboard" id="sandboxDashLink" style="display:inline-block;background:#6366f1;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มและ Candidates → Dashboard</a>
+          <a href="/dashboard?q=${encodeURIComponent(desc)}" style="display:inline-block;background:#6366f1;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มและ Candidates → Dashboard</a>
         </div>`;
     }
   } catch(e) {

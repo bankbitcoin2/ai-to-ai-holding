@@ -173,6 +173,19 @@ async def process_invoice(
         halal_required = halal_result.get("halal_required", False)
         halal_risk     = halal_result.get("risk_level", "NONE")
 
+        # ── FTA info + saving estimate ──
+        from knowledge_service import get_fta_form_db as _get_fta_db, _fta_note_th
+        _fta_info: dict = {"eligible": False, "form": None, "all_eligible_countries": [], "fta_details": []}
+        try:
+            _fta_db = await _get_fta_db(tax_code, origin)
+            if _fta_db.get("eligible") or _fta_db.get("all_eligible_countries"):
+                _fta_info = _fta_db
+        except Exception:
+            pass
+        _mfn_rate = float(tax_result.get("mfn_rate") or tax_result.get("general_rate") or duty_rate)
+        _fta_saving = round((total_price or 0) * (_mfn_rate - duty_rate), 2) if (total_price and _fta_info.get("eligible") and _mfn_rate > duty_rate) else None
+        _import_total = round((duty_amount or 0) + (vat_amount or 0), 2) if (duty_amount is not None or vat_amount is not None) else None
+
         # ── บันทึก DB ──
         item_id   = str(uuid.uuid4())
         item_hash = _make_hash(f"{item_id}{result.hs_code}{result.confidence_score}{now}")
@@ -240,7 +253,16 @@ async def process_invoice(
             "oga_detail":      oga_result,
             "halal_required":  halal_required,
             "halal_risk_level": halal_risk,
+            "halal_authority": (halal_result.get("destination_info") or {}).get("authority"),
             "halal_detail":    halal_result,
+            "fta_eligible":    _fta_info.get("eligible", False),
+            "fta_form":        _fta_info.get("form"),
+            "fta_note_th":     _fta_note_th(_fta_info.get("form")),
+            "fta_eligible_countries": _fta_info.get("all_eligible_countries", []),
+            "fta_details":     _fta_info.get("fta_details", []),
+            "fta_saving_amount": _fta_saving,
+            "import_total_estimate": _import_total,
+            "oga_risk_level":  oga_result.get("risk_level"),
             "glossary_hint":   gloss.get("matched") if gloss else None,
             "notes":           result.notes,
         })
@@ -280,7 +302,11 @@ async def process_invoice(
                 sum(i["confidence_score"] for i in classified_items) / len(classified_items), 3
             ) if classified_items else 0,
             "oga_flagged":    sum(1 for i in classified_items if i["oga_required"]),
+            "oga_high_risk":  sum(1 for i in classified_items if i.get("oga_risk_level") == "HIGH"),
             "halal_flagged":  sum(1 for i in classified_items if i["halal_required"]),
+            "fta_eligible":   sum(1 for i in classified_items if i.get("fta_eligible")),
+            "fta_saving_total": round(sum(i.get("fta_saving_amount") or 0 for i in classified_items), 2),
+            "import_total_estimate": round(sum(i.get("import_total_estimate") or 0 for i in classified_items), 2),
             "glossary_hits":  sum(1 for i in classified_items if i["glossary_hint"]),
         },
         "treasury":   treasury,

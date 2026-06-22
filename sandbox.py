@@ -129,6 +129,10 @@ class ResultItem(BaseModel):
     fta_note_th: Optional[str] = None
     fta_eligible_countries: list[str] = []
     fta_details: list[dict] = []
+    # Financial estimates
+    fta_mfn_rate: Optional[float] = None        # MFN rate ก่อน FTA
+    fta_saving_amount: Optional[float] = None   # ประหยัดได้ถ้าใช้ FTA
+    import_total_estimate: Optional[float] = None  # duty + VAT รวม
     notes: Optional[str]
     candidates: list[CandidateItem] = []   # ranked list >= 75%
     watermark: str = "[SANDBOX — NOT FOR PRODUCTION USE]"
@@ -228,6 +232,10 @@ async def sandbox_classify(body: SandboxReq, req: Request):
             da = round(price * dr, 2) if price else None
             vr = float(tax.get("vat_rate") or 0.07)
             va = round(price * vr, 2) if price else None
+            # FTA saving estimate
+            _mfn_rate = float(tax.get("mfn_rate") or tax.get("general_rate") or dr)
+            _fta_saving = round(price * (_mfn_rate - dr), 2) if (price and _fta_info.get("eligible") and _mfn_rate > dr) else None
+            _import_total = round((da or 0) + (va or 0), 2) if (da is not None or va is not None) else None
             try:
                 oga = check_restricted(cls.hs_code or "")
             except Exception:
@@ -281,6 +289,9 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 fta_note_th=_fta_note_th(_fta_info.get("form")),
                 fta_eligible_countries=_fta_info.get("all_eligible_countries", []),
                 fta_details=_fta_info.get("fta_details", []),
+                fta_mfn_rate=_mfn_rate if _fta_info.get("eligible") else None,
+                fta_saving_amount=_fta_saving,
+                import_total_estimate=_import_total,
                 halal_required=bool(_halal.get("halal_required")),
                 halal_risk_level=_halal.get("risk_level"),
                 halal_authority=(_halal.get("destination_info") or {}).get("authority"),
@@ -327,6 +338,9 @@ async def sandbox_classify(body: SandboxReq, req: Request):
             "oga_flagged": sum(1 for r in results if r.oga_required),
             "halal_flagged": sum(1 for r in results if r.halal_required),
             "fta_eligible": sum(1 for r in results if r.fta_eligible),
+            "fta_saving_total": round(sum(r.fta_saving_amount or 0 for r in results), 2),
+            "import_total_estimate": round(sum(r.import_total_estimate or 0 for r in results), 2),
+            "oga_high_risk": sum(1 for r in results if r.oga_risk_level == "HIGH"),
             "ready_for_production": avg >= 0.75,
             "free_calls_used_today": used,
             "free_calls_remaining": rem,
