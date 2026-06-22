@@ -8,7 +8,6 @@ import uuid
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Optional
-import aiosqlite
 
 from holding_config import MOCK_MODE
 
@@ -43,7 +42,7 @@ class OfficeHead:
             timestamp=datetime.now(timezone.utc).isoformat(),
         )
 
-    async def handle(self, task_type: str, payload: dict, db: Optional[aiosqlite.Connection] = None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         raise NotImplementedError
 
 
@@ -55,12 +54,12 @@ class KnowledgeHead(OfficeHead):
     OFFICE_NAME = "Knowledge Office"
     ENTITY_ID   = "ent-head-knowledge"
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type == "REPORT_REQUEST":
             # ดึง pending learning triggers จาก DB ถ้ามี
             pending = 0
-            if db:
-                rows = await db.execute_fetchall(
+            if conn:
+                rows = await conn.fetch(
                     "SELECT COUNT(*) as cnt FROM learning_triggers WHERE processed=0"
                 )
                 pending = rows[0]["cnt"] if rows else 0
@@ -95,12 +94,12 @@ class GovernanceHead(OfficeHead):
 
     CONSTITUTION_CODES = ["P-01","P-02","P-03","P-04","P-05","P-06"]
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type == "REPORT_REQUEST":
             # ตรวจ constitution ครบไหม
             principles_ok = len(self.CONSTITUTION_CODES)
-            if db:
-                rows = await db.execute_fetchall("SELECT COUNT(*) as cnt FROM gov_constitution")
+            if conn:
+                rows = await conn.fetch("SELECT COUNT(*) as cnt FROM gov_constitution")
                 principles_ok = rows[0]["cnt"] if rows else 0
 
             return self._report(task_type, "COMPLETED", {
@@ -129,13 +128,13 @@ class AuditHead(OfficeHead):
     OFFICE_NAME = "Audit Office"
     ENTITY_ID   = "ent-head-audit"
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type == "REPORT_REQUEST":
             total_events = 0
             decisions = escalations = low_conf = 0
 
-            if db:
-                rows = await db.execute_fetchall(
+            if conn:
+                rows = await conn.fetch(
                     """
                     SELECT event_type, COUNT(*) as cnt
                     FROM audit_events GROUP BY event_type
@@ -146,7 +145,7 @@ class AuditHead(OfficeHead):
                     if r["event_type"] == "DECISION":    decisions   += r["cnt"]
                     if r["event_type"] == "ESCALATION":  escalations += r["cnt"]
 
-                low_rows = await db.execute_fetchall(
+                low_rows = await conn.fetch(
                     "SELECT COUNT(*) as cnt FROM audit_events WHERE confidence_score < 0.70"
                 )
                 low_conf = low_rows[0]["cnt"] if low_rows else 0
@@ -172,11 +171,11 @@ class RiskHead(OfficeHead):
     OFFICE_NAME = "Risk Office"
     ENTITY_ID   = "ent-head-risk"
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type in ("REPORT_REQUEST", "TASK_ASSIGN"):
             low_conf_cases = 0
-            if db:
-                rows = await db.execute_fetchall(
+            if conn:
+                rows = await conn.fetch(
                     """
                     SELECT COUNT(*) as cnt FROM customs_invoice_items
                     WHERE confidence_score < 0.70
@@ -207,12 +206,12 @@ class TreasuryHead(OfficeHead):
     OFFICE_NAME = "Treasury Office"
     ENTITY_ID   = "ent-head-treasury"
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type == "REPORT_REQUEST":
             total_gross = total_net = corp = chairman = txn_count = 0
 
-            if db:
-                rows = await db.execute_fetchall(
+            if conn:
+                rows = await conn.fetch(
                     """
                     SELECT COUNT(*) as cnt,
                            SUM(gross_amount) as gross,
@@ -225,7 +224,7 @@ class TreasuryHead(OfficeHead):
                     total_gross = round(rows[0]["gross"] or 0, 2)
                     total_net   = round(rows[0]["net"]   or 0, 2)
 
-                split_rows = await db.execute_fetchall(
+                split_rows = await conn.fetch(
                     "SELECT split_type, SUM(amount) as total FROM treasury_splits GROUP BY split_type"
                 )
                 for r in split_rows:
@@ -253,13 +252,13 @@ class TrustHead(OfficeHead):
     OFFICE_NAME = "Trust Office"
     ENTITY_ID   = "ent-head-trust"
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type in ("REPORT_REQUEST", "TASK_ASSIGN"):
             avg_conf = 0.0
             total_items = 0
 
-            if db:
-                rows = await db.execute_fetchall(
+            if conn:
+                rows = await conn.fetch(
                     """
                     SELECT AVG(confidence_score) as avg, COUNT(*) as cnt
                     FROM customs_invoice_items WHERE confidence_score IS NOT NULL
@@ -298,7 +297,7 @@ class DiscoveryHead(OfficeHead):
         "Evidence chain proof-of-compliance (active)",
     ]
 
-    async def handle(self, task_type: str, payload: dict, db=None) -> OfficeReport:
+    async def handle(self, task_type: str, payload: dict, conn=None) -> OfficeReport:
         if task_type in ("REPORT_REQUEST", "TASK_ASSIGN"):
             return self._report(task_type, "COMPLETED", {
                 "active_channels": self.CHANNELS,

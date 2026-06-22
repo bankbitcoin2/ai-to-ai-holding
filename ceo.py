@@ -6,9 +6,8 @@ Chairman → AI CEO Command Interface
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from typing import Optional
-import aiosqlite
 
-from database import get_db
+from db_adapter import get_pool
 from ceo_agent import AICEOAgent
 from office_heads import OFFICE_HEADS
 
@@ -36,26 +35,25 @@ class OrgStatusResponse(BaseModel):
     summary="ส่งคำสั่งจาก Chairman → AI CEO",
     description="AI CEO รับคำสั่ง วิเคราะห์ และกระจายงานไปทุก Office ที่เกี่ยวข้อง",
 )
-async def chairman_command(
-    req: ChairmanCommand,
-    db: aiosqlite.Connection = Depends(get_db),
-):
+async def chairman_command(req: ChairmanCommand):
+    pool = await get_pool()
     # AI CEO รับคำสั่ง
     decision = await ceo.process_command(req.command, req.context)
 
     # Office Heads ดำเนินการตาม actions ที่ CEO dispatch
     office_results = []
-    for action in decision.actions_dispatched:
-        office_key = action["office"].lower()
-        head = OFFICE_HEADS.get(office_key)
-        if head:
-            report = await head.handle(action["task_type"], action, db)
-            office_results.append({
-                "office": report.office,
-                "status": report.status,
-                "findings": report.findings,
-                "recommendation": report.recommendation,
-            })
+    async with pool.acquire() as conn:
+        for action in decision.actions_dispatched:
+            office_key = action["office"].lower()
+            head = OFFICE_HEADS.get(office_key)
+            if head:
+                report = await head.handle(action["task_type"], action, conn)
+                office_results.append({
+                    "office": report.office,
+                    "status": report.status,
+                    "findings": report.findings,
+                    "recommendation": report.recommendation,
+                })
 
     return {
         "decision_id": decision.decision_id,
@@ -74,13 +72,14 @@ async def chairman_command(
     summary="รายงานสถานะองค์กรรายวัน (Daily Briefing)",
     description="AI CEO รวบรวมรายงานจากทุก Office แล้วสรุปให้ Chairman",
 )
-async def daily_briefing(db: aiosqlite.Connection = Depends(get_db)):
-    briefing = await ceo.daily_briefing(db)
-
-    # เสริมด้วยข้อมูลจริงจาก Office Heads
-    for key, head in OFFICE_HEADS.items():
-        report = await head.handle("REPORT_REQUEST", {}, db)
-        briefing["sections"][key] = report.findings
+async def daily_briefing():
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        briefing = await ceo.daily_briefing(conn)
+        # เสริมด้วยข้อมูลจริงจาก Office Heads
+        for key, head in OFFICE_HEADS.items():
+            report = await head.handle("REPORT_REQUEST", {}, conn)
+            briefing["sections"][key] = report.findings
 
     return briefing
 
