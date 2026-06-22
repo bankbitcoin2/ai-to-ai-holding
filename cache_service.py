@@ -1,8 +1,8 @@
 """
 cache_service.py — HS Classification Cache
-schema: hs_classification_cache ใช้ cache_key (SHA256), description, origin_country
+schema: hs_classification_cache ใช้ cache_key (SHA256 ของ normalized description)
+hash logic → cache_key_utils.make_cache_key() — แก้ที่นั่นที่เดียว
 """
-import hashlib
 import os
 from typing import Optional
 
@@ -12,14 +12,10 @@ if DATABASE_URL.startswith("postgres://"):
 USE_POSTGRES = bool(DATABASE_URL)
 
 
-def _make_key(description: str, origin_country: Optional[str]) -> str:
-    try:
-        from normalize_description import normalize
-        norm = normalize(description)
-    except Exception:
-        norm = description.lower().strip()
-    origin = (origin_country or "").upper().strip()
-    return hashlib.sha256(f"{norm}|{origin}".encode("utf-8")).hexdigest()
+def _make_key(description: str, origin_country: Optional[str] = None) -> str:
+    """Thin wrapper — ให้ backward compat สำหรับ callers ที่ยังส่ง origin_country มา"""
+    from cache_key_utils import make_cache_key
+    return make_cache_key(description)
 
 
 async def cache_get(description: str, origin_country: Optional[str]) -> Optional[dict]:

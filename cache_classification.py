@@ -15,8 +15,9 @@ from typing import Optional
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _desc_hash(description: str) -> str:
-    normalized = description.lower().strip()
-    return hashlib.sha256(normalized.encode()).hexdigest()
+    """Canonical key — delegates to cache_key_utils (แก้ที่นั่นที่เดียว)"""
+    from cache_key_utils import make_cache_key
+    return make_cache_key(description)
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -49,7 +50,7 @@ async def cache_lookup(db, description: str) -> Optional[dict]:
                 """SELECT hs_code, hs_code_11, hs_description, hs_description_th,
                           confidence_score, source, hit_count
                    FROM hs_classification_cache
-                   WHERE description_hash = $1
+                   WHERE cache_key = $1
                      AND (expires_at IS NULL OR expires_at > NOW())""",
                 h,
             )
@@ -57,7 +58,7 @@ async def cache_lookup(db, description: str) -> Optional[dict]:
                 await conn.execute(
                     """UPDATE hs_classification_cache
                        SET hit_count = hit_count + 1, last_hit_at = NOW()
-                       WHERE description_hash = $1""",
+                       WHERE cache_key = $1""",
                     h,
                 )
                 return dict(row)
@@ -74,7 +75,7 @@ async def cache_save(db, description: str, best_candidate: dict, source: str = "
     db: backward compat — ไม่ได้ใช้
     """
     h = _desc_hash(description)
-    data = {**best_candidate, "description_hash": h, "source": source}
+    data = {**best_candidate, "cache_key": h, "source": source}
     pool = await _get_pool()
     if not pool:
         return
@@ -82,10 +83,10 @@ async def cache_save(db, description: str, best_candidate: dict, source: str = "
         async with pool.acquire() as conn:
             await conn.execute(
                 """INSERT INTO hs_classification_cache
-                   (description_hash, description_sample, hs_code, hs_code_11,
+                   (cache_key, description_sample, hs_code, hs_code_11,
                     hs_description, hs_description_th, confidence_score, source, evidence_hash)
                    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-                   ON CONFLICT (description_hash) DO UPDATE SET
+                   ON CONFLICT (cache_key) DO UPDATE SET
                      hs_code          = EXCLUDED.hs_code,
                      hs_code_11       = EXCLUDED.hs_code_11,
                      confidence_score = EXCLUDED.confidence_score,
@@ -273,13 +274,13 @@ async def _apply_feedback_action(conn, r):
 
     if action == "PROMOTE_TO_CACHE":
         # Boost confidence, mark CONFIRMED
-        data = {"description_hash": h, "hs_code": r["hs_code"], "source": "CONFIRMED"}
+        data = {"cache_key": h, "hs_code": r["hs_code"], "source": "CONFIRMED"}
         await conn.execute(
             """INSERT INTO hs_classification_cache
-               (description_hash, description_sample, hs_code, hs_code_11,
+               (cache_key, description_sample, hs_code, hs_code_11,
                 hs_description, confidence_score, source, evidence_hash)
                VALUES ($1,$2,$3,$4,$5,$6,'CONFIRMED',$7)
-               ON CONFLICT (description_hash) DO UPDATE SET
+               ON CONFLICT (cache_key) DO UPDATE SET
                  confidence_score = LEAST(hs_classification_cache.confidence_score + 0.05, 0.98),
                  source           = 'CONFIRMED',
                  last_hit_at      = NOW(),
@@ -301,20 +302,20 @@ async def _apply_feedback_action(conn, r):
                SET confidence_score = GREATEST(confidence_score - 0.10, 0.0),
                    source           = 'REJECTED',
                    last_hit_at      = NOW()
-               WHERE description_hash = $1""",
+               WHERE cache_key = $1""",
             h,
         )
 
     elif action == "CREATE_LESSON":
         # AMENDED → บันทึก hs_code ที่ถูกต้องจาก amended_hs_code
         final_hs = r["amended_hs_code"] or r["hs_code"]
-        data = {"description_hash": h, "hs_code": final_hs, "source": "CONFIRMED"}
+        data = {"cache_key": h, "hs_code": final_hs, "source": "CONFIRMED"}
         await conn.execute(
             """INSERT INTO hs_classification_cache
-               (description_hash, description_sample, hs_code, confidence_score,
+               (cache_key, description_sample, hs_code, confidence_score,
                 source, evidence_hash)
                VALUES ($1,$2,$3, 0.92,'CONFIRMED',$4)
-               ON CONFLICT (description_hash) DO UPDATE SET
+               ON CONFLICT (cache_key) DO UPDATE SET
                  hs_code          = EXCLUDED.hs_code,
                  confidence_score = 0.92,
                  source           = 'CONFIRMED',

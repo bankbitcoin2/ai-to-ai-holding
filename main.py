@@ -122,11 +122,47 @@ async def _fix_audit_fk():
 
 
 @asynccontextmanager
+async def _migrate_cache_schema():
+    """
+    Migration: เพิ่มคอลัมน์ที่ขาดใน hs_classification_cache
+    ปลอดภัย — ใช้ ADD COLUMN IF NOT EXISTS ทั้งหมด
+    เรียกทุก startup แต่ no-op ถ้าคอลัมน์มีอยู่แล้ว
+    """
+    try:
+        from db_adapter import get_pool, USE_POSTGRES
+        if not USE_POSTGRES:
+            return
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            migrations = [
+                # คอลัมน์ที่ schema_cache_v1.sql ไม่มี แต่ cache_classification.py ต้องการ
+                "ALTER TABLE hs_classification_cache ADD COLUMN IF NOT EXISTS description_sample TEXT",
+                "ALTER TABLE hs_classification_cache ADD COLUMN IF NOT EXISTS hs_code_11 TEXT",
+                "ALTER TABLE hs_classification_cache ADD COLUMN IF NOT EXISTS hs_description_th TEXT",
+                "ALTER TABLE hs_classification_cache ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'CLAUDE'",
+                "ALTER TABLE hs_classification_cache ADD COLUMN IF NOT EXISTS evidence_hash TEXT DEFAULT 'PENDING'",
+                # index เผื่อ lookup เร็ว
+                "CREATE INDEX IF NOT EXISTS idx_cache_key ON hs_classification_cache(cache_key)",
+                "CREATE INDEX IF NOT EXISTS idx_cache_source ON hs_classification_cache(source)",
+            ]
+            for sql in migrations:
+                try:
+                    await conn.execute(sql)
+                except Exception as e:
+                    msg = str(e).lower()
+                    if "already exists" not in msg and "duplicate" not in msg:
+                        print(f"[MIGRATION] cache schema warning: {e}")
+        print("[MIGRATION] hs_classification_cache schema up to date")
+    except Exception as e:
+        print(f"[MIGRATION] _migrate_cache_schema warning (non-fatal): {e}")
+
+
 async def lifespan(app: FastAPI):
     print_config()
     await init_db()
     await _auto_seed()
     await _fix_audit_fk()
+    await _migrate_cache_schema()
     yield
 
 

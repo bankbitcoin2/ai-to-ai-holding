@@ -49,6 +49,8 @@ _COMPOUNDS = [
     ("\u0e19\u0e49\u0e33\u0e21\u0e31\u0e19\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07", "engine oil"),
     ("\u0e2d\u0e30\u0e44\u0e2b\u0e25\u0e48\u0e23\u0e16", "auto parts"),
     ("\u0e22\u0e32\u0e07\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c", "car tyre"),
+    ("\u0e22\u0e32\u0e07\u0e18\u0e23\u0e23\u0e21\u0e0a\u0e32\u0e15\u0e34", "natural rubber"),
+    ("\u0e22\u0e32\u0e07", "rubber"),
     ("\u0e41\u0e1a\u0e15\u0e40\u0e15\u0e2d\u0e23\u0e35\u0e48\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c", "car battery"),
     ("\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c", "automobile"),
     ("\u0e2b\u0e19\u0e49\u0e32\u0e01\u0e32\u0e01\u0e2d\u0e19\u0e32\u0e21\u0e31\u0e22", "surgical mask"),
@@ -290,7 +292,7 @@ _ZH_SINGLES = [
     ("盐",      "salt"),
     # Vehicles & Parts
     ("汽车",    "car"),
-    ("轮胎",    "tyre"),
+    ("轮胎",    "car tyre"),
     ("自行车",  "bicycle"),
     ("发动机",  "engine"),
     # Chemicals / Raw materials
@@ -411,7 +413,7 @@ _JA_SINGLES = [
     # Vehicles & Parts
     ("自動車",      "car"),
     ("バイク",      "motorcycle"),
-    ("タイヤ",      "tyre"),
+    ("タイヤ",      "car tyre"),
     ("自転車",      "bicycle"),
     ("エンジン",    "engine"),
     # Chemicals / Raw materials
