@@ -431,6 +431,25 @@ console.log(await res.json());</div>
       <div class="amount-btn" onclick="selectAmount(100, this)">$100</div>
       <div class="amount-btn" onclick="selectAmount(200, this)">$200</div>
     </div>
+    <!-- Custom amount input -->
+    <div style="margin-bottom:0.75rem">
+      <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:5px">กำหนดจำนวนเอง (ขั้นต่ำ $5)</label>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <span style="color:var(--muted);font-size:1rem;font-weight:700">$</span>
+        <input type="number" id="customAmount" min="5" step="1" placeholder="ระบุจำนวน..."
+          style="flex:1;padding:0.6rem 0.75rem;background:var(--bg);border:1px solid var(--border);
+                 border-radius:8px;color:var(--text);font-size:0.95rem;font-family:inherit;
+                 transition:border-color 0.2s;"
+          oninput="onCustomAmountInput(this)"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--border)'"/>
+        <button onclick="applyCustomAmount()" style="padding:0.6rem 1rem;background:var(--accent);
+          color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;
+          font-family:inherit;white-space:nowrap;transition:opacity 0.2s"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">ใช้จำนวนนี้</button>
+      </div>
+      <div id="customAmountHint" style="font-size:0.78rem;color:var(--muted);margin-top:4px;min-height:1em"></div>
+    </div>
     <div id="topupError" class="error-msg"></div>
     <div class="modal-footer">
       <button class="btn btn-outline" style="flex:1" onclick="closeTopup()" data-i18n="cancel">ยกเลิก</button>
@@ -1011,6 +1030,43 @@ function selectAmount(amount, el) {
   selectedAmount = amount;
   document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  // clear custom input when preset is selected
+  const ci = document.getElementById('customAmount');
+  if (ci) { ci.value = ''; document.getElementById('customAmountHint').textContent = ''; }
+}
+
+function onCustomAmountInput(input) {
+  const val = parseFloat(input.value);
+  const hint = document.getElementById('customAmountHint');
+  if (!input.value) { hint.textContent = ''; input.style.borderColor = 'var(--border)'; return; }
+  if (isNaN(val) || val < 5) {
+    hint.style.color = '#f87171';
+    hint.textContent = '⚠️ ขั้นต่ำ $5.00';
+    input.style.borderColor = '#f87171';
+  } else {
+    const calls = Math.floor(val / 0.50);
+    hint.style.color = '#10b981';
+    hint.textContent = `✓ $${val.toFixed(2)} ≈ ${calls.toLocaleString()} calls`;
+    input.style.borderColor = '#10b981';
+  }
+}
+
+function applyCustomAmount() {
+  const input = document.getElementById('customAmount');
+  const val = parseFloat(input.value);
+  if (isNaN(val) || val < 5) {
+    document.getElementById('customAmountHint').textContent = '⚠️ กรุณาระบุจำนวนขั้นต่ำ $5.00';
+    document.getElementById('customAmountHint').style.color = '#f87171';
+    input.style.borderColor = '#f87171';
+    input.focus();
+    return;
+  }
+  selectedAmount = Math.round(val * 100) / 100;
+  // deactivate preset buttons
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('customAmountHint').style.color = '#818cf8';
+  document.getElementById('customAmountHint').textContent = `✓ เลือกแล้ว $${selectedAmount.toFixed(2)}`;
+  input.style.borderColor = 'var(--accent)';
 }
 
 function openTopup() { document.getElementById('topupModal').classList.add('show'); }
