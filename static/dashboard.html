@@ -36,7 +36,7 @@
   .login-footer a { color: var(--accent); text-decoration: none; }
 
   #dashboard { display: none; }
-  nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem; position: sticky; top: 0; z-index: 100; background: var(--bg); backdrop-filter: blur(12px); }
   .logo { font-size: 1rem; font-weight: 700; }
   .logo span { color: var(--accent); }
   .nav-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
@@ -165,7 +165,7 @@
         <button class="lang-btn" onclick="setLang('ja')">日本語</button>
       </div>
       <span class="agent-badge"><span class="status-dot"></span><span id="navAgent">Agent</span></span>
-      <a href="/" class="btn btn-outline" style="padding:0.4rem 0.9rem;font-size:0.8rem;text-decoration:none">🏠 Home</a>
+      <a href="/" class="btn btn-outline" style="padding:0.5rem 1.2rem;font-size:0.88rem;font-weight:600;text-decoration:none;border-color:#6366f1;color:#a5b4fc">🏠 Home</a>
       <button class="btn btn-outline" onclick="doLogout()" style="padding:0.4rem 0.9rem;font-size:0.8rem" data-i18n="logout">ออกจากระบบ</button>
     </div>
   </nav>
@@ -1143,5 +1143,20 @@ document.getElementById('topupModal').addEventListener('click', e => {
   if (e.target === document.getElementById('topupModal')) closeTopup();
 });
 </script>
+
+<!-- Floating Home Button -->
+<a href="/" id="floatingHome" title="กลับหน้าหลัก"
+  style="position:fixed;bottom:2rem;right:2rem;z-index:999;
+         display:flex;align-items:center;gap:6px;
+         background:linear-gradient(135deg,#6366f1,#8b5cf6);
+         color:#fff;text-decoration:none;
+         padding:0.7rem 1.2rem;border-radius:50px;
+         font-size:0.88rem;font-weight:700;
+         box-shadow:0 4px 20px rgba(99,102,241,0.45);
+         transition:transform 0.2s,box-shadow 0.2s"
+  onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(99,102,241,0.6)'"
+  onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(99,102,241,0.45)'">
+  🏠 <span>Home</span>
+</a>
 </body>
 </html>
