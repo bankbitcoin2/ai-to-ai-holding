@@ -587,4 +587,23 @@ async function doRecover() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contact_email: email, agent_name: agent }),
     });
-    const da
+    const da    const data = await res.json();
+    if (!res.ok) {
+      err.textContent = data.detail?.message || data.message || 'ไม่พบบัญชีที่ตรงกัน';
+      err.style.display = 'block';
+    } else {
+      document.getElementById('recoverResult').style.display = 'block';
+      document.getElementById('recoveredKey').textContent = data.api_key || '';
+    }
+  } catch(e) {
+    err.textContent = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+    err.style.display = 'block';
+  } finally {
+    btn.textContent = i18n[currentLang]?.recover_btn || 'กู้คืน Key →';
+    btn.disabled = false;
+  }
+}
+
+</script>
+</body>
+</html>
