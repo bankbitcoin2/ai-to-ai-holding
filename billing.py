@@ -7,6 +7,7 @@ import hmac
 import os
 import secrets
 import uuid
+import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -91,6 +92,32 @@ async def _audit(db, event_type: str, actor_id: str, action: str, payload: str):
 
 # ── Register ──────────────────────────────────────────────────
 
+
+async def log_agent_call(agent_id: str, endpoint: str, status_code: int,
+                         latency_ms: int, tokens_used: int = 0,
+                         session_id: str = None):
+    """บันทึก API call ลง client_agent_calls — non-blocking, never raises"""
+    try:
+        from db_adapter import get_pool, USE_POSTGRES
+        if not USE_POSTGRES:
+            return
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            import uuid as _uuid
+            from datetime import datetime, timezone
+            await conn.execute(
+                "INSERT INTO client_agent_calls "
+                "(id, agent_id, endpoint, method, status_code, latency_ms, tokens_used, called_at, session_id) "
+                "VALUES ($1,$2,$3,'POST',$4,$5,$6,$7,$8)",
+                str(_uuid.uuid4()), agent_id, endpoint, status_code,
+                latency_ms, tokens_used,
+                datetime.now(timezone.utc).isoformat(),
+                session_id
+            )
+    except Exception as e:
+        pass  # log failure ไม่ควร crash main flow
+
+
 @router.post("/register", summary="ลงทะเบียน AI Client — รับ API Key")
 async def register_client(req: RegisterRequest):
     api_key = _generate_api_key()
@@ -164,18 +191,11 @@ async def recover_key(req: RecoverKeyRequest):
         from db_adapter import get_pool
         pool = await get_pool()
         async with pool.acquire() as conn:
-            # DEBUG: dump all rows to find exact stored values
-            all_rows = await conn.fetch("SELECT id, agent_name, contact_email, status FROM client_agents LIMIT 20")
-            print(f"[DEBUG recover_key] total rows={len(all_rows)}")
-            for r in all_rows:
-                print(f"[DEBUG recover_key] row: name={r['agent_name']!r} email={r['contact_email']!r} status={r['status']!r}")
-            print(f"[DEBUG recover_key] querying email={email!r} name={name!r}")
             row = await conn.fetchrow(
                 "SELECT id, agent_name, contact_email, status FROM client_agents "
                 "WHERE LOWER(contact_email) = LOWER($1) AND LOWER(agent_name) = LOWER($2)",
                 email, name
             )
-            print(f"[DEBUG recover_key] fetchrow result={row}")
             if not row:
                 raise HTTPException(404, {
                     "error": "NOT_FOUND",

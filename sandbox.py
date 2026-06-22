@@ -9,6 +9,7 @@ from collections import defaultdict, deque
 from datetime import datetime, timezone, date
 from typing import Optional
 
+import time
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 from knowledge_service import lookup_tax_rate, check_restricted
@@ -138,6 +139,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     from knowledge_service import get_hs_description as _get_desc, get_fta_form as _get_fta, get_hs_description_db as _get_desc_db, get_fta_form_db as _get_fta_db
 
     results, duties, scores = [], 0.0, []
+    _t_start = time.time()
     try:
         for i, item in enumerate(body.items, 1):
             # ── Cache lookup ──────────────────────────────────
@@ -265,6 +267,19 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     )
     disc = f"SANDBOX only. [{used}/{DAILY_LIMIT} calls today, {rem} left] Production: POST /v1/customs/classify"
 
+    # ── Log call ─────────────────────────────────────────────────────────
+    try:
+        from billing import log_agent_call
+        _latency = int((time.time() - _t_start) * 1000)
+        await log_agent_call(
+            agent_id="sandbox",
+            endpoint="/v1/sandbox/classify",
+            status_code=200,
+            latency_ms=_latency,
+            session_id=str(body.items[0].description[:32]) if body.items else None
+        )
+    except Exception:
+        pass
     return SandboxResp(
         sandbox_session_id=str(uuid.uuid4()),
         client_id=body.client_id,
@@ -318,3 +333,67 @@ async def probe_ckan(hs: str = "6802"):
         return result
     except Exception as e:
         return {"error": str(e)}
+
+
+# ── Feedback endpoint ─────────────────────────────────────────────────────────
+
+class FeedbackReq(BaseModel):
+    session_id: str = Field(..., description="sandbox_session_id จาก classify response")
+    description: str = Field(..., description="product description ที่ใช้ classify")
+    hs_code: str = Field(..., description="HS code ที่ user ยืนยันว่าถูกต้อง")
+    origin_country: Optional[str] = None
+    note: Optional[str] = None
+
+
+@router.post("/feedback", summary="ยืนยัน HS Code — เพิ่ม confidence ใน cache")
+async def sandbox_feedback(body: FeedbackReq):
+    """
+    User ยืนยันผลที่ถูกต้อง → อัปเดต cache ให้มี source='user_confirmed'
+    ใช้เป็น training signal สำหรับ DB-first lookup ในอนาคต
+    """
+    try:
+        from db_adapter import get_pool, USE_POSTGRES
+        if not USE_POSTGRES:
+            return {"status": "ok", "message": "feedback noted (dev mode)"}
+
+        import uuid as _uuid, hashlib
+        from datetime import datetime, timezone
+
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            # อัปเดต cache entry ถ้ามี — เพิ่ม confidence + mark source
+            cache_key = hashlib.sha256(
+                f"{body.description.lower().strip()}:{(body.origin_country or '').upper()}".encode()
+            ).hexdigest()
+
+            existing = await conn.fetchrow(
+                "SELECT id FROM hs_classification_cache WHERE cache_key = $1", cache_key
+            )
+            if existing:
+                await conn.execute(
+                    "UPDATE hs_classification_cache SET "
+                    "confidence_score = LEAST(confidence_score + 0.05, 1.0), "
+                    "source = 'user_confirmed' "
+                    "WHERE cache_key = $1",
+                    cache_key
+                )
+            else:
+                # สร้าง cache entry ใหม่จาก feedback
+                await conn.execute(
+                    "INSERT INTO hs_classification_cache "
+                    "(id, cache_key, hs_code, hs_description, confidence_score, source, created_at) "
+                    "VALUES ($1,$2,$3,$4,$5,'user_confirmed',$6) "
+                    "ON CONFLICT (cache_key) DO NOTHING",
+                    str(_uuid.uuid4()), cache_key, body.hs_code,
+                    body.note or "", 0.92,
+                    datetime.now(timezone.utc).isoformat()
+                )
+
+        return {
+            "status": "ok",
+            "message": "ขอบคุณ — ยืนยัน HS Code แล้ว ระบบจะจดจำสำหรับ query ต่อไป",
+            "hs_code": body.hs_code,
+            "effect": "cache confidence updated"
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
