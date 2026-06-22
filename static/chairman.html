@@ -431,7 +431,7 @@ tr:last-child td{border:none}
 
         <!-- P-03 Split -->
         <div class="card">
-          <div class="sec">P-03 — 60/40 SPLIT ต่อ 1 CALL ($1.50)</div>
+          <div class="sec">P-03 — 60/40 SPLIT ต่อ 1 CALL ($0.50)</div>
           <div class="split-bar"><div style="width:60%;background:var(--accent)"></div><div style="width:40%;background:var(--green)"></div></div>
           <div style="display:flex;gap:14px;margin-bottom:12px">
             <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:2px;background:var(--accent)"></div><span style="font-size:10px;color:var(--muted)">60% Corporate</span></div>
@@ -440,7 +440,7 @@ tr:last-child td{border:none}
           <div class="bar-row"><div class="bar-lbl">Claude API cost</div><div class="bar-track"><div class="bar-fill" style="width:13%;background:var(--red)">~1%</div></div><div class="bar-val">~$0.002</div></div>
           <div class="bar-row"><div class="bar-lbl">Corporate 60%</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--accent)">60%</div></div><div class="bar-val">$0.90</div></div>
           <div class="bar-row"><div class="bar-lbl">Chairman 40%</div><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--green)">40%</div></div><div class="bar-val">$0.60</div></div>
-          <div style="margin-top:8px;font-size:10px;color:var(--dim);line-height:1.6">Cache hit → ต้นทุน $0 → กำไร $1.50 ทั้งหมด<br>CHAIRMAN_PRIVATE_WALLET — No AI read/write access</div>
+          <div style="margin-top:8px;font-size:10px;color:var(--dim);line-height:1.6">Cache hit → ต้นทุน $0 → กำไร $0.50 ทั้งหมด<br>CHAIRMAN_PRIVATE_WALLET — No AI read/write access</div>
         </div>
       </div>
 
@@ -922,13 +922,4 @@ function addBubble(role, txt, thinking=false) {
   el.className = 'msg msg-'+(role==='bot'?'b':'u');
   el.id = id;
   const now = new Date().toLocaleTimeString('th-TH',{hour12:false});
-  el.innerHTML = '<div class="bubble bubble-'+(role==='bot'?'b':'u')+(thinking?' thinking':'')+'">'+txt.replace(/\n/g,'<br>')+'</div>'
-    + '<div class="msg-time">'+now+'</div>';
-  body.appendChild(el);
-  body.scrollTop = body.scrollHeight;
-  return id;
-}
-function removeBubble(id) { const e = document.getElementById(id); if(e) e.remove(); }
-</script>
-</body>
-</html>
+  el.innerHTML = '<div class="bubble bubble-'+(role==='bot'?'b':'u')+(thinking?' thinking':'')+'">'+txt.replace(/\n/g,'<
