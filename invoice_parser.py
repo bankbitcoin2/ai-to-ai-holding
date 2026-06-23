@@ -130,45 +130,44 @@ async def extract_with_claude_vision(content: bytes, file_type: str) -> dict:
     if not ANTHROPIC_API_KEY:
         return {"error": "ANTHROPIC_API_KEY not set"}
     try:
-        import anthropic
-        client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+        import httpx
 
         media_type = "image/jpeg"
         if file_type == "PDF_SCAN":
-            # แปลง PDF scan เป็น image ด้วย pdf2image ถ้ามี
             try:
                 from pdf2image import convert_from_bytes
                 images = convert_from_bytes(content, first_page=1, last_page=3)
-                # ใช้หน้าแรกก่อน
                 img_io = io.BytesIO()
                 images[0].save(img_io, format="JPEG")
                 content = img_io.getvalue()
                 media_type = "image/jpeg"
             except ImportError:
-                # ถ้าไม่มี pdf2image ส่ง PDF ตรงๆ (Claude รองรับ PDF)
                 media_type = "application/pdf"
 
         b64 = image_to_base64(content)
-        msg = await client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=4096,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": media_type,
-                            "data": b64
-                        }
-                    },
-                    {"type": "text", "text": EXTRACTION_PROMPT}
-                ]
-            }]
-        )
-        raw = msg.content[0].text.strip()
-        # ตัด markdown code block ออกถ้ามี
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": ANTHROPIC_API_KEY,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": "claude-haiku-4-5-20251001",
+                    "max_tokens": 4096,
+                    "messages": [{
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": b64}},
+                            {"type": "text", "text": EXTRACTION_PROMPT}
+                        ]
+                    }]
+                }
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        raw = data["content"][0]["text"].strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -183,15 +182,25 @@ async def extract_with_claude_text(raw_text: str) -> dict:
     if not ANTHROPIC_API_KEY:
         return {"error": "ANTHROPIC_API_KEY not set"}
     try:
-        import anthropic
-        client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+        import httpx
         prompt = EXTRACTION_PROMPT + f"\n\nDocument text:\n{raw_text[:8000]}"
-        msg = await client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=4096,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        raw = msg.content[0].text.strip()
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": ANTHROPIC_API_KEY,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": "claude-haiku-4-5-20251001",
+                    "max_tokens": 4096,
+                    "messages": [{"role": "user", "content": prompt}]
+                }
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        raw = data["content"][0]["text"].strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
