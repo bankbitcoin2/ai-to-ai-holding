@@ -278,7 +278,7 @@ def _parse_compiled_text(text: str) -> dict:
     HS_KW   = ("hs code", "hscode", "hs_code", "tariff")
     QTY_KW  = ("qty", "quantity", "จำนวน")
     PRICE_KW = ("unit price", "price", "ราคา")
-    AMOUNT_KW = ("amount", "value", "มูลค่า")
+    AMOUNT_KW = ("amount", "value", "total", "มูลค่า")
     ORIGIN_KW = ("origin",)
 
     # สกัด meta จาก text ทั้งหมด
@@ -319,6 +319,7 @@ def _parse_compiled_text(text: str) -> dict:
             header_idx = i
             break
 
+    result["_debug"] = f"lines={len(lines)} header_idx={header_idx} col_map={col_map} first_lines={[l[:60] for l in lines[:5]]}"
     if header_idx == -1:
         return result  # ไม่เจอ header → fallback
 
@@ -339,18 +340,28 @@ def _parse_compiled_text(text: str) -> dict:
 
         def to_float(v):
             try:
-                return float(str(v).replace(",", "")) if v else None
+                if not v:
+                    return None
+                cleaned = str(v).replace(",", "").replace("$", "").replace("฿", "").replace("€", "").replace("¥", "").strip()
+                return float(cleaned) if cleaned else None
             except Exception:
                 return None
+
+        qty_val = to_float(get("qty"))
+        unit_price_val = to_float(get("price"))
+        line_value_val = to_float(get("amount"))
+        # fallback: คำนวณ qty × unit_price ถ้า line_value ไม่มี
+        if line_value_val is None and qty_val and unit_price_val:
+            line_value_val = round(qty_val * unit_price_val, 2)
 
         items.append({
             "line_no": len(items) + 1,
             "description": desc,
             "hs_code_declared": get("hs"),
-            "qty": to_float(get("qty")),
+            "qty": qty_val,
             "unit": get("unit"),
-            "unit_price": to_float(get("price")),
-            "line_value": to_float(get("amount")),
+            "unit_price": unit_price_val,
+            "line_value": line_value_val,
             "country_origin": get("origin") or result.get("seller_country"),
             "marks_numbers": None,
         })

@@ -48,8 +48,17 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
 
 async def _check_fta(hs_code: str, origin: str, dest: str = "TH") -> dict:
     try:
-        from knowledge_service import check_fta_eligibility
-        return await check_fta_eligibility(hs_code, origin, dest) or {}
+        from knowledge_service import get_fta_form
+        result = get_fta_form(hs_code, origin) or {}
+        return result
+    except Exception:
+        return {}
+
+
+async def _lookup_duty_rate(hs_code: str, origin: str) -> dict:
+    try:
+        from knowledge_service import lookup_tax_rate
+        return lookup_tax_rate(hs_code, origin) or {}
     except Exception:
         return {}
 
@@ -242,10 +251,23 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
         cl_result = await _classify_item(desc, origin, dest_country)
         hs_ai = cl_result.get("hs_code") or cl_result.get("hs_code_6") or ""
 
-        # FTA / OGA / Halal
+        # Tax rate / FTA / OGA / Halal
+        tax_result = await _lookup_duty_rate(hs_ai, origin) if hs_ai else {}
         fta_result = await _check_fta(hs_ai, origin, dest_country) if hs_ai else {}
         oga_result = await _check_oga(hs_ai) if hs_ai else {}
         halal_result = await _check_halal(hs_ai, dest_country) if hs_ai else {}
+
+        # ฝัง duty_rate เข้า cl_result เพื่อให้ _save_item ใช้ได้
+        if tax_result:
+            cl_result["duty_rate"] = tax_result.get("mfn_rate")
+            cl_result["applicable_rate"] = tax_result.get("applicable_rate")
+
+        # ฝัง fta_rate และ agreement เข้า fta_result
+        if fta_result.get("eligible") and tax_result:
+            fta_result["duty_rate"] = tax_result.get("mfn_rate")
+            fta_result["fta_rate"] = tax_result.get("fta_rate") or tax_result.get("applicable_rate")
+            fta_result["agreement"] = fta_result.get("form")
+            fta_result["fta_eligible"] = True
 
         combined = {
             "classification": cl_result,
@@ -261,10 +283,13 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
         lv = _safe_float(item.get("line_value")) or 0
         total_value += lv
 
-        duty_rate = _safe_float(fta_result.get("duty_rate") or cl_result.get("duty_rate")) or 0
+        mfn_rate = _safe_float(cl_result.get("duty_rate")) or 0
+        applicable_rate = _safe_float(cl_result.get("applicable_rate"))
         fta_rate = _safe_float(fta_result.get("fta_rate"))
+        # duty_rate = อัตราที่ใช้จริง (FTA ถ้ามี, ไม่งั้น MFN)
+        duty_rate = applicable_rate if applicable_rate is not None else mfn_rate
         duty_est = lv * duty_rate / 100
-        fta_sav = lv * (duty_rate - (fta_rate or duty_rate)) / 100 if fta_rate is not None else 0
+        fta_sav = lv * (mfn_rate - duty_rate) / 100 if mfn_rate > duty_rate else 0
         total_duty += duty_est
         total_saving += fta_sav
 
@@ -310,9 +335,11 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
             "description": desc,
             "hs_code": hs_ai,
             "confidence": conf,
-            "duty_rate": duty_rate,
+            "duty_rate": mfn_rate,           # อัตรา MFN (ก่อน FTA)
+            "applicable_rate": duty_rate,    # อัตราที่ใช้จริง (หลัง FTA)
             "duty_estimate_usd": round(duty_est, 2),
             "fta_eligible": fta_elig,
+            "fta_agreement": fta_result.get("form"),
             "fta_saving_usd": round(fta_sav, 2),
             "oga_required": oga_req,
             "oga_agencies": oga_result.get("agencies") or [],
