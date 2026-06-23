@@ -26,15 +26,22 @@ async def _get_pool():
 # ─── Classify 1 item ─────────────────────────────────────────────────────────
 
 async def _classify_item(description: str, country_origin: str = "", dest_country: str = "TH") -> dict:
-    """ใช้ engine เดิมจาก knowledge_service"""
+    """ใช้ classification_agent (เหมือน sandbox)"""
     try:
-        from knowledge_service import classify_hs_code
-        result = await classify_hs_code(
+        from classification_agent import classify_item
+        result = await classify_item(
             description=description,
             origin_country=country_origin,
-            destination_country=dest_country
         )
-        return result or {}
+        if result is None:
+            return {}
+        # ClassificationResult is a dataclass — convert to plain dict
+        return {
+            "hs_code": result.hs_code,
+            "hs_description": result.hs_description,
+            "confidence_score": result.confidence_score,
+            "reasoning": result.notes,
+        }
     except Exception as e:
         return {"error": str(e)}
 
