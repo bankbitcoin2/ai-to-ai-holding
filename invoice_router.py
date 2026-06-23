@@ -25,11 +25,13 @@ async def _get_client(api_key: str = Depends(API_KEY_HEADER)) -> str:
     if not api_key:
         raise HTTPException(status_code=401, detail="X-API-Key required")
     try:
+        # auth ด้วย hint (8 ตัวสุดท้าย) — เหมือน billing._get_agent_by_key
+        hint = api_key[-8:]
         pool = await get_pool()
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
-                "SELECT agent_id FROM client_agents WHERE api_key=$1 AND (is_active=TRUE OR status='ACTIVE')",
-                api_key
+                "SELECT id FROM client_agents WHERE api_key_hint=$1 AND status='ACTIVE'",
+                hint
             )
         if not row:
             raise HTTPException(status_code=401, detail="Invalid API Key")
