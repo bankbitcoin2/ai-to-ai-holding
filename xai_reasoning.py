@@ -62,9 +62,10 @@ async def _claude_reasoning(
     description, hs_code, chapter, heading, confidence,
     origin_country, dest_country, duty_rate, fta_eligible, oga_required
 ) -> dict:
-    import anthropic
+    import httpx
 
-    client = anthropic.AsyncAnthropic(api_key=_ANTHROPIC_KEY)
+    ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
+    MODEL = "claude-haiku-4-5-20251001"
 
     prompt = f"""You are a Thai customs classification expert. Explain why this product was classified under HS code {hs_code}.
 
@@ -92,13 +93,24 @@ Rules:
 - alternative_considered: ถ้า confidence < 0.80 ต้องระบุ HS อื่นที่ใกล้เคียง
 """
 
-    msg = await client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=512,
-        messages=[{"role": "user", "content": prompt}]
-    )
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.post(
+            ANTHROPIC_API_URL,
+            headers={
+                "x-api-key": _ANTHROPIC_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            },
+            json={
+                "model": MODEL,
+                "max_tokens": 512,
+                "messages": [{"role": "user", "content": prompt}],
+            },
+        )
+        resp.raise_for_status()
+        data = resp.json()
 
-    raw = msg.content[0].text.strip()
+    raw = data["content"][0]["text"].strip()
     # strip markdown code fence if present
     if raw.startswith("```"):
         raw = raw.split("```")[1]
