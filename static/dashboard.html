@@ -555,6 +555,9 @@ const i18n = {
     inv_step1: '📄 อ่านเอกสาร', inv_step2: '🎯 จัดพิกัด HS',
     inv_step3: '💱 คำนวณภาษี', inv_step4: '🤝 ตรวจ FTA',
     inv_warn_title: 'คำเตือน',
+    inv_warn_mismatch: (ln, decl, ai) => `บรรทัด ${ln}: HS ที่ระบุ ${decl} ≠ AI แนะนำ ${ai}`,
+    inv_warn_oga: (ln, ag) => `บรรทัด ${ln}: ต้องขออนุญาต ${ag}`,
+    inv_warn_item: (ln, desc) => `บรรทัด ${ln}: "${desc}" ประมวลผลไม่สำเร็จ → ตรวจสอบใน Sandbox`,
     inv_col_goods: 'สินค้า', inv_col_lineval: 'Line Value',
     inv_col_flags: 'Flags', inv_col_conf: 'มั่นใจ',
     inv_col_duty: 'ภาษี ($)',
@@ -653,6 +656,9 @@ const i18n = {
     inv_step1: '📄 Reading Doc', inv_step2: '🎯 HS Classify',
     inv_step3: '💱 Calc Duty', inv_step4: '🤝 Check FTA',
     inv_warn_title: 'Warnings',
+    inv_warn_mismatch: (ln, decl, ai) => `Line ${ln}: Declared HS ${decl} ≠ AI recommended ${ai}`,
+    inv_warn_oga: (ln, ag) => `Line ${ln}: OGA permit required — ${ag}`,
+    inv_warn_item: (ln, desc) => `Line ${ln}: "${desc}" failed — check in Sandbox`,
     inv_col_goods: 'Goods', inv_col_lineval: 'Line Value',
     inv_col_flags: 'Flags', inv_col_conf: 'Conf.',
     inv_col_duty: 'Duty ($)',
@@ -751,6 +757,9 @@ const i18n = {
     inv_step1: '📄 读取文件', inv_step2: '🎯 HS 分类',
     inv_step3: '💱 计算关税', inv_step4: '🤝 检查 FTA',
     inv_warn_title: '警告',
+    inv_warn_mismatch: (ln, decl, ai) => `第${ln}行：申报HS ${decl} ≠ AI推荐 ${ai}`,
+    inv_warn_oga: (ln, ag) => `第${ln}行：需申请许可证 — ${ag}`,
+    inv_warn_item: (ln, desc) => `第${ln}行："${desc}" 处理失败 → 请在Sandbox中检查`,
     inv_col_goods: '商品', inv_col_lineval: '行金额',
     inv_col_flags: '标志', inv_col_conf: '置信度',
     inv_col_duty: '关税 ($)',
@@ -849,6 +858,9 @@ const i18n = {
     inv_step1: '📄 文書読取', inv_step2: '🎯 HS分類',
     inv_step3: '💱 関税計算', inv_step4: '🤝 FTA確認',
     inv_warn_title: '警告',
+    inv_warn_mismatch: (ln, decl, ai) => `${ln}行目：申告HS ${decl} ≠ AI推奨 ${ai}`,
+    inv_warn_oga: (ln, ag) => `${ln}行目：許可証申請が必要 — ${ag}`,
+    inv_warn_item: (ln, desc) => `${ln}行目：「${desc}」処理失敗 → Sandboxで確認してください`,
     inv_col_goods: '商品', inv_col_lineval: '金額',
     inv_col_flags: 'フラグ', inv_col_conf: '信頼度',
     inv_col_duty: '関税 ($)',
@@ -1568,11 +1580,11 @@ function toggleInvDetail(idx) {
   const isOpen = panel.style.display !== 'none';
   // close all panels
   document.querySelectorAll('.inv-detail-panel').forEach(p => p.style.display = 'none');
-  document.querySelectorAll('.inv-row-btn').forEach(b => b.textContent = '▶ ดูรายละเอียด');
+  document.querySelectorAll('.inv-row-btn').forEach(b => b.textContent = t('inv_detail_btn'));
   if (isOpen) { _invOpenIdx = null; return; }
   panel.style.display = 'block';
   const btn = document.getElementById('inv-btn-' + idx);
-  if (btn) btn.textContent = '▼ ซ่อน';
+  if (btn) btn.textContent = t('inv_detail_hide');
   _invOpenIdx = idx;
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -1617,8 +1629,22 @@ function renderInvoiceResult(d, filename) {
       ${warnings.map(w => {
         const isHS = w.type === 'HS_MISMATCH';
         const isOGA = w.type === 'OGA_REQUIRED';
+        const isErr = w.type === 'ITEM_ERROR';
         const icon = isHS ? '🔴' : isOGA ? '🟡' : '▸';
-        return `<div class="inv-warn-item">${icon} ${w.message}</div>`;
+        let msg;
+        if (isHS && w.declared_hs && w.ai_hs) {
+          const fn = t('inv_warn_mismatch');
+          msg = typeof fn === 'function' ? fn(w.line_no, w.declared_hs, w.ai_hs) : w.message;
+        } else if (isOGA && w.agencies) {
+          const fn = t('inv_warn_oga');
+          msg = typeof fn === 'function' ? fn(w.line_no, (w.agencies||[]).join(', ')) : w.message;
+        } else if (isErr && w.line_no) {
+          const fn = t('inv_warn_item');
+          msg = typeof fn === 'function' ? fn(w.line_no, (w.desc||'')) : w.message;
+        } else {
+          msg = w.message;
+        }
+        return `<div class="inv-warn-item">${icon} ${msg}</div>`;
       }).join('')}
     </div>`;
 

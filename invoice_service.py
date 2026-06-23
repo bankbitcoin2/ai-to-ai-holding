@@ -395,10 +395,13 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
         if hs_declared and hs_ai:
             if hs_declared.replace(".", "")[:6] != hs_ai.replace(".", "")[:6]:
                 warnings.append({"line_no": r["line_no"], "type": "HS_MISMATCH",
+                    "declared_hs": hs_declared, "ai_hs": hs_ai,
+                    "desc": (r.get("description") or "")[:60],
                     "message": f"บรรทัด {r['line_no']}: HS ที่ระบุ {hs_declared} ≠ AI แนะนำ {hs_ai}"})
         if r.get("oga_required"):
             agencies = r.get("oga_agencies") or []
             warnings.append({"line_no": r["line_no"], "type": "OGA_REQUIRED",
+                "agencies": agencies,
                 "message": f"บรรทัด {r['line_no']}: ต้องขออนุญาต {', '.join(agencies)}"})
         results.append(r)
 
