@@ -215,4 +215,160 @@ USE_POSTGRES = True  # Railway always PostgreSQL
 
 ---
 
-*อัปเดตครั้งล่าสุด: มิถุนายน 2026 | งานเสร็จ 68 tasks | Production: Online ✅*
+---
+
+## 11. Roadmap เต็ม (14 Phases)
+
+| Phase | ชื่อ | สถานะ |
+|-------|------|-------|
+| 1 | Foundation — PostgreSQL + Railway | ✅ Done |
+| 2 | Engines — Halal/OGA/Tax/FTA/Normalize | ✅ Done |
+| 3 | API & UI — Sandbox/Dashboard/Chairman | ✅ Done |
+| 4 | Learning Cache — Feedback loop + 202k FTA | ✅ Done |
+| 5 | Market Discovery — MCP/GPT/RapidAPI/LangChain | ✅ Submitted |
+| 6 | CEO Real Mode (AXIS) | ⏸️ Deferred |
+| 7 | Revenue Scale — Stripe live + multi-tenant | 📋 Planned |
+| 8 | Invoice Intelligence Pipeline | 📋 Planned |
+| 8.1 | Invoice Upload Channel (รูปภาพ/PDF/Excel) | 📋 Planned |
+| 9 | Freight Intelligence & Logistics Expansion | 📋 Planned |
+| 10 | Customs Software Integration (Pre-flight Check) | 📋 Planned |
+| 11 | Explainable AI (XAI) Reasoning Block | 📋 Planned |
+| 12 | Valuation Risk Alert (Price Benchmark) | 📋 Planned |
+| 13 | Dynamic OGA Update Pipeline | 📋 Planned |
+| 14 | Dual-Track Pricing & Revenue Structure | 📋 Planned |
+
+---
+
+## 12. Strategic Position — Intelligence Layer
+
+```
+ระบบเราไม่ได้แข่งกับ VAN/Customs Software/FF
+เราเป็น Intelligence API ที่ทุกคนในห่วงโซ่ต้อง call มา
+
+[กรมศุลกากร / NSW]
+        ↑
+[VAN: Netbay / TradeSiam]
+        ↑
+[Customs Software: e-Customs Pro ฯลฯ]
+        ↑
+[Freight Forwarder] ← [Importer โดยตรง]
+        ↑
+════════════════════════
+│   AI TO AI HOLDING   │  ← เราอยู่ตรงนี้
+│   Intelligence API   │
+│ HS + FTA + OGA + XAI │
+│ Valuation + Halal    │
+════════════════════════
+        ↑
+[Invoice Data + Feedback Loop + Trade Intelligence]
+```
+
+---
+
+## 13. ช่องว่างตลาดที่ระบบเราอุด (Gap Analysis)
+
+**Gap 1 — Legal Accountability**
+ชิปปิ้งกลัวใช้ AI เพราะถ้า HS ผิดโดนปรับ ใครรับผิดชอบ
+→ แก้ด้วย XAI Reasoning Block (Phase 11) — ส่ง evidence พร้อมผลลัพธ์
+
+**Gap 2 — Customs Valuation**
+ไม่มีใครรู้ราคากลางสินค้าจริง → under-valuation → Red Line
+→ แก้ด้วย Price Benchmark (Phase 12) — สะสมจาก invoice จริง
+
+**Gap 3 — Dynamic Non-Tariff Barriers**
+กฎ OGA เปลี่ยนรายสัปดาห์ — rule-based system พัง
+→ แก้ด้วย Dynamic OGA Pipeline (Phase 13) — auto-fetch จาก DLD/FDA
+
+---
+
+## 14. ข้อมูลที่เก็บได้จาก 1 Invoice
+
+```
+ทันที:
+→ HS verify + FTA + OGA + Halal ครบ
+→ บันทึก description เข้า normalize cache
+→ บันทึก price data point
+
+สะสม 100 ใบ   → เห็น price range ต่อ HS code
+สะสม 1,000 ใบ → เห็น trade flow, เริ่ม flag under-valuation
+สะสม 10,000 ใบ → price benchmark real-time, seasonal pattern
+สะสม 100,000 ใบ → ข้อมูลระดับกรมศุลกากร
+```
+
+**Fields ที่สกัดจาก Invoice:**
+- Description → normalize cache + XAI training
+- HS Code (ที่ลูกค้าใส่มา) → verify vs AI → learning signal
+- Unit Price → price benchmark
+- Country of Origin → FTA + Halal zone mapping
+- Incoterms → CIF calculation base
+- Transport mode/Shipping line → freight intelligence
+- Port of loading/discharge → trade route analytics
+
+---
+
+## 15. Revenue Model (Dual-Track + Data)
+
+```
+Track A — Volume API (VAN / Customs Software)
+$0.003-0.015 per call | volume discount
+Target: Netbay, TradeSiam, e-Customs Pro
+
+Track B — Enterprise SaaS (FF / Importer ใหญ่)
+$200-500/เดือน | XAI + Valuation Alert + Priority
+Target: FF รายใหญ่ 10 ราย = $2,000-5,000/เดือน
+
+Track C — Trade Intelligence Reports (ระยะยาว)
+Anonymized trade flow รายไตรมาส
+ขายให้ธนาคาร/ประกัน/นักลงทุน/BOI
+High-margin passive income
+```
+
+**PoC Strategy:** API ฟรี 3 เดือน แลก anonymous invoice data
+→ Flywheel: data มาก → AI แม่น → ลูกค้ามาก → data มากขึ้น
+
+---
+
+## 16. Economic Moat — สิ่งที่คู่แข่งต่างชาติทำไม่ได้
+
+```
+✅ OGA rules เฉพาะไทย (DLD, FDA, TISI, กรมอุตฯทหาร)
+✅ Halal zone 21 พื้นที่ในอาเซียน
+✅ FTA ไทย-อาเซียนระดับ 11-digit
+✅ Invoice data จากตลาดไทยจริง (สะสมเรื่อยๆ)
+✅ ภาษาไทย/context ท้องถิ่น
+✅ Feedback loop จากการใช้งานจริง
+```
+
+Amazon/Google มี AI เก่งกว่า แต่ไม่มี local knowledge เหล่านี้
+และต้องใช้เวลาหลายปีถึงจะสร้างได้ — เราเริ่มก่อนแล้ว
+
+---
+
+## 17. สิ่งที่ทำได้เลย vs รอ Data
+
+**ทำได้เลย (ไม่ต้องรอ):**
+- XAI Reasoning Block — เพิ่มใน response เดิม
+- Stripe live mode — เปิดใน Stripe Dashboard
+- CHAIRMAN_API_KEY — ตั้งใน Railway Variables
+- Valuation benchmark เบื้องต้น — ใช้ข้อมูลสาธารณะก่อน
+
+**รอ Data สะสม:**
+- Price benchmark จริง — รอ invoice ไหลเข้า
+- Trade flow analytics — รอ volume
+- Seasonal pattern — รอข้อมูลหลายเดือน
+- Freight intelligence — รอ transport data
+
+---
+
+## 18. AI CEO — AXIS
+
+ชื่อ: **AXIS**
+บทบาท: AI Chief Executive Officer — AI TO AI HOLDING
+Avatar: "AX"
+สถานะ: Standby — CEO Real Mode (Phase 6) ยัง deferred ตามคำสั่ง Chairman
+Interface: chairman.html → tab "ceo · head"
+Endpoint: `/v1/agents/command` → ยัง NotImplementedError
+
+---
+
+*อัปเดตครั้งล่าสุด: มิถุนายน 2026 | Tasks: 78 | Production: Online ✅ | Phases: 14*
