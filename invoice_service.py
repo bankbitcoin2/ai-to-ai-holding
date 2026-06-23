@@ -331,19 +331,33 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
             reasoning = None
 
         results.append({
+            # ── Invoice line fields ──
             "line_no": i + 1,
             "description": desc,
+            "hs_code_declared": item.get("hs_code_declared"),
+            "qty": item.get("qty"),
+            "unit": item.get("unit"),
+            "unit_price": item.get("unit_price"),
+            "line_value": item.get("line_value"),
+            "currency": item.get("currency") or parsed.get("currency", "USD"),
+            "country_origin": origin,
+            # ── Classification ──
             "hs_code": hs_ai,
             "confidence": conf,
-            "duty_rate": mfn_rate,           # อัตรา MFN (ก่อน FTA)
+            # ── Duty / Tax ──
+            "duty_rate": mfn_rate,           # MFN rate (ก่อน FTA)
             "applicable_rate": duty_rate,    # อัตราที่ใช้จริง (หลัง FTA)
             "duty_estimate_usd": round(duty_est, 2),
+            # ── FTA ──
             "fta_eligible": fta_elig,
             "fta_agreement": fta_result.get("form"),
             "fta_saving_usd": round(fta_sav, 2),
+            # ── OGA / Halal ──
             "oga_required": oga_req,
             "oga_agencies": oga_result.get("agencies") or [],
             "halal_required": bool(halal_result.get("required")),
+            "halal_cert_body": halal_result.get("cert_body") or halal_result.get("certification_body"),
+            # ── XAI ──
             "reasoning": reasoning,
         })
 

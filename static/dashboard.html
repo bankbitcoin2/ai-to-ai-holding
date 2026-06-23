@@ -1285,84 +1285,263 @@ function showInvError(msg) {
     </div>`;
 }
 
+// ── Invoice Detail Panel (click-to-expand) ────────────────────
+let _invOpenIdx = null;
+
+function toggleInvDetail(idx) {
+  const panel = document.getElementById('inv-detail-' + idx);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  // close all panels
+  document.querySelectorAll('.inv-detail-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.inv-row-btn').forEach(b => b.textContent = '▶ ดูรายละเอียด');
+  if (isOpen) { _invOpenIdx = null; return; }
+  panel.style.display = 'block';
+  const btn = document.getElementById('inv-btn-' + idx);
+  if (btn) btn.textContent = '▼ ซ่อน';
+  _invOpenIdx = idx;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 function renderInvoiceResult(d, filename) {
   const items = d.items || [];
   const warnings = d.warnings || [];
+  const cur = d.currency || 'USD';
+  const effectiveRate = d.total_value_usd > 0
+    ? ((d.total_duty_estimate_usd / d.total_value_usd) * 100).toFixed(2) + '%'
+    : '—';
 
-  const summaryHtml = `
-    <div class="inv-summary-grid">
-      <div class="inv-sum-card">
-        <div class="inv-sum-label">รายการสินค้า</div>
-        <div class="inv-sum-val">${d.total_items} items</div>
-      </div>
-      <div class="inv-sum-card">
-        <div class="inv-sum-label">มูลค่ารวม</div>
-        <div class="inv-sum-val" style="color:var(--green)">$${(d.total_value_usd||0).toFixed(2)}</div>
-      </div>
-      <div class="inv-sum-card">
-        <div class="inv-sum-label">ประมาณการภาษี</div>
-        <div class="inv-sum-val" style="color:var(--yellow)">$${(d.total_duty_estimate_usd||0).toFixed(2)}</div>
-      </div>
-      <div class="inv-sum-card">
-        <div class="inv-sum-label">FTA ประหยัดได้</div>
-        <div class="inv-sum-val" style="color:var(--green)">$${(d.total_fta_saving_usd||0).toFixed(2)}</div>
-      </div>
+  // ── Meta header ──
+  const metaHtml = `
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
+      <span>📄 <b style="color:var(--text)">${filename}</b></span>
+      ${d.invoice_no ? `<span>Invoice: <b style="color:var(--text)">${d.invoice_no}</b></span>` : ''}
+      ${d.invoice_date ? `<span>วันที่: <b style="color:var(--text)">${d.invoice_date}</b></span>` : ''}
+      ${d.seller_country ? `<span>📦 ต้นทาง: <b style="color:var(--accent)">${d.seller_country}</b></span>` : ''}
+      ${d.buyer_country ? `<span>🏁 ปลายทาง: <b style="color:var(--accent)">${d.buyer_country}</b></span>` : ''}
+      ${d.incoterms ? `<span>📋 Incoterms: <b style="color:var(--text)">${d.incoterms}</b></span>` : ''}
+      ${cur ? `<span>💱 ${cur}</span>` : ''}
+      <span style="margin-left:auto;font-size:.7rem;opacity:.5">ID: ${d.submission_id||''}</span>
     </div>`;
 
-  const itemsHtml = items.length === 0 ? '<div style="padding:1rem;color:var(--muted)">ไม่พบรายการสินค้า</div>' : `
-    <div style="overflow:auto;border:1px solid var(--border);border-radius:10px;margin-top:12px">
-      <div class="inv-item-head">
-        <span>สินค้า</span><span>HS Code</span><span>ภาษี %</span><span>FTA</span><span>OGA</span><span>ความมั่นใจ</span>
-      </div>
-      ${items.map((it, idx) => {
-        const r = it.reasoning || {};
-        const hasReasoning = r.summary;
-        const confPct = it.confidence != null ? Math.round(it.confidence*100) : null;
-        const confColor = (it.confidence||0)>=0.85?'var(--green)':'var(--yellow)';
-        return `
-      <div class="inv-item-row" style="flex-direction:column;display:block;padding:12px">
-        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:center">
-          <span style="font-size:.8rem;color:var(--text)">${it.description||'—'}</span>
-          <span style="font-family:monospace;font-weight:700;color:var(--accent)">${it.hs_code||'—'}</span>
-          <span>${it.duty_rate != null ? it.duty_rate.toFixed(1)+'%' : '—'}</span>
-          <span>${it.fta_eligible
-            ? `<span class="inv-badge ok">✓ $${(it.fta_saving_usd||0).toFixed(2)}</span>`
-            : `<span class="inv-badge warn">—</span>`}</span>
-          <span>${it.oga_required
-            ? `<span class="inv-badge err">⚠ ${(it.oga_agencies||[]).join(',')}</span>`
-            : `<span class="inv-badge ok">ผ่าน</span>`}</span>
-          <span style="color:${confColor}">${confPct != null ? confPct+'%' : '—'}</span>
-        </div>
-        ${hasReasoning ? `
-        <div style="margin-top:8px;padding:8px 10px;background:rgba(99,102,241,0.06);border-radius:8px;border-left:3px solid var(--accent)">
-          <div style="font-size:.75rem;color:var(--accent);font-weight:700;margin-bottom:4px">🧠 XAI</div>
-          <div style="font-size:.8rem;color:var(--text);line-height:1.5">${r.summary}</div>
-          ${(r.key_factors||[]).length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${(r.key_factors||[]).map(f=>`<span style="font-size:.7rem;background:rgba(99,102,241,0.12);color:var(--accent);border-radius:999px;padding:1px 8px">${f}</span>`).join('')}</div>` : ''}
-          ${r.legal_basis ? `<div style="font-size:.72rem;color:var(--muted);margin-top:4px">⚖️ ${r.legal_basis}</div>` : ''}
-          ${r.alternative_considered ? `<div style="font-size:.72rem;color:var(--yellow);margin-top:2px">↔ ${r.alternative_considered}</div>` : ''}
-          ${r.warning ? `<div style="font-size:.72rem;color:var(--red);margin-top:4px">⚠️ ${r.warning}</div>` : ''}
-        </div>` : ''}
-      </div>`;
+  // ── 5-card Summary ──
+  const summaryHtml = `
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
+      <div class="inv-sum-card"><div class="inv-sum-label">รายการสินค้า</div><div class="inv-sum-val">${d.total_items} items</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">มูลค่ารวม</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_value_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">ประมาณการภาษี</div><div class="inv-sum-val" style="color:var(--yellow)">$${(d.total_duty_estimate_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">FTA ประหยัดได้</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_fta_saving_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">Effective Duty Rate</div><div class="inv-sum-val" style="color:var(--yellow)">${effectiveRate}</div></div>
+    </div>`;
+
+  // ── Warnings (atas) ──
+  const warningsHtml = warnings.length === 0 ? '' : `
+    <div class="inv-warn-box" style="margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:6px;color:var(--yellow)">⚠️ คำเตือน (${warnings.length})</div>
+      ${warnings.map(w => {
+        const isHS = w.type === 'HS_MISMATCH';
+        const isOGA = w.type === 'OGA_REQUIRED';
+        const icon = isHS ? '🔴' : isOGA ? '🟡' : '▸';
+        return `<div class="inv-warn-item">${icon} ${w.message}</div>`;
       }).join('')}
     </div>`;
 
-  const warningsHtml = warnings.length === 0 ? '' : `
-    <div class="inv-warn-box">
-      <div style="font-weight:700;margin-bottom:6px;color:var(--yellow)">⚠️ คำเตือน (${warnings.length})</div>
-      ${warnings.map(w => `<div class="inv-warn-item">▸ ${w.message}</div>`).join('')}
+  // ── Summary table ──
+  const tableHtml = items.length === 0
+    ? '<div style="padding:1rem;color:var(--muted)">ไม่พบรายการสินค้า</div>'
+    : `<div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px">
+    <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead>
+        <tr style="background:rgba(99,102,241,0.08);color:var(--muted);text-align:left">
+          <th style="padding:9px 10px;white-space:nowrap">#</th>
+          <th style="padding:9px 10px">สินค้า</th>
+          <th style="padding:9px 10px;white-space:nowrap">HS Code (AI)</th>
+          <th style="padding:9px 10px;white-space:nowrap">Declared</th>
+          <th style="padding:9px 10px;white-space:nowrap">Qty × Unit</th>
+          <th style="padding:9px 10px;white-space:nowrap">Unit Price</th>
+          <th style="padding:9px 10px;white-space:nowrap">Line Value</th>
+          <th style="padding:9px 10px;white-space:nowrap">MFN %</th>
+          <th style="padding:9px 10px;white-space:nowrap">FTA %</th>
+          <th style="padding:9px 10px;white-space:nowrap">ภาษี ($)</th>
+          <th style="padding:9px 10px;white-space:nowrap">FTA Saving</th>
+          <th style="padding:9px 10px;white-space:nowrap">OGA</th>
+          <th style="padding:9px 10px;white-space:nowrap">Halal</th>
+          <th style="padding:9px 10px;white-space:nowrap">มั่นใจ</th>
+          <th style="padding:9px 10px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${items.map((it, idx) => {
+          const confPct = it.confidence != null ? Math.round(it.confidence * 100) : null;
+          const confColor = (it.confidence||0) >= 0.85 ? 'var(--green)' : (it.confidence||0) >= 0.65 ? 'var(--yellow)' : 'var(--red)';
+          const mfn = it.duty_rate != null ? it.duty_rate.toFixed(1) + '%' : '—';
+          const fta = it.applicable_rate != null ? it.applicable_rate.toFixed(1) + '%' : '—';
+          const hasDecl = it.hs_code_declared;
+          const aiCode = it.hs_code || '—';
+          const isMismatch = hasDecl && aiCode !== '—' && hasDecl.replace('.','').slice(0,6) !== aiCode.replace('.','').slice(0,6);
+          const rowBg = isMismatch ? 'background:rgba(239,68,68,0.04)' : (idx % 2 === 1 ? 'background:rgba(255,255,255,0.015)' : '');
+          return `
+          <tr style="${rowBg};border-top:1px solid var(--border);cursor:pointer" onclick="toggleInvDetail(${idx})">
+            <td style="padding:8px 10px;color:var(--muted)">${it.line_no}</td>
+            <td style="padding:8px 10px;max-width:200px">
+              <div style="font-size:.79rem;line-height:1.4;color:var(--text)">${it.description||'—'}</div>
+              <div style="font-size:.7rem;color:var(--muted)">${it.country_origin ? '🌍 '+it.country_origin : ''}</div>
+            </td>
+            <td style="padding:8px 10px;font-family:monospace;font-weight:700;color:var(--accent);white-space:nowrap">${aiCode}</td>
+            <td style="padding:8px 10px;font-family:monospace;font-size:.78rem;color:${isMismatch?'var(--red)':'var(--muted)'}">
+              ${hasDecl ? (isMismatch ? '⚠ ' : '') + hasDecl : '—'}
+            </td>
+            <td style="padding:8px 10px;white-space:nowrap;color:var(--muted)">
+              ${it.qty != null ? it.qty.toLocaleString() : '—'}${it.unit ? ' '+it.unit : ''}
+            </td>
+            <td style="padding:8px 10px;white-space:nowrap;text-align:right">
+              ${it.unit_price != null ? '$'+it.unit_price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}
+            </td>
+            <td style="padding:8px 10px;white-space:nowrap;text-align:right;font-weight:600;color:var(--text)">
+              ${it.line_value != null ? '$'+it.line_value.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}
+            </td>
+            <td style="padding:8px 10px;text-align:center;color:var(--yellow)">${mfn}</td>
+            <td style="padding:8px 10px;text-align:center;color:${it.fta_eligible?'var(--green)':'var(--muted)'}">${fta}</td>
+            <td style="padding:8px 10px;text-align:right;color:var(--yellow)">
+              ${it.duty_estimate_usd != null && it.duty_estimate_usd > 0 ? '$'+it.duty_estimate_usd.toFixed(2) : '—'}
+            </td>
+            <td style="padding:8px 10px;text-align:right;color:var(--green)">
+              ${it.fta_saving_usd > 0 ? '💚 $'+it.fta_saving_usd.toFixed(2) : '—'}
+            </td>
+            <td style="padding:8px 10px;text-align:center">
+              ${it.oga_required
+                ? `<span style="background:rgba(245,158,11,.15);color:var(--yellow);border-radius:4px;padding:1px 6px;font-size:.72rem;white-space:nowrap">⚠ OGA</span>`
+                : `<span style="color:var(--green);font-size:.8rem">✓</span>`}
+            </td>
+            <td style="padding:8px 10px;text-align:center">
+              ${it.halal_required
+                ? `<span style="background:rgba(239,68,68,.12);color:var(--red);border-radius:4px;padding:1px 6px;font-size:.72rem">🚫 Halal</span>`
+                : `<span style="color:var(--green);font-size:.8rem">✓</span>`}
+            </td>
+            <td style="padding:8px 10px;text-align:center;font-weight:700;color:${confColor}">
+              ${confPct != null ? confPct + '%' : '—'}
+            </td>
+            <td style="padding:8px 10px">
+              <button id="inv-btn-${idx}" class="inv-row-btn" onclick="event.stopPropagation();toggleInvDetail(${idx})"
+                style="font-size:.7rem;padding:3px 8px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.25);border-radius:4px;cursor:pointer;white-space:nowrap">▶ ดูรายละเอียด</button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="15" style="padding:0">
+              <div id="inv-detail-${idx}" class="inv-detail-panel" style="display:none">
+                ${buildDetailPanel(it, cur)}
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById('invResult').innerHTML = metaHtml + summaryHtml + warningsHtml + tableHtml;
+}
+
+function buildDetailPanel(it, cur) {
+  const r = it.reasoning || {};
+  const mfn = it.duty_rate != null ? it.duty_rate.toFixed(1) + '%' : '—';
+  const ftaRate = it.applicable_rate != null ? it.applicable_rate.toFixed(1) + '%' : '—';
+  const hasDecl = it.hs_code_declared;
+  const aiCode = it.hs_code || '—';
+  const isMismatch = hasDecl && aiCode !== '—' && hasDecl.replace('.','').slice(0,6) !== aiCode.replace('.','').slice(0,6);
+
+  const chip = (label, color='var(--accent)') =>
+    `<span style="display:inline-block;font-size:.72rem;background:rgba(99,102,241,.12);color:${color};border-radius:999px;padding:2px 10px;margin:2px">${label}</span>`;
+
+  const section = (icon, title, content) =>
+    `<div style="margin-bottom:14px">
+      <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">${icon} ${title}</div>
+      ${content}
     </div>`;
 
-  const metaHtml = `
-    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-bottom:8px">
-      <span>📄 ${filename}</span>
-      ${d.invoice_no ? `<span>Invoice: <b>${d.invoice_no}</b></span>` : ''}
-      ${d.seller_country ? `<span>ต้นทาง: <b>${d.seller_country}</b></span>` : ''}
-      ${d.buyer_country ? `<span>ปลายทาง: <b>${d.buyer_country}</b></span>` : ''}
-      ${d.incoterms ? `<span>Incoterms: <b>${d.incoterms}</b></span>` : ''}
-      <span style="margin-left:auto;color:var(--muted);font-size:.72rem">ID: ${d.submission_id||''}</span>
+  const row2 = (label, val, color='var(--text)') =>
+    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+      <span style="color:var(--muted);font-size:.8rem">${label}</span>
+      <span style="font-weight:600;color:${color};font-size:.8rem">${val || '—'}</span>
     </div>`;
 
-  document.getElementById('invResult').innerHTML = metaHtml + summaryHtml + itemsHtml + warningsHtml;
+  // Section A — Line item info
+  const lineSection = section('📦', 'ข้อมูลรายการ', `
+    ${row2('คำบรรยาย', it.description)}
+    ${row2('Qty × Unit', it.qty != null ? it.qty.toLocaleString() + (it.unit ? ' ' + it.unit : '') : null)}
+    ${row2('Unit Price', it.unit_price != null ? '$' + it.unit_price.toLocaleString('en',{minimumFractionDigits:2}) : null)}
+    ${row2('Line Value', it.line_value != null ? '$' + it.line_value.toLocaleString('en',{minimumFractionDigits:2}) : null, 'var(--green)')}
+    ${row2('Currency', it.currency || cur)}
+    ${row2('Country of Origin', it.country_origin)}
+  `);
+
+  // Section B — HS Classification
+  const hsSection = section('🎯', 'HS Code Classification', `
+    ${row2('HS Code (AI)', aiCode, 'var(--accent)')}
+    ${hasDecl ? row2('HS Code (Declared)', hasDecl, isMismatch ? 'var(--red)' : 'var(--muted)') : ''}
+    ${isMismatch ? `<div style="margin:6px 0;padding:6px 10px;background:rgba(239,68,68,.1);border-radius:6px;font-size:.78rem;color:var(--red)">⚠️ HS Code ที่ระบุ <b>${hasDecl}</b> ไม่ตรงกับ AI แนะนำ <b>${aiCode}</b> — ควรตรวจสอบ</div>` : ''}
+    <div style="margin-top:6px">
+      <span style="font-size:.72rem;color:var(--muted)">ความมั่นใจ</span>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
+          <div style="height:100%;background:${(it.confidence||0)>=.85?'var(--green)':(it.confidence||0)>=.65?'var(--yellow)':'var(--red)'};width:${Math.round((it.confidence||0)*100)}%;transition:width .4s"></div>
+        </div>
+        <span style="font-size:.85rem;font-weight:700;color:${(it.confidence||0)>=.85?'var(--green)':(it.confidence||0)>=.65?'var(--yellow)':'var(--red)'}">${Math.round((it.confidence||0)*100)}%</span>
+      </div>
+    </div>
+  `);
+
+  // Section C — Duty / Tax
+  const dutySection = section('💰', 'ภาษีนำเข้า', `
+    ${row2('MFN Rate (ก่อน FTA)', mfn, 'var(--yellow)')}
+    ${row2('Applicable Rate (หลัง FTA)', ftaRate, it.fta_eligible ? 'var(--green)' : 'var(--yellow)')}
+    ${row2('ประมาณการภาษี (USD)', it.duty_estimate_usd != null && it.duty_estimate_usd > 0 ? '$' + it.duty_estimate_usd.toFixed(2) : '0.00', 'var(--yellow)')}
+    ${it.fta_eligible && it.fta_saving_usd > 0 ? row2('ประหยัดได้จาก FTA', '$' + it.fta_saving_usd.toFixed(2), 'var(--green)') : ''}
+  `);
+
+  // Section D — FTA
+  const ftaSection = section('🤝', 'FTA Status', `
+    ${row2('FTA Eligible', it.fta_eligible ? '✅ ใช่' : '❌ ไม่', it.fta_eligible ? 'var(--green)' : 'var(--muted)')}
+    ${it.fta_agreement ? row2('FTA Agreement', it.fta_agreement, 'var(--green)') : ''}
+    ${it.fta_saving_usd > 0 ? row2('FTA Saving', '$' + it.fta_saving_usd.toFixed(2), 'var(--green)') : ''}
+  `);
+
+  // Section E — OGA
+  const ogaSection = section('📋', 'OGA / ใบอนุญาต', it.oga_required ? `
+    <div style="padding:8px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:6px">
+      <div style="font-size:.8rem;color:var(--yellow);font-weight:700;margin-bottom:4px">⚠️ ต้องขอใบอนุญาตก่อนนำเข้า</div>
+      ${(it.oga_agencies||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${(it.oga_agencies||[]).map(a=>chip(a,'var(--yellow)')).join('')}</div>` : ''}
+    </div>` : `<div style="color:var(--green);font-size:.82rem">✅ ไม่มีข้อกำหนด OGA สำหรับพิกัดนี้</div>`
+  );
+
+  // Section F — Halal
+  const halalSection = section('🌙', 'Halal Compliance', it.halal_required ? `
+    <div style="padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px">
+      <div style="font-size:.8rem;color:var(--red);font-weight:700;margin-bottom:4px">🚫 ต้องมีใบรับรอง Halal</div>
+      ${it.halal_cert_body ? `<div style="font-size:.78rem;color:var(--muted)">หน่วยงาน: <b style="color:var(--text)">${it.halal_cert_body}</b></div>` : ''}
+    </div>` : `<div style="color:var(--green);font-size:.82rem">✅ ไม่ต้องใบรับรอง Halal</div>`
+  );
+
+  // Section G — XAI Reasoning
+  const xaiSection = r.summary ? section('🧠', 'XAI Reasoning', `
+    <div style="padding:10px 12px;background:rgba(99,102,241,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0">
+      <div style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px">${r.summary}</div>
+      ${(r.key_factors||[]).length ? `
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+          ${(r.key_factors||[]).map(f => chip(f)).join('')}
+        </div>` : ''}
+      ${r.legal_basis ? `<div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">⚖️ ${r.legal_basis}</div>` : ''}
+      ${r.alternative_considered ? `<div style="font-size:.75rem;color:var(--yellow);margin-bottom:4px">↔ ตัดออก: ${r.alternative_considered}</div>` : ''}
+      ${r.warning ? `<div style="font-size:.75rem;color:var(--red)">⚠️ ${r.warning}</div>` : ''}
+    </div>
+  `) : '';
+
+  return `<div style="padding:16px 14px;background:rgba(15,20,35,.6);border-top:2px solid var(--accent)">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>${lineSection}${dutySection}${ftaSection}</div>
+      <div>${hsSection}${ogaSection}${halalSection}</div>
+    </div>
+    ${xaiSection}
+  </div>`;
 }
 
 document.addEventListener('DOMContentLoaded', initInvoiceUpload);
