@@ -22,7 +22,7 @@
 | URL | web-production-c9da4.up.railway.app |
 | HS Code Master | 12,247 rows |
 | FTA Eligibility | 202,438 rows |
-| Commit ล่าสุด | 77cf44f |
+| Commit ล่าสุด | 840ad96 |
 | API Price | $0.50 / query |
 
 ---
@@ -33,7 +33,7 @@
 FastAPI + Uvicorn
     └── asyncpg → PostgreSQL (Railway)
     └── Middleware: KillSwitch → Security → CORS
-    └── Routers: sandbox, customs, billing, chairman, agents, kill_switch, treasury_wallet
+    └── Routers: sandbox, customs, billing, chairman, agents, kill_switch, treasury_wallet, invoice
     └── Engines (bundled, no external file):
         ├── halal_engine.py       — halal countries + cert requirements
         ├── oga_engine.py         — OGA controlled goods rules
@@ -105,6 +105,15 @@ FastAPI + Uvicorn
 - Cross-language cache: ZH/JA/TH → normalize → sha256 เดียวกัน
 - schema_learning_v2_pg.sql: classification_candidates_log + cache_feedback_queue
 - _migrate_cache_schema(): auto-run ทุก startup
+
+### Phase 8 & 8.1 — Invoice Intelligence Pipeline ✅ (commit 840ad96)
+- `schema_invoice.sql` — ตาราง invoice_submissions + invoice_items (PostgreSQL)
+- `invoice_parser.py` — detect + parse: PDF_TEXT/PDF_SCAN/IMAGE/EXCEL/CSV ผ่าน pdfplumber/Claude Vision/pandas
+- `invoice_service.py` — classify ทุก line item → FTA/OGA/Halal check → save DB → summary + warnings
+- `invoice_router.py` — POST /v1/invoice/upload | GET /v1/invoice/{id} | GET /v1/invoice/list/all
+- `main.py` — include invoice_router
+- `database.py` — เพิ่ม schema_invoice.sql ใน init list
+- `dashboard.html` — Invoice Intelligence section: drag & drop, summary grid, per-item table, warnings
 
 ### Phase 5 — Market Discovery
 - MCP Registry submission package
@@ -228,8 +237,8 @@ USE_POSTGRES = True  # Railway always PostgreSQL
 | 5 | Market Discovery — MCP/GPT/RapidAPI/LangChain | ✅ Submitted |
 | 6 | CEO Real Mode (AXIS) | ⏸️ Deferred |
 | 7 | Revenue Scale — Stripe live + multi-tenant | 📋 Planned |
-| 8 | Invoice Intelligence Pipeline | 📋 Planned |
-| 8.1 | Invoice Upload Channel (รูปภาพ/PDF/Excel) | 📋 Planned |
+| 8 | Invoice Intelligence Pipeline | ✅ Done |
+| 8.1 | Invoice Upload Channel (รูปภาพ/PDF/Excel) | ✅ Done |
 | 9 | Freight Intelligence & Logistics Expansion | 📋 Planned |
 | 10 | Customs Software Integration (Pre-flight Check) | 📋 Planned |
 | 11 | Explainable AI (XAI) Reasoning Block | 📋 Planned |
@@ -371,4 +380,20 @@ Endpoint: `/v1/agents/command` → ยัง NotImplementedError
 
 ---
 
-*อัปเดตครั้งล่าสุด: มิถุนายน 2026 | Tasks: 78 | Production: Online ✅ | Phases: 14*
+---
+
+## 19. ไฟล์ Invoice Pipeline (Phase 8.1)
+
+| ไฟล์ | หน้าที่ |
+|------|---------|
+| `schema_invoice.sql` | invoice_submissions + invoice_items schema |
+| `invoice_parser.py` | detect file type → extract text/vision → structured dict |
+| `invoice_service.py` | classify all items + DB save + summary |
+| `invoice_router.py` | 3 endpoints: upload / get / list |
+| `static/dashboard.html` | Invoice Intelligence drag & drop UI |
+
+**Flow:** upload file → parse → classify ทุก item → DB → คืน summary (HS/duty/FTA saving/OGA warnings)
+
+---
+
+*อัปเดตครั้งล่าสุด: มิถุนายน 2026 | Tasks: 85 | Production: Online ✅ | Phases: 14 (8/14 Done)*
