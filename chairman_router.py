@@ -1,5 +1,6 @@
 """
 chairman_router.py - Chairman-only endpoints
+ใช้ asyncpg (PostgreSQL) — ไม่ใช้ SQLite
 """
 from fastapi import APIRouter, Header, HTTPException
 from datetime import datetime, timezone
@@ -22,26 +23,24 @@ def _require_chairman_key(x_api_key: str) -> None:
 @router.get("/stats", summary="Chairman revenue + jobs overview")
 async def chairman_stats(x_api_key: str = Header(default="", alias="X-API-Key")):
     _require_chairman_key(x_api_key)
-    from billing import _get_db
-    db = await _get_db()
     try:
-        async with db.execute(
-            "SELECT COUNT(DISTINCT a.id) AS total_clients,"
-            " COALESCE(SUM(c.credit_topup_total), 0) AS total_revenue,"
-            " COALESCE(SUM(c.credit_balance), 0) AS total_balance"
-            " FROM client_agents a"
-            " LEFT JOIN client_credits c ON c.agent_id = a.id"
-            " WHERE a.status = 'ACTIVE'"
-        ) as cur:
-            row = await cur.fetchone()
-
-        total_jobs = 0
-        try:
-            async with db.execute("SELECT COUNT(*) as n FROM audit_events") as cur2:
-                r2 = await cur2.fetchone()
+        from db_adapter import get_pool
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT COUNT(DISTINCT a.id) AS total_clients,"
+                " COALESCE(SUM(c.credit_topup_total), 0) AS total_revenue,"
+                " COALESCE(SUM(c.credit_balance), 0) AS total_balance"
+                " FROM client_agents a"
+                " LEFT JOIN client_credits c ON c.agent_id = a.id"
+                " WHERE a.status = 'ACTIVE'"
+            )
+            total_jobs = 0
+            try:
+                r2 = await conn.fetchrow("SELECT COUNT(*) as n FROM audit_events")
                 total_jobs = r2["n"] if r2 else 0
-        except Exception:
-            pass
+            except Exception:
+                pass
 
         revenue = float(row["total_revenue"]) if row else 0.0
         from holding_config import PRICE_PER_ITEM
@@ -62,8 +61,6 @@ async def chairman_stats(x_api_key: str = Header(default="", alias="X-API-Key"))
             "price_per_item_usd": 1.50, "revenue_usd_estimate": 0.0,
             "note": "DB not ready: " + str(e),
         }
-    finally:
-        await db.close()
 
 
 @router.get("/cache/stats", summary="Chairman HS cache statistics")
@@ -90,42 +87,37 @@ async def chairman_topups(
     x_api_key: str = Header(default="", alias="X-API-Key")
 ):
     _require_chairman_key(x_api_key)
-    from billing import _get_db
-    db = await _get_db()
     try:
-        sql_topups = (
-            "SELECT t.id, a.agent_name, a.contact_email,"
-            " t.amount_usd, t.status, t.created_at, t.completed_at,"
-            " t.stripe_session_id"
-            " FROM credit_topups t"
-            " LEFT JOIN client_agents a ON a.id = t.agent_id"
-            " ORDER BY t.created_at DESC LIMIT $1"
-        )
-        async with db.execute(sql_topups, (limit,)) as cur:
-            topup_rows = await cur.fetchall()
-
-        sql_deducts = (
-            "SELECT e.id, e.actor_id, e.action, e.occurred_at,"
-            " a.agent_name"
-            " FROM audit_events e"
-            " LEFT JOIN client_agents a ON a.id = e.actor_id"
-            " WHERE e.event_type = 'CREDIT_DEDUCT'"
-            " ORDER BY e.occurred_at DESC LIMIT $1"
-        )
-        async with db.execute(sql_deducts, (limit,)) as cur2:
-            deduct_rows = await cur2.fetchall()
-
-        sql_daily = (
-            "SELECT DATE(created_at) as day,"
-            " COUNT(*) as txn_count,"
-            " SUM(amount_usd) as total_usd"
-            " FROM credit_topups"
-            " WHERE status = 'completed'"
-            " GROUP BY DATE(created_at)"
-            " ORDER BY day DESC LIMIT 30"
-        )
-        async with db.execute(sql_daily) as cur3:
-            daily_rows = await cur3.fetchall()
+        from db_adapter import get_pool
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            topup_rows = await conn.fetch(
+                "SELECT t.id, a.agent_name, a.contact_email,"
+                " t.amount_usd, t.status, t.created_at, t.completed_at,"
+                " t.stripe_session_id"
+                " FROM credit_topups t"
+                " LEFT JOIN client_agents a ON a.id = t.agent_id"
+                " ORDER BY t.created_at DESC LIMIT $1",
+                limit
+            )
+            deduct_rows = await conn.fetch(
+                "SELECT e.id, e.actor_id, e.action, e.occurred_at,"
+                " a.agent_name"
+                " FROM audit_events e"
+                " LEFT JOIN client_agents a ON a.id = e.actor_id"
+                " WHERE e.event_type = 'CREDIT_DEDUCT'"
+                " ORDER BY e.occurred_at DESC LIMIT $1",
+                limit
+            )
+            daily_rows = await conn.fetch(
+                "SELECT DATE(created_at) as day,"
+                " COUNT(*) as txn_count,"
+                " SUM(amount_usd) as total_usd"
+                " FROM credit_topups"
+                " WHERE status = 'completed'"
+                " GROUP BY DATE(created_at)"
+                " ORDER BY day DESC LIMIT 30"
+            )
 
         return {
             "topups": [dict(r) for r in topup_rows],
@@ -136,28 +128,24 @@ async def chairman_topups(
         }
     except Exception as e:
         return {"topups": [], "deducts": [], "daily_summary": [], "error": str(e)}
-    finally:
-        await db.close()
 
 
 @router.get("/clients", summary="Chairman client list")
 async def chairman_clients(x_api_key: str = Header(default="", alias="X-API-Key")):
     _require_chairman_key(x_api_key)
-    from billing import _get_db
-    db = await _get_db()
     try:
-        async with db.execute(
-            "SELECT a.id, a.agent_name, a.contact_email, a.status,"
-            " a.registered_at, a.api_key_hint,"
-            " COALESCE(c.credit_balance, 0) as credit_balance,"
-            " COALESCE(c.credit_topup_total, 0) as credit_topup_total"
-            " FROM client_agents a"
-            " LEFT JOIN client_credits c ON c.agent_id = a.id"
-            " ORDER BY a.registered_at DESC LIMIT 100"
-        ) as cur:
-            rows = await cur.fetchall()
+        from db_adapter import get_pool
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT a.id, a.agent_name, a.contact_email, a.status,"
+                " a.registered_at, a.api_key_hint,"
+                " COALESCE(c.credit_balance, 0) as credit_balance,"
+                " COALESCE(c.credit_topup_total, 0) as credit_topup_total"
+                " FROM client_agents a"
+                " LEFT JOIN client_credits c ON c.agent_id = a.id"
+                " ORDER BY a.registered_at DESC LIMIT 100"
+            )
         return {"total": len(rows), "clients": [dict(r) for r in rows]}
     except Exception as e:
         return {"total": 0, "clients": [], "error": str(e)}
-    finally:
-        await db.close()
