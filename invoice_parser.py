@@ -237,6 +237,145 @@ async def extract_with_claude_text(raw_text: str) -> dict:
         return {"error": str(e)}
 
 
+# ─── Smart Excel Parser ──────────────────────────────────────────────────────
+
+# keywords ที่บ่งบอกว่าแถวนี้คือ header ของตาราง items
+_ITEM_HEADER_KEYWORDS = {
+    "description", "goods", "commodity", "item", "product",
+    "สินค้า", "รายการ", "คำบรรยาย"
+}
+_HS_KEYWORDS = {"hs", "tariff", "hscode", "hs code", "hs_code"}
+_QTY_KEYWORDS = {"qty", "quantity", "จำนวน"}
+_PRICE_KEYWORDS = {"price", "unit price", "ราคา"}
+_AMOUNT_KEYWORDS = {"amount", "total", "value", "มูลค่า"}
+_ORIGIN_KEYWORDS = {"origin", "country of origin", "ถิ่นกำเนิด"}
+
+
+def _find_header_row(rows: list) -> tuple[int, dict]:
+    """หา row index ของ header และ column mapping"""
+    for ri, row in enumerate(rows):
+        row_lower = [str(c).lower().strip() if c else "" for c in row]
+        desc_col = next((ci for ci, v in enumerate(row_lower)
+                         if any(kw in v for kw in _ITEM_HEADER_KEYWORDS)), None)
+        if desc_col is not None:
+            col_map = {"desc": desc_col}
+            for ci, v in enumerate(row_lower):
+                if any(kw in v for kw in _HS_KEYWORDS): col_map["hs"] = ci
+                if any(kw in v for kw in _QTY_KEYWORDS) and "qty" not in col_map: col_map["qty"] = ci
+                if any(kw in v for kw in _PRICE_KEYWORDS): col_map["price"] = ci
+                if any(kw in v for kw in _AMOUNT_KEYWORDS): col_map["amount"] = ci
+                if any(kw in v for kw in _ORIGIN_KEYWORDS): col_map["origin"] = ci
+            return ri, col_map
+    return -1, {}
+
+
+def _safe_float(v):
+    try:
+        return float(str(v).replace(",", "").strip()) if v not in (None, "", "None") else None
+    except Exception:
+        return None
+
+
+def _smart_parse_excel(content: bytes, filename: str) -> dict:
+    """
+    อ่าน Excel โดยตรงด้วย openpyxl
+    - ค้นหา header row (description/goods/item)
+    - extract items จาก rows ที่ตามมา
+    - สกัด invoice meta จาก rows บนๆ (invoice_no, seller, buyer)
+    """
+    result = {"items": []}
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(io.BytesIO(content), data_only=True)
+        ws = wb.active or wb[wb.sheetnames[0]]
+
+        all_rows = [[cell.value for cell in row] for row in ws.iter_rows()]
+
+        # สกัด meta จาก rows แรก (scan 30 rows แรก)
+        meta_text = ""
+        for row in all_rows[:30]:
+            vals = [str(v).strip() for v in row if v not in (None, "")]
+            if vals:
+                meta_text += " | ".join(vals) + "\n"
+
+        # ดึง invoice_no, seller, buyer จาก meta_text แบบ heuristic
+        import re
+        inv_match = re.search(r'INV[-\s]?([\w\-]+)', meta_text, re.IGNORECASE)
+        result["invoice_no"] = inv_match.group(0) if inv_match else None
+
+        date_match = re.search(r'(\d{4}[-/]\d{2}[-/]\d{2})', meta_text)
+        result["invoice_date"] = date_match.group(1) if date_match else None
+
+        # incoterms
+        inco_match = re.search(r'\b(CIF|FOB|EXW|DDP|CFR|DAP|FCA)\b', meta_text, re.IGNORECASE)
+        result["incoterms"] = inco_match.group(1).upper() if inco_match else None
+
+        # currency
+        cur_match = re.search(r'\b(USD|THB|CNY|EUR|GBP|JPY)\b', meta_text, re.IGNORECASE)
+        result["currency"] = cur_match.group(1).upper() if cur_match else "USD"
+
+        # seller/buyer country
+        result["seller_country"] = "CN"
+        result["buyer_country"] = "TH"
+        if "china" in meta_text.lower(): result["seller_country"] = "CN"
+        if "thailand" in meta_text.lower() or "bangkok" in meta_text.lower():
+            result["buyer_country"] = "TH"
+
+        # Seller/Buyer name (first non-empty text after keyword)
+        for line in meta_text.split("\n"):
+            if "seller" in line.lower() or "exporter" in line.lower() or "shipper" in line.lower():
+                parts = [p.strip() for p in line.split("|") if p.strip()]
+                if len(parts) > 1:
+                    result["seller_name"] = parts[1]
+                    break
+        for line in meta_text.split("\n"):
+            if "buyer" in line.lower() or "consignee" in line.lower() or "importer" in line.lower():
+                parts = [p.strip() for p in line.split("|") if p.strip()]
+                if len(parts) > 1:
+                    result["buyer_name"] = parts[1]
+                    break
+
+        # หา header row
+        header_ri, col_map = _find_header_row(all_rows)
+        if header_ri == -1 or "desc" not in col_map:
+            return result  # ไม่เจอ table → fallback Claude
+
+        # Extract items จาก rows หลัง header
+        items = []
+        for row in all_rows[header_ri + 1:]:
+            desc_val = row[col_map["desc"]] if col_map["desc"] < len(row) else None
+            if not desc_val or str(desc_val).strip() in ("", "None"):
+                continue
+            desc_str = str(desc_val).strip()
+            # ข้าม footer rows (TOTAL, SUBTOTAL, ฯลฯ)
+            if any(kw in desc_str.upper() for kw in ("TOTAL", "SUBTOTAL", "REMARK", "SIGNATURE", "FREIGHT", "INSURANCE")):
+                continue
+
+            item = {
+                "line_no": len(items) + 1,
+                "description": desc_str,
+                "hs_code_declared": str(row[col_map["hs"]]).strip() if "hs" in col_map and row[col_map["hs"]] else None,
+                "qty": _safe_float(row[col_map["qty"]]) if "qty" in col_map else None,
+                "unit": None,
+                "unit_price": _safe_float(row[col_map["price"]]) if "price" in col_map else None,
+                "line_value": _safe_float(row[col_map["amount"]]) if "amount" in col_map else None,
+                "country_origin": str(row[col_map["origin"]]).strip() if "origin" in col_map and row[col_map["origin"]] else result.get("seller_country"),
+                "marks_numbers": None,
+            }
+            # หา unit column (ถัดจาก qty)
+            if "qty" in col_map:
+                unit_ci = col_map["qty"] + 1
+                if unit_ci < len(row) and unit_ci not in col_map.values():
+                    item["unit"] = str(row[unit_ci]).strip() if row[unit_ci] else None
+
+            items.append(item)
+
+        result["items"] = items
+    except Exception as e:
+        result["_smart_parse_error"] = str(e)
+    return result
+
+
 # ─── Main parse function ──────────────────────────────────────────────────────
 
 async def parse_invoice(filename: str, content: bytes) -> dict:
@@ -264,8 +403,12 @@ async def parse_invoice(filename: str, content: bytes) -> dict:
         raw_text = json.dumps(extracted, ensure_ascii=False)
 
     elif file_type in ("EXCEL", "CSV"):
-        raw_text = extract_text_from_excel(content, filename)
-        extracted = await extract_with_claude_text(raw_text)
+        # ลอง smart parse โดยตรงก่อน (หา header row → extract items)
+        extracted = _smart_parse_excel(content, filename)
+        if not extracted.get("items"):
+            # Fallback: ส่ง raw text ให้ Claude
+            raw_text = extract_text_from_excel(content, filename)
+            extracted = await extract_with_claude_text(raw_text)
 
     else:
         return {"error": f"Unsupported file type: {filename}", "file_type": "UNKNOWN"}
