@@ -545,6 +545,49 @@ const i18n = {
     rc_duty: 'อัตราภาษีนำเข้า', rc_oga: 'OGA / ใบอนุญาต', rc_source: 'แหล่งอ้างอิง',
     rc_note: 'ข้อควรระวัง', rc_raw: 'ดู Raw JSON',
     rc_candidates: 'ตัวเลือกที่เป็นไปได้ (≥75% ทั้งหมด)',
+    // Invoice
+    inv_section_title: 'Invoice Intelligence',
+    inv_section_sub: 'อัปโหลด Invoice → HS Code + ภาษี + FTA อัตโนมัติ',
+    inv_drop_title: 'วางไฟล์ที่นี่ หรือคลิกเพื่อเลือก',
+    inv_drop_sub: 'รองรับ PDF, JPG, PNG, Excel, CSV (สูงสุด 10MB)',
+    inv_upload_new: '📤 อัพโหลดใบใหม่',
+    inv_loading_sub: 'Claude AI กำลังอ่านเอกสารและจัดพิกัด HS Code',
+    inv_step1: '📄 อ่านเอกสาร', inv_step2: '🎯 จัดพิกัด HS',
+    inv_step3: '💱 คำนวณภาษี', inv_step4: '🤝 ตรวจ FTA',
+    inv_warn_title: 'คำเตือน',
+    inv_col_goods: 'สินค้า', inv_col_lineval: 'Line Value',
+    inv_col_flags: 'Flags', inv_col_conf: 'มั่นใจ',
+    inv_col_duty: 'ภาษี ($)',
+    inv_detail_btn: '▶ รายละเอียด', inv_detail_hide: '▼ ซ่อน',
+    inv_sec_item: 'ข้อมูลรายการ', inv_sec_hs: 'HS Code Classification',
+    inv_sec_duty: 'ภาษีนำเข้า', inv_sec_fta: 'FTA Status',
+    inv_sec_oga: 'OGA / ใบอนุญาต', inv_sec_halal: 'Halal Compliance',
+    inv_sec_xai: 'XAI Reasoning',
+    inv_lbl_desc: 'คำบรรยาย', inv_lbl_qty: 'Qty × Unit',
+    inv_lbl_uprice: 'Unit Price', inv_lbl_lval: 'Line Value',
+    inv_lbl_currency: 'Currency', inv_lbl_origin: 'Country of Origin',
+    inv_lbl_mfn: 'MFN Rate (ก่อน FTA)', inv_lbl_applicable: 'Applicable Rate (หลัง FTA)',
+    inv_lbl_dutyest: 'ประมาณการภาษี (USD)', inv_lbl_ftasave: 'ประหยัดได้จาก FTA',
+    inv_lbl_ftaelig: 'FTA Eligible', inv_lbl_ftaagreement: 'FTA Agreement',
+    inv_lbl_ftasaving: 'FTA Saving',
+    inv_oga_yes: '⚠️ ต้องขอใบอนุญาตก่อนนำเข้า', inv_oga_no: '✅ ไม่มีข้อกำหนด OGA สำหรับพิกัดนี้',
+    inv_oga_agency: 'หน่วยงาน:',
+    inv_halal_yes: '🚫 ต้องมีใบรับรอง Halal', inv_halal_no: '✅ ไม่ต้องใบรับรอง Halal',
+    inv_halal_body: 'หน่วยงาน:',
+    inv_conf_label: 'ความมั่นใจ',
+    inv_ai_no_hs: '⚠ AI ไม่สามารถจัดพิกัดได้',
+    inv_ai_fail: 'ล้มเหลว',
+    inv_sum_items: 'รายการสินค้า', inv_sum_total: 'มูลค่ารวม',
+    inv_sum_duty: 'ประมาณการภาษี', inv_sum_fta: 'FTA ประหยัดได้',
+    inv_sum_rate: 'Effective Duty Rate',
+    inv_origin: 'ต้นทาง:', inv_dest: 'ปลายทาง:',
+    inv_mismatch_declared: 'ที่ระบุ (Declared)', inv_mismatch_ai: 'AI แนะนำ',
+    inv_mismatch_chapter: '🔴 ต่างกันคนละหมวด (Chapter)',
+    inv_mismatch_heading: '🟡 ต่างกันระดับ Heading (4 หลัก)',
+    inv_mismatch_sub: '🟡 ต่างกันระดับ Subheading (6 หลัก)',
+    inv_mismatch_rec: '💡',
+    inv_no_items: 'ไม่พบรายการสินค้า',
+    inv_fta_yes: '✅ ใช่', inv_fta_no: '❌ ไม่',
   },
   en: {
     login_title: 'Client Login',
@@ -600,6 +643,49 @@ const i18n = {
     rc_duty: 'Import Duty', rc_oga: 'OGA / Permit', rc_source: 'Source Reference',
     rc_note: 'Note', rc_raw: 'View Raw JSON',
     rc_candidates: 'All candidates (≥75%)',
+    // Invoice
+    inv_section_title: 'Invoice Intelligence',
+    inv_section_sub: 'Upload Invoice → HS Code + Duty + FTA Automatically',
+    inv_drop_title: 'Drop file here or click to select',
+    inv_drop_sub: 'Supports PDF, JPG, PNG, Excel, CSV (max 10MB)',
+    inv_upload_new: '📤 Upload New Invoice',
+    inv_loading_sub: 'Claude AI is reading the document and classifying HS Codes',
+    inv_step1: '📄 Reading Doc', inv_step2: '🎯 HS Classify',
+    inv_step3: '💱 Calc Duty', inv_step4: '🤝 Check FTA',
+    inv_warn_title: 'Warnings',
+    inv_col_goods: 'Goods', inv_col_lineval: 'Line Value',
+    inv_col_flags: 'Flags', inv_col_conf: 'Conf.',
+    inv_col_duty: 'Duty ($)',
+    inv_detail_btn: '▶ Detail', inv_detail_hide: '▼ Hide',
+    inv_sec_item: 'Line Item Info', inv_sec_hs: 'HS Code Classification',
+    inv_sec_duty: 'Import Duty', inv_sec_fta: 'FTA Status',
+    inv_sec_oga: 'OGA / Permit', inv_sec_halal: 'Halal Compliance',
+    inv_sec_xai: 'XAI Reasoning',
+    inv_lbl_desc: 'Description', inv_lbl_qty: 'Qty × Unit',
+    inv_lbl_uprice: 'Unit Price', inv_lbl_lval: 'Line Value',
+    inv_lbl_currency: 'Currency', inv_lbl_origin: 'Country of Origin',
+    inv_lbl_mfn: 'MFN Rate (before FTA)', inv_lbl_applicable: 'Applicable Rate (after FTA)',
+    inv_lbl_dutyest: 'Duty Estimate (USD)', inv_lbl_ftasave: 'FTA Savings',
+    inv_lbl_ftaelig: 'FTA Eligible', inv_lbl_ftaagreement: 'FTA Agreement',
+    inv_lbl_ftasaving: 'FTA Saving',
+    inv_oga_yes: '⚠️ Import permit required before shipment', inv_oga_no: '✅ No OGA requirements for this HS code',
+    inv_oga_agency: 'Agency:',
+    inv_halal_yes: '🚫 Halal Certificate Required', inv_halal_no: '✅ No Halal Certificate Required',
+    inv_halal_body: 'Certifying Body:',
+    inv_conf_label: 'Confidence',
+    inv_ai_no_hs: '⚠ AI could not classify',
+    inv_ai_fail: 'Failed',
+    inv_sum_items: 'Line Items', inv_sum_total: 'Total Value',
+    inv_sum_duty: 'Duty Estimate', inv_sum_fta: 'FTA Savings',
+    inv_sum_rate: 'Effective Duty Rate',
+    inv_origin: 'Origin:', inv_dest: 'Destination:',
+    inv_mismatch_declared: 'Declared', inv_mismatch_ai: 'AI Recommended',
+    inv_mismatch_chapter: '🔴 Different Chapter',
+    inv_mismatch_heading: '🟡 Different Heading (4-digit)',
+    inv_mismatch_sub: '🟡 Different Subheading (6-digit)',
+    inv_mismatch_rec: '💡',
+    inv_no_items: 'No line items found',
+    inv_fta_yes: '✅ Yes', inv_fta_no: '❌ No',
   },
   zh: {
     login_title: '客户登录',
@@ -655,6 +741,49 @@ const i18n = {
     rc_duty: '进口关税', rc_oga: 'OGA/许可证', rc_source: '参考来源',
     rc_note: '注意事项', rc_raw: '查看原始JSON',
     rc_candidates: '所有候选（≥75%）',
+    // Invoice
+    inv_section_title: '发票智能分析',
+    inv_section_sub: '上传发票 → 自动识别 HS 编码 + 关税 + FTA',
+    inv_drop_title: '将文件拖到此处或点击选择',
+    inv_drop_sub: '支持 PDF、JPG、PNG、Excel、CSV（最大 10MB）',
+    inv_upload_new: '📤 上传新发票',
+    inv_loading_sub: 'Claude AI 正在读取文件并分类 HS 编码',
+    inv_step1: '📄 读取文件', inv_step2: '🎯 HS 分类',
+    inv_step3: '💱 计算关税', inv_step4: '🤝 检查 FTA',
+    inv_warn_title: '警告',
+    inv_col_goods: '商品', inv_col_lineval: '行金额',
+    inv_col_flags: '标志', inv_col_conf: '置信度',
+    inv_col_duty: '关税 ($)',
+    inv_detail_btn: '▶ 详情', inv_detail_hide: '▼ 收起',
+    inv_sec_item: '行项目信息', inv_sec_hs: 'HS 编码分类',
+    inv_sec_duty: '进口关税', inv_sec_fta: 'FTA 状态',
+    inv_sec_oga: 'OGA / 许可证', inv_sec_halal: '清真合规',
+    inv_sec_xai: 'AI 解释',
+    inv_lbl_desc: '描述', inv_lbl_qty: '数量 × 单位',
+    inv_lbl_uprice: '单价', inv_lbl_lval: '行金额',
+    inv_lbl_currency: '货币', inv_lbl_origin: '原产国',
+    inv_lbl_mfn: '最惠国税率 (FTA前)', inv_lbl_applicable: '适用税率 (FTA后)',
+    inv_lbl_dutyest: '预估关税 (USD)', inv_lbl_ftasave: 'FTA 节省',
+    inv_lbl_ftaelig: 'FTA 资格', inv_lbl_ftaagreement: 'FTA 协议',
+    inv_lbl_ftasaving: 'FTA 节省',
+    inv_oga_yes: '⚠️ 进口前需申请许可证', inv_oga_no: '✅ 该HS编码无OGA要求',
+    inv_oga_agency: '机构：',
+    inv_halal_yes: '🚫 需要清真认证', inv_halal_no: '✅ 无需清真认证',
+    inv_halal_body: '认证机构：',
+    inv_conf_label: '置信度',
+    inv_ai_no_hs: '⚠ AI 无法分类',
+    inv_ai_fail: '失败',
+    inv_sum_items: '商品行数', inv_sum_total: '总金额',
+    inv_sum_duty: '预估关税', inv_sum_fta: 'FTA 节省',
+    inv_sum_rate: '有效税率',
+    inv_origin: '起运地：', inv_dest: '目的地：',
+    inv_mismatch_declared: '申报编码', inv_mismatch_ai: 'AI 推荐',
+    inv_mismatch_chapter: '🔴 章节不同 (Chapter)',
+    inv_mismatch_heading: '🟡 税目不同 (4位)',
+    inv_mismatch_sub: '🟡 子目不同 (6位)',
+    inv_mismatch_rec: '💡',
+    inv_no_items: '未找到商品行',
+    inv_fta_yes: '✅ 是', inv_fta_no: '❌ 否',
   },
   ja: {
     login_title: 'クライアントログイン',
@@ -710,6 +839,49 @@ const i18n = {
     rc_duty: '輸入関税', rc_oga: 'OGA/許可証', rc_source: '参照元',
     rc_note: '注意事項', rc_raw: 'Raw JSONを見る',
     rc_candidates: '候補一覧（≥75%）',
+    // Invoice
+    inv_section_title: '請求書インテリジェンス',
+    inv_section_sub: '請求書をアップロード → HSコード + 関税 + FTAを自動分析',
+    inv_drop_title: 'ここにファイルをドロップまたはクリックして選択',
+    inv_drop_sub: 'PDF、JPG、PNG、Excel、CSV対応（最大10MB）',
+    inv_upload_new: '📤 新しい請求書をアップロード',
+    inv_loading_sub: 'Claude AIがドキュメントを読み取りHSコードを分類中',
+    inv_step1: '📄 文書読取', inv_step2: '🎯 HS分類',
+    inv_step3: '💱 関税計算', inv_step4: '🤝 FTA確認',
+    inv_warn_title: '警告',
+    inv_col_goods: '商品', inv_col_lineval: '金額',
+    inv_col_flags: 'フラグ', inv_col_conf: '信頼度',
+    inv_col_duty: '関税 ($)',
+    inv_detail_btn: '▶ 詳細', inv_detail_hide: '▼ 閉じる',
+    inv_sec_item: '明細情報', inv_sec_hs: 'HSコード分類',
+    inv_sec_duty: '輸入関税', inv_sec_fta: 'FTAステータス',
+    inv_sec_oga: 'OGA / 許可証', inv_sec_halal: 'ハラール適合',
+    inv_sec_xai: 'AI説明',
+    inv_lbl_desc: '説明', inv_lbl_qty: '数量 × 単位',
+    inv_lbl_uprice: '単価', inv_lbl_lval: '金額',
+    inv_lbl_currency: '通貨', inv_lbl_origin: '原産国',
+    inv_lbl_mfn: 'MFN税率 (FTA前)', inv_lbl_applicable: '適用税率 (FTA後)',
+    inv_lbl_dutyest: '関税見積 (USD)', inv_lbl_ftasave: 'FTA節約額',
+    inv_lbl_ftaelig: 'FTA対象', inv_lbl_ftaagreement: 'FTA協定',
+    inv_lbl_ftasaving: 'FTA節約',
+    inv_oga_yes: '⚠️ 輸入前に許可証が必要', inv_oga_no: '✅ このHSコードにOGA要件なし',
+    inv_oga_agency: '機関：',
+    inv_halal_yes: '🚫 ハラール認証が必要', inv_halal_no: '✅ ハラール認証不要',
+    inv_halal_body: '認証機関：',
+    inv_conf_label: '信頼度',
+    inv_ai_no_hs: '⚠ AIが分類できませんでした',
+    inv_ai_fail: '失敗',
+    inv_sum_items: '明細数', inv_sum_total: '合計金額',
+    inv_sum_duty: '関税見積', inv_sum_fta: 'FTA節約',
+    inv_sum_rate: '実効税率',
+    inv_origin: '輸出国：', inv_dest: '輸入国：',
+    inv_mismatch_declared: '申告コード', inv_mismatch_ai: 'AI推奨',
+    inv_mismatch_chapter: '🔴 章が異なります (Chapter)',
+    inv_mismatch_heading: '🟡 号が異なります (4桁)',
+    inv_mismatch_sub: '🟡 小号が異なります (6桁)',
+    inv_mismatch_rec: '💡',
+    inv_no_items: '明細が見つかりません',
+    inv_fta_yes: '✅ はい', inv_fta_no: '❌ いいえ',
   },
 };
 
@@ -1362,12 +1534,12 @@ function showInvLoading(name) {
         <div style="font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:.35rem">
           กำลังวิเคราะห์ <span style="color:#8b5cf6">${name}</span>
         </div>
-        <div style="font-size:.78rem;color:var(--muted)">Claude AI กำลังอ่านเอกสารและจัดพิกัด HS Code</div>
+        <div style="font-size:.78rem;color:var(--muted)">${t('inv_loading_sub')}</div>
         <div class="inv-loading-steps">
-          <span class="inv-step">📄 อ่านเอกสาร</span>
-          <span class="inv-step">🎯 จัดพิกัด HS</span>
-          <span class="inv-step">💱 คำนวณภาษี</span>
-          <span class="inv-step">🤝 ตรวจ FTA</span>
+          <span class="inv-step">${t('inv_step1')}</span>
+          <span class="inv-step">${t('inv_step2')}</span>
+          <span class="inv-step">${t('inv_step3')}</span>
+          <span class="inv-step">${t('inv_step4')}</span>
         </div>
       </div>
     </div>`;
@@ -1422,17 +1594,17 @@ function renderInvoiceResult(d, filename) {
   // ── 5-card Summary ──
   const summaryHtml = `
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
-      <div class="inv-sum-card"><div class="inv-sum-label">รายการสินค้า</div><div class="inv-sum-val">${d.total_items} items</div></div>
-      <div class="inv-sum-card"><div class="inv-sum-label">มูลค่ารวม</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_value_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
-      <div class="inv-sum-card"><div class="inv-sum-label">ประมาณการภาษี</div><div class="inv-sum-val" style="color:var(--yellow)">$${(d.total_duty_estimate_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
-      <div class="inv-sum-card"><div class="inv-sum-label">FTA ประหยัดได้</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_fta_saving_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
-      <div class="inv-sum-card"><div class="inv-sum-label">Effective Duty Rate</div><div class="inv-sum-val" style="color:var(--yellow)">${effectiveRate}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_items')}</div><div class="inv-sum-val">${d.total_items} items</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_total')}</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_value_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_duty')}</div><div class="inv-sum-val" style="color:var(--yellow)">$${(d.total_duty_estimate_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_fta')}</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_fta_saving_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_rate')}</div><div class="inv-sum-val" style="color:var(--yellow)">${effectiveRate}</div></div>
     </div>`;
 
   // ── Warnings (atas) ──
   const warningsHtml = warnings.length === 0 ? '' : `
     <div class="inv-warn-box" style="margin-bottom:12px">
-      <div style="font-weight:700;margin-bottom:6px;color:var(--yellow)">⚠️ คำเตือน (${warnings.length})</div>
+      <div style="font-weight:700;margin-bottom:6px;color:var(--yellow)">⚠️ ${t('inv_warn_title')} (${warnings.length})</div>
       ${warnings.map(w => {
         const isHS = w.type === 'HS_MISMATCH';
         const isOGA = w.type === 'OGA_REQUIRED';
@@ -1449,15 +1621,15 @@ function renderInvoiceResult(d, filename) {
       <thead>
         <tr style="background:rgba(99,102,241,0.08);color:var(--muted);text-align:left">
           <th style="padding:8px 8px;white-space:nowrap;width:32px">#</th>
-          <th style="padding:8px 8px;min-width:140px;max-width:200px">สินค้า</th>
+          <th style="padding:8px 8px;min-width:140px;max-width:200px">${t('inv_col_goods')}</th>
           <th style="padding:8px 8px;white-space:nowrap">HS Code (AI)</th>
-          <th style="padding:8px 8px;white-space:nowrap">Line Value</th>
+          <th style="padding:8px 8px;white-space:nowrap">${t('inv_col_lineval')}</th>
           <th style="padding:8px 8px;white-space:nowrap;text-align:center">MFN%</th>
           <th style="padding:8px 8px;white-space:nowrap;text-align:center">FTA%</th>
-          <th style="padding:8px 8px;white-space:nowrap;text-align:right">ภาษี ($)</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:right">${t('inv_col_duty')}</th>
           <th style="padding:8px 8px;white-space:nowrap;text-align:right">FTA Saving</th>
-          <th style="padding:8px 8px;white-space:nowrap;text-align:center">Flags</th>
-          <th style="padding:8px 8px;white-space:nowrap;text-align:center">มั่นใจ</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:center">${t('inv_col_flags')}</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:center">${t('inv_col_conf')}</th>
           <th style="padding:8px 8px;width:90px"></th>
         </tr>
       </thead>
@@ -1485,7 +1657,7 @@ function renderInvoiceResult(d, filename) {
             // AI ไม่มีพิกัด แต่มี declared — แสดง declared เป็นหลัก + badge
             hsCell = `<td style="padding:7px 8px;font-family:monospace;font-weight:700;font-size:.78rem;white-space:nowrap">
               <div style="color:var(--muted)">${hasDecl}</div>
-              <div style="font-size:.65rem;color:var(--yellow);margin-top:1px">⚠ AI ไม่สามารถจัดพิกัดได้</div>
+              <div style="font-size:.65rem;color:var(--yellow);margin-top:1px">${t('inv_ai_no_hs')}</div>
             </td>`;
           } else if (noAI) {
             // ไม่มีทั้งคู่
@@ -1525,11 +1697,11 @@ function renderInvoiceResult(d, filename) {
             </td>
             <td style="padding:7px 8px;text-align:center">${flags}</td>
             <td style="padding:7px 8px;text-align:center;font-weight:700;color:${confColor}">
-              ${noAI ? `<span style="font-size:.7rem;color:var(--yellow)">ล้มเหลว</span>` : confPct != null ? confPct + '%' : '—'}
+              ${noAI ? `<span style="font-size:.7rem;color:var(--yellow)">${t('inv_ai_fail')}</span>` : confPct != null ? confPct + '%' : '—'}
             </td>
             <td style="padding:7px 8px">
               <button id="inv-btn-${idx}" class="inv-row-btn" onclick="event.stopPropagation();toggleInvDetail(${idx})"
-                style="font-size:.68rem;padding:3px 7px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.25);border-radius:4px;cursor:pointer;white-space:nowrap">▶ รายละเอียด</button>
+                style="font-size:.68rem;padding:3px 7px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.25);border-radius:4px;cursor:pointer;white-space:nowrap">${t('inv_detail_btn')}</button>
             </td>
           </tr>
           <tr>
@@ -1545,7 +1717,7 @@ function renderInvoiceResult(d, filename) {
   </div>`;
 
   const resetBtn = `<div style="margin-bottom:12px;display:flex;justify-content:flex-end">
-    <button onclick="resetInvoiceUpload()" style="font-size:.8rem;padding:6px 16px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.3);border-radius:8px;cursor:pointer">📤 อัพโหลดใบใหม่</button>
+    <button onclick="resetInvoiceUpload()" style="font-size:.8rem;padding:6px 16px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.3);border-radius:8px;cursor:pointer">${t('inv_upload_new')}</button>
   </div>`;
   document.getElementById('invResult').innerHTML = resetBtn + metaHtml + summaryHtml + warningsHtml + tableHtml;
 }
@@ -1574,17 +1746,17 @@ function buildDetailPanel(it, cur) {
     </div>`;
 
   // Section A — Line item info
-  const lineSection = section('📦', 'ข้อมูลรายการ', `
-    ${row2('คำบรรยาย', it.description)}
-    ${row2('Qty × Unit', it.qty != null ? it.qty.toLocaleString() + (it.unit ? ' ' + it.unit : '') : null)}
-    ${row2('Unit Price', it.unit_price != null ? '$' + it.unit_price.toLocaleString('en',{minimumFractionDigits:2}) : null)}
-    ${row2('Line Value', it.line_value != null ? '$' + it.line_value.toLocaleString('en',{minimumFractionDigits:2}) : null, 'var(--green)')}
-    ${row2('Currency', it.currency || cur)}
-    ${row2('Country of Origin', it.country_origin)}
+  const lineSection = section('📦', t('inv_sec_item'), `
+    ${row2(t('inv_lbl_desc'), it.description)}
+    ${row2(t('inv_lbl_qty'), it.qty != null ? it.qty.toLocaleString() + (it.unit ? ' ' + it.unit : '') : null)}
+    ${row2(t('inv_lbl_uprice'), it.unit_price != null ? '$' + it.unit_price.toLocaleString('en',{minimumFractionDigits:2}) : null)}
+    ${row2(t('inv_lbl_lval'), it.line_value != null ? '$' + it.line_value.toLocaleString('en',{minimumFractionDigits:2}) : null, 'var(--green)')}
+    ${row2(t('inv_lbl_currency'), it.currency || cur)}
+    ${row2(t('inv_lbl_origin'), it.country_origin)}
   `);
 
   // Section B — HS Classification
-  const hsSection = section('🎯', 'HS Code Classification', `
+  const hsSection = section('🎯', t('inv_sec_hs'), `
     ${row2('HS Code (AI)', aiCode, 'var(--accent)')}
     ${hasDecl ? row2('HS Code (Declared)', hasDecl, isMismatch ? 'var(--red)' : 'var(--muted)') : ''}
     ${isMismatch ? (() => {
@@ -1594,40 +1766,91 @@ function buildDetailPanel(it, cur) {
       const dHd = d.slice(0,4), aHd = a.slice(0,4);
       const dSub = d.slice(0,6), aSub = a.slice(0,6);
       let severity, sevColor, sevLabel, analysis, recommendation;
+      const _mismatchTexts = {
+        th: {
+          chLabel: '🔴 ต่างกันคนละหมวด (Chapter)',
+          chAnalysis: (d,a) => `Chapter ที่ระบุ <b>${d}xx</b> vs AI แนะนำ <b>${a}xx</b> — คนละประเภทสินค้าหลัก สาเหตุที่พบบ่อย: สินค้าที่มีหลายฟังก์ชัน, ระบุ description ไม่ครบ, หรือเจตนาใช้พิกัดภาษีต่ำกว่า`,
+          chRec: 'ตรวจสอบ Chapter Notes ทั้งสอง Chapter และดู GRI 1–3 หากสงสัยควรขอ Advance Ruling จากกรมศุลกากร',
+          hdLabel: '🟡 ต่างกันระดับ Heading (4 หลัก)',
+          hdAnalysis: (d,a) => `Chapter เดียวกัน (<b>${d}xx</b>) แต่ Heading ต่างกัน: ที่ระบุ <b>${d.slice(0,4)}.xx</b> vs AI แนะนำ <b>${a.slice(0,4)}.xx</b> — อาจต่างเรื่อง material หรือ function`,
+          hdRec: 'เปรียบเทียบ Heading Notes ทั้งสอง Heading — ตรวจสอบ Explanatory Notes ของ WCO',
+          subLabel: '🟡 ต่างกันระดับ Subheading (6 หลัก)',
+          subAnalysis: (decl,ai) => `Heading เดียวกัน แต่ Subheading ต่างกัน: ที่ระบุ <b>${decl}</b> vs AI แนะนำ <b>${ai}</b> — ความต่างมักเกิดจาก ขนาด, กำลังไฟ, วัสดุ, หรือ sub-category`,
+          subRec: 'ตรวจสอบรายละเอียดสินค้าให้ครบ (กำลังไฟ, ขนาด, ส่วนประกอบ) เพื่อเลือก Subheading ที่ถูกต้อง',
+          confWarn: (p) => `⚡ AI มั่นใจ ${p}% — ควรให้ผู้เชี่ยวชาญตรวจสอบเพิ่มเติม`,
+        },
+        en: {
+          chLabel: '🔴 Different Chapter',
+          chAnalysis: (d,a) => `Declared chapter <b>${d}xx</b> vs AI recommendation <b>${a}xx</b> — completely different product categories. Common causes: multi-function goods (e.g. Smart Watch = watch vs electronics), incomplete description, or intentional misclassification.`,
+          chRec: 'Check Chapter Notes for both chapters and apply GRI 1–3. Consider requesting an Advance Ruling from Customs.',
+          hdLabel: '🟡 Different Heading (4-digit)',
+          hdAnalysis: (d,a) => `Same chapter (<b>${d}xx</b>) but different heading: declared <b>${d.slice(0,4)}.xx</b> vs AI <b>${a.slice(0,4)}.xx</b> — likely differs by material or function.`,
+          hdRec: 'Compare Heading Notes for both headings — consult WCO Explanatory Notes.',
+          subLabel: '🟡 Different Subheading (6-digit)',
+          subAnalysis: (decl,ai) => `Same heading but different subheading: declared <b>${decl}</b> vs AI <b>${ai}</b> — typically differs by size, power, material, or sub-category.`,
+          subRec: 'Verify full product specs (power, size, components) to select the correct subheading.',
+          confWarn: (p) => `⚡ AI confidence ${p}% — expert review recommended.`,
+        },
+        zh: {
+          chLabel: '🔴 章节不同 (Chapter)',
+          chAnalysis: (d,a) => `申报章节 <b>${d}xx</b> vs AI推荐 <b>${a}xx</b> — 完全不同的商品类别。常见原因：多功能商品（如智能手表=手表vs电子产品）、描述不完整、或故意低报税率。`,
+          chRec: '查阅两个章节的章注，并运用归类总规则1–3。如有疑问，建议向海关申请预裁定。',
+          hdLabel: '🟡 税目不同 (4位)',
+          hdAnalysis: (d,a) => `同一章节 (<b>${d}xx</b>)，但税目不同：申报 <b>${d.slice(0,4)}.xx</b> vs AI <b>${a.slice(0,4)}.xx</b> — 通常因材料或功能不同。`,
+          hdRec: '比较两个税目的税目注释，参考WCO解释性注释。',
+          subLabel: '🟡 子目不同 (6位)',
+          subAnalysis: (decl,ai) => `同一税目，但子目不同：申报 <b>${decl}</b> vs AI <b>${ai}</b> — 通常因规格、功率、材料或子类别不同。`,
+          subRec: '核实完整产品规格（功率、尺寸、成分）以确定正确子目。',
+          confWarn: (p) => `⚡ AI置信度 ${p}% — 建议专家复核。`,
+        },
+        ja: {
+          chLabel: '🔴 章が異なります (Chapter)',
+          chAnalysis: (d,a) => `申告章 <b>${d}xx</b> vs AI推奨 <b>${a}xx</b> — 全く異なる商品カテゴリ。よくある原因：多機能品（例：スマートウォッチ=時計vs電子機器）、説明不足、意図的な低税率申告。`,
+          chRec: '両章のChapter Notesを確認し、GRI 1–3を適用してください。不明な場合は税関に事前教示を申請することをお勧めします。',
+          hdLabel: '🟡 号が異なります (4桁)',
+          hdAnalysis: (d,a) => `同一章 (<b>${d}xx</b>) ですが号が異なります：申告 <b>${d.slice(0,4)}.xx</b> vs AI <b>${a.slice(0,4)}.xx</b> — 素材または機能の違いが原因と考えられます。`,
+          hdRec: '両号のHeading Notesを比較し、WCO解説注釈を確認してください。',
+          subLabel: '🟡 小号が異なります (6桁)',
+          subAnalysis: (decl,ai) => `同一号ですが小号が異なります：申告 <b>${decl}</b> vs AI <b>${ai}</b> — 規格・電力・素材・サブカテゴリの違いが原因です。`,
+          subRec: '製品仕様（電力、サイズ、成分）を確認して正しい小号を選択してください。',
+          confWarn: (p) => `⚡ AI信頼度 ${p}% — 専門家による確認を推奨します。`,
+        },
+      };
+      const _mt = _mismatchTexts[currentLang] || _mismatchTexts.th;
       if (dCh !== aCh) {
-        severity = 'high'; sevColor = 'var(--red)'; sevLabel = '🔴 ต่างกันคนละหมวด (Chapter)';
-        analysis = `Chapter ที่ระบุ <b>${dCh}xx</b> vs AI แนะนำ <b>${aCh}xx</b> — คนละประเภทสินค้าหลัก สาเหตุที่พบบ่อย: สินค้าที่มีหลายฟังก์ชัน (เช่น Smart Watch = นาฬิกา vs อุปกรณ์อิเล็กทรอนิกส์), ระบุ description ไม่ครบ, หรือเจตนาใช้พิกัดภาษีต่ำกว่า`;
-        recommendation = 'ตรวจสอบ Chapter Notes ของทั้งสอง Chapter และดู GRI 1–3 เพื่อหาพิกัดที่ถูกต้อง หากมีข้อสงสัยควรขอ Advance Ruling จากกรมศุลกากร';
+        severity = 'high'; sevColor = 'var(--red)'; sevLabel = _mt.chLabel;
+        analysis = _mt.chAnalysis(dCh, aCh);
+        recommendation = _mt.chRec;
       } else if (dHd !== aHd) {
-        severity = 'medium'; sevColor = 'var(--yellow)'; sevLabel = '🟡 ต่างกันระดับ Heading (4 หลัก)';
-        analysis = `Chapter เดียวกัน (<b>${dCh}xx</b>) แต่ Heading ต่างกัน: ที่ระบุ <b>${dHd}.xx</b> vs AI แนะนำ <b>${aHd}.xx</b> — สาเหตุที่พบบ่อย: สินค้าอยู่ระหว่าง 2 Heading ใน Chapter เดียวกัน, คำบรรยายไม่ชัดเจนเรื่อง material หรือ function`;
-        recommendation = 'เปรียบเทียบ Heading Notes ของทั้งสอง Heading อาจต่างเพียงวัสดุหรือรูปแบบ — ตรวจสอบ Explanatory Notes ของ WCO';
+        severity = 'medium'; sevColor = 'var(--yellow)'; sevLabel = _mt.hdLabel;
+        analysis = _mt.hdAnalysis(dCh, aCh);
+        recommendation = _mt.hdRec;
       } else {
-        severity = 'low'; sevColor = 'var(--yellow)'; sevLabel = '🟡 ต่างกันระดับ Subheading (6 หลัก)';
-        analysis = `Heading เดียวกัน (<b>${dHd}</b>) แต่ Subheading ต่างกัน: ที่ระบุ <b>${hasDecl}</b> vs AI แนะนำ <b>${aiCode}</b> — ความต่างมักเกิดจาก ขนาด, กำลังไฟ, วัสดุ, หรือ sub-category เฉพาะ`;
-        recommendation = 'ตรวจสอบรายละเอียดสินค้าให้ครบ (กำลังไฟ, ขนาด, ส่วนประกอบ) เพื่อเลือก Subheading ที่ถูกต้อง';
+        severity = 'low'; sevColor = 'var(--yellow)'; sevLabel = _mt.subLabel;
+        analysis = _mt.subAnalysis(hasDecl, aiCode);
+        recommendation = _mt.subRec;
       }
-      const confWarn = (it.confidence||0) < 0.75 ? `<div style="margin-top:6px;font-size:.73rem;color:var(--yellow)">⚡ AI มั่นใจ ${Math.round((it.confidence||0)*100)}% — ควรให้ผู้เชี่ยวชาญตรวจสอบเพิ่มเติม</div>` : '';
+      const confWarn = (it.confidence||0) < 0.75 ? `<div style="margin-top:6px;font-size:.73rem;color:var(--yellow)">${_mt.confWarn(Math.round((it.confidence||0)*100))}</div>` : '';
       return `<div style="margin:8px 0;padding:10px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px">
         <div style="font-size:.78rem;font-weight:700;color:${sevColor};margin-bottom:6px">${sevLabel}</div>
         <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
           <div style="flex:1;min-width:120px;background:rgba(0,0,0,.2);border-radius:6px;padding:6px 10px;text-align:center">
-            <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px">ที่ระบุ (Declared)</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px">${t('inv_mismatch_declared')}</div>
             <div style="font-family:monospace;font-size:.95rem;font-weight:700;color:var(--red)">${hasDecl}</div>
           </div>
           <div style="display:flex;align-items:center;color:var(--muted);font-size:.8rem">≠</div>
           <div style="flex:1;min-width:120px;background:rgba(0,0,0,.2);border-radius:6px;padding:6px 10px;text-align:center">
-            <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px">AI แนะนำ</div>
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px">${t('inv_mismatch_ai')}</div>
             <div style="font-family:monospace;font-size:.95rem;font-weight:700;color:var(--accent)">${aiCode}</div>
           </div>
         </div>
         <div style="font-size:.76rem;color:rgba(255,255,255,.75);line-height:1.55;margin-bottom:6px">${analysis}</div>
-        <div style="font-size:.73rem;color:var(--green);background:rgba(16,185,129,.06);border-radius:4px;padding:5px 8px">💡 ${recommendation}</div>
+        <div style="font-size:.73rem;color:var(--green);background:rgba(16,185,129,.06);border-radius:4px;padding:5px 8px">${t('inv_mismatch_rec')} ${recommendation}</div>
         ${confWarn}
       </div>`;
     })() : ''}
     <div style="margin-top:6px">
-      <span style="font-size:.72rem;color:var(--muted)">ความมั่นใจ</span>
+      <span style="font-size:.72rem;color:var(--muted)">${t('inv_conf_label')}</span>
       <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
         <div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
           <div style="height:100%;background:${(it.confidence||0)>=.85?'var(--green)':(it.confidence||0)>=.65?'var(--yellow)':'var(--red)'};width:${Math.round((it.confidence||0)*100)}%;transition:width .4s"></div>
@@ -1638,38 +1861,38 @@ function buildDetailPanel(it, cur) {
   `);
 
   // Section C — Duty / Tax
-  const dutySection = section('💰', 'ภาษีนำเข้า', `
-    ${row2('MFN Rate (ก่อน FTA)', mfn, 'var(--yellow)')}
-    ${row2('Applicable Rate (หลัง FTA)', ftaRate, it.fta_eligible ? 'var(--green)' : 'var(--yellow)')}
-    ${row2('ประมาณการภาษี (USD)', it.duty_estimate_usd != null && it.duty_estimate_usd > 0 ? '$' + it.duty_estimate_usd.toFixed(2) : '0.00', 'var(--yellow)')}
-    ${it.fta_eligible && it.fta_saving_usd > 0 ? row2('ประหยัดได้จาก FTA', '$' + it.fta_saving_usd.toFixed(2), 'var(--green)') : ''}
+  const dutySection = section('💰', t('inv_sec_duty'), `
+    ${row2(t('inv_lbl_mfn'), mfn, 'var(--yellow)')}
+    ${row2(t('inv_lbl_applicable'), ftaRate, it.fta_eligible ? 'var(--green)' : 'var(--yellow)')}
+    ${row2(t('inv_lbl_dutyest'), it.duty_estimate_usd != null && it.duty_estimate_usd > 0 ? '$' + it.duty_estimate_usd.toFixed(2) : '0.00', 'var(--yellow)')}
+    ${it.fta_eligible && it.fta_saving_usd > 0 ? row2(t('inv_lbl_ftasave'), '$' + it.fta_saving_usd.toFixed(2), 'var(--green)') : ''}
   `);
 
   // Section D — FTA
-  const ftaSection = section('🤝', 'FTA Status', `
-    ${row2('FTA Eligible', it.fta_eligible ? '✅ ใช่' : '❌ ไม่', it.fta_eligible ? 'var(--green)' : 'var(--muted)')}
-    ${it.fta_agreement ? row2('FTA Agreement', it.fta_agreement, 'var(--green)') : ''}
-    ${it.fta_saving_usd > 0 ? row2('FTA Saving', '$' + it.fta_saving_usd.toFixed(2), 'var(--green)') : ''}
+  const ftaSection = section('🤝', t('inv_sec_fta'), `
+    ${row2(t('inv_lbl_ftaelig'), it.fta_eligible ? t('inv_fta_yes') : t('inv_fta_no'), it.fta_eligible ? 'var(--green)' : 'var(--muted)')}
+    ${it.fta_agreement ? row2(t('inv_lbl_ftaagreement'), it.fta_agreement, 'var(--green)') : ''}
+    ${it.fta_saving_usd > 0 ? row2(t('inv_lbl_ftasaving'), '$' + it.fta_saving_usd.toFixed(2), 'var(--green)') : ''}
   `);
 
   // Section E — OGA
-  const ogaSection = section('📋', 'OGA / ใบอนุญาต', it.oga_required ? `
+  const ogaSection = section('📋', t('inv_sec_oga'), it.oga_required ? `
     <div style="padding:8px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:6px">
-      <div style="font-size:.8rem;color:var(--yellow);font-weight:700;margin-bottom:4px">⚠️ ต้องขอใบอนุญาตก่อนนำเข้า</div>
+      <div style="font-size:.8rem;color:var(--yellow);font-weight:700;margin-bottom:4px">${t('inv_oga_yes')}</div>
       ${(it.oga_agencies||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${(it.oga_agencies||[]).map(a=>chip(a,'var(--yellow)')).join('')}</div>` : ''}
-    </div>` : `<div style="color:var(--green);font-size:.82rem">✅ ไม่มีข้อกำหนด OGA สำหรับพิกัดนี้</div>`
+    </div>` : `<div style="color:var(--green);font-size:.82rem">${t('inv_oga_no')}</div>`
   );
 
   // Section F — Halal
-  const halalSection = section('🌙', 'Halal Compliance', it.halal_required ? `
+  const halalSection = section('🌙', t('inv_sec_halal'), it.halal_required ? `
     <div style="padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px">
-      <div style="font-size:.8rem;color:var(--red);font-weight:700;margin-bottom:4px">🚫 ต้องมีใบรับรอง Halal</div>
-      ${it.halal_cert_body ? `<div style="font-size:.78rem;color:var(--muted)">หน่วยงาน: <b style="color:var(--text)">${it.halal_cert_body}</b></div>` : ''}
-    </div>` : `<div style="color:var(--green);font-size:.82rem">✅ ไม่ต้องใบรับรอง Halal</div>`
+      <div style="font-size:.8rem;color:var(--red);font-weight:700;margin-bottom:4px">${t('inv_halal_yes')}</div>
+      ${it.halal_cert_body ? `<div style="font-size:.78rem;color:var(--muted)">${t('inv_halal_body')} <b style="color:var(--text)">${it.halal_cert_body}</b></div>` : ''}
+    </div>` : `<div style="color:var(--green);font-size:.82rem">${t('inv_halal_no')}</div>`
   );
 
   // Section G — XAI Reasoning
-  const xaiSection = r.summary ? section('🧠', 'XAI Reasoning', `
+  const xaiSection = r.summary ? section('🧠', t('inv_sec_xai'), `
     <div style="padding:10px 12px;background:rgba(99,102,241,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0">
       <div style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px">${r.summary}</div>
       ${(r.key_factors||[]).length ? `
