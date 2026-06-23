@@ -22,7 +22,7 @@
 | URL | web-production-c9da4.up.railway.app |
 | HS Code Master | 12,247 rows |
 | FTA Eligibility | 202,438 rows |
-| Commit ล่าสุด | 840ad96 |
+| Commit ล่าสุด | 484f127 |
 | API Price | $0.50 / query |
 
 ---
@@ -106,14 +106,22 @@ FastAPI + Uvicorn
 - schema_learning_v2_pg.sql: classification_candidates_log + cache_feedback_queue
 - _migrate_cache_schema(): auto-run ทุก startup
 
-### Phase 8 & 8.1 — Invoice Intelligence Pipeline ✅ (commit 840ad96)
+### Phase 8 & 8.1 — Invoice Intelligence Pipeline ✅ (commit 484f127)
 - `schema_invoice.sql` — ตาราง invoice_submissions + invoice_items (PostgreSQL)
 - `invoice_parser.py` — detect + parse: PDF_TEXT/PDF_SCAN/IMAGE/EXCEL/CSV ผ่าน pdfplumber/Claude Vision/pandas
-- `invoice_service.py` — classify ทุก line item → FTA/OGA/Halal check → save DB → summary + warnings
+  - approach: `_compile_excel_text` (cell → pipe-delimited) + `_parse_compiled_text` (direct parse, ไม่พึ่ง Claude)
+  - fallback: Claude text extraction กรณี format แปลก
+- `invoice_service.py` — classify ทุก item + duty_rate + FTA saving + OGA/Halal → save DB → summary
 - `invoice_router.py` — POST /v1/invoice/upload | GET /v1/invoice/{id} | GET /v1/invoice/list/all
 - `main.py` — include invoice_router
 - `database.py` — เพิ่ม schema_invoice.sql ใน init list
-- `dashboard.html` — Invoice Intelligence section: drag & drop, summary grid, per-item table, warnings
+- `dashboard.html` — Invoice Intelligence section: drag & drop, summary grid, per-item table + XAI, warnings
+
+### Phase 11 — XAI Reasoning Block ✅ (commit 484f127)
+- `xai_reasoning.py` — generate_reasoning(): ส่ง HS+confidence+origin+duty → Claude Haiku → Thai explanation
+- Wire เข้า invoice_service.py: per-item XAI reasoning บันทึก DB + return ใน API response
+- Wire เข้า customs_service.py + sandbox.py: แสดง reasoning ใน /v1/classify response
+- dashboard.html: XAI block แสดงใต้แต่ละ item พร้อม evidence chips + GRI steps + rejection reasoning
 
 ### Phase 5 — Market Discovery
 - MCP Registry submission package
@@ -241,7 +249,7 @@ USE_POSTGRES = True  # Railway always PostgreSQL
 | 8.1 | Invoice Upload Channel (รูปภาพ/PDF/Excel) | ✅ Done |
 | 9 | Freight Intelligence & Logistics Expansion | 📋 Planned |
 | 10 | Customs Software Integration (Pre-flight Check) | 📋 Planned |
-| 11 | Explainable AI (XAI) Reasoning Block | 📋 Planned |
+| 11 | Explainable AI (XAI) Reasoning Block | ✅ Done |
 | 12 | Valuation Risk Alert (Price Benchmark) | 📋 Planned |
 | 13 | Dynamic OGA Update Pipeline | 📋 Planned |
 | 14 | Dual-Track Pricing & Revenue Structure | 📋 Planned |
@@ -382,18 +390,72 @@ Endpoint: `/v1/agents/command` → ยัง NotImplementedError
 
 ---
 
-## 19. ไฟล์ Invoice Pipeline (Phase 8.1)
+## 19. ไฟล์ Invoice Pipeline (Phase 8.1 + 11)
 
 | ไฟล์ | หน้าที่ |
 |------|---------|
 | `schema_invoice.sql` | invoice_submissions + invoice_items schema |
-| `invoice_parser.py` | detect file type → extract text/vision → structured dict |
-| `invoice_service.py` | classify all items + DB save + summary |
+| `invoice_parser.py` | detect file type → compile Excel → parse text → structured dict |
+| `invoice_service.py` | classify + duty_rate + FTA + OGA/Halal → save DB → summary |
 | `invoice_router.py` | 3 endpoints: upload / get / list |
-| `static/dashboard.html` | Invoice Intelligence drag & drop UI |
+| `xai_reasoning.py` | generate_reasoning() → Claude Haiku → Thai XAI per item |
+| `classification_agent.py` | classify_item() → ClassificationResult dataclass |
+| `static/dashboard.html` | Invoice Intelligence: drag & drop + XAI block |
 
-**Flow:** upload file → parse → classify ทุก item → DB → คืน summary (HS/duty/FTA saving/OGA warnings)
+**Flow:** upload → parse (Excel: compile→parse, PDF_TEXT: pdfplumber, IMAGE: Claude Vision)
+→ classify per item (classification_agent) → duty_rate (knowledge_service.lookup_tax_rate)
+→ FTA (knowledge_service.get_fta_form) → OGA + Halal → XAI reasoning → save DB → summary
+
+**ผลลัพธ์จริง (TEST_INVOICE_2026.xlsx — 8 items, CN→TH, CIF):**
+- มูลค่ารวม $41,610 | ภาษีประมาณ $325 | FTA ประหยัด $4,071
+- Cotton T-Shirt MFN 30% | Frozen Beef MFN 50% | PP Bag MFN 20%
+- Electronics (Laptop/Headphone/Cable) = 0% MFN จริงตาม Thai Tariff
 
 ---
 
-*อัปเดตครั้งล่าสุด: มิถุนายน 2026 | Tasks: 85 | Production: Online ✅ | Phases: 14 (8/14 Done)*
+## 20. Bug Patterns ที่พบและแก้แล้ว (Invoice Pipeline)
+
+| Bug | Root Cause | Fix |
+|-----|-----------|-----|
+| ไม่พบรายการสินค้า | openpyxl ไม่ได้ติดตั้งบน Railway | เพิ่มใน requirements.txt |
+| Excel items=[] | `_smart_parse_excel` header detection ล้มเหลวบน Railway | เปลี่ยนเป็น compile→parse approach |
+| HS Code = "–" | เรียก `knowledge_service.classify_hs_code` ที่ไม่มี | ใช้ `classification_agent.classify_item` |
+| ClassificationResult.get() error | classify_item คืน dataclass ไม่ใช่ dict | แปลง → plain dict ก่อน return |
+| `destination_country` error | classify_item ไม่มี param นี้ | ลบออก |
+| มูลค่ารวม $0.00 | to_float ไม่ strip `$`, AMOUNT_KW ไม่มี "total" | strip symbols + เพิ่ม "total" + fallback qty×price |
+| ภาษี % = 0.0% | check_fta_eligibility ไม่มี, ไม่มี duty_rate lookup | `get_fta_form` + `lookup_tax_rate` |
+| "upstream error" not valid JSON | Railway timeout — sequential 8×2 Claude calls ~80s | asyncio.gather + Semaphore(4) → ~20-25s |
+| `asyncio.coroutine` DeprecationWarning | ใช้ coroutine ใน ternary fallback กรณี hs="" | เรียกฟังก์ชันตรง ทุกตัวมี try/except ใน |
+| git index.lock | bash mount ใน shell session lock ซ้อน | user รัน `Remove-Item .git\index.lock` จาก PowerShell |
+
+---
+
+## 21. UI Fixes — Invoice Dashboard (commit 2e52a71)
+
+### ปัญหา
+- ตาราง 15 คอลัมน์ล้นขอบขวา ข้อมูลขาดหาย
+- Drop zone ยังแสดงอยู่หลัง upload สำเร็จ → อัพซ้ำได้
+- API Key แสดงเปิดเผยอยู่ใน section card แยก
+
+### การแก้ไข
+
+**Fix 1 — Table overflow**
+- ลดจาก 15 → 10 คอลัมน์ในตารางหลัก
+- คอลัมน์ที่ตัดออก (ย้ายไปใน Detail Panel): Qty, Unit Price, Declared HS
+- รวม OGA / Halal / HS Mismatch → คอลัมน์ "Flags" เดียว (icon badge)
+- ตาราง: `min-width:700px` + font `.77rem` + `-webkit-overflow-scrolling:touch`
+- Description cell: `-webkit-line-clamp:2` ป้องกันข้อความยาวทำแถวสูง
+
+**Fix 2 — Drop zone ซ่อนหลัง upload**
+- `handleInvoiceFile`: หลัง `renderInvoiceResult` → `zone.style.display = 'none'`
+- เพิ่มฟังก์ชัน `resetInvoiceUpload()`: คืน drop zone + ล้าง invResult
+- `renderInvoiceResult`: แสดงปุ่ม "📤 อัพโหลดใบใหม่" ด้านบนสุดผลลัพธ์
+
+**Fix 3 — API Key masked ใน credit card**
+- ลบ section card `🔑 API Key ของคุณ` เดิมออก
+- Key แสดงใน credit card: `filter:blur(4px)` → hover เพื่อดู
+- ปุ่ม Copy อยู่ข้างๆ พร้อม blur mask
+
+---
+
+*อัปเดตครั้งล่าสุด: 23 มิถุนายน 2026 | Tasks: 95 | Production: Online ✅ | Commits: 10 | Phases: 14 (9/14 Done)*
