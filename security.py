@@ -162,6 +162,7 @@ PUBLIC_PREFIXES: tuple = (
     "/v1/register",
     "/v1/recover-key",
     "/v1/billing/",
+    "/v1/invoice/",   # invoice router handles its own DB-based auth
     "/.well-known/",
     "/chairman",
     "/static/",
