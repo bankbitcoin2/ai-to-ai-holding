@@ -29,17 +29,22 @@ async def _get_pool():
 async def _classify_item(description: str, country_origin: str = "", dest_country: str = "TH") -> dict:
     """Cache-first → Claude fallback (ประหยัดค่า API)"""
     # 1. ลองดู cache ก่อน — ไม่เสียค่า Claude
+    CACHE_CONFIDENCE_THRESHOLD = 0.80  # ต่ำกว่านี้ → ส่ง Claude ตรวจอีกรอบ
     try:
         from cache_classification import cache_lookup
         cached = await cache_lookup(None, description)
         if cached and cached.get("hs_code"):
-            return {
-                "hs_code": cached["hs_code"],
-                "hs_description": cached.get("hs_description") or "",
-                "confidence_score": float(cached.get("confidence_score") or 0),
-                "reasoning": None,
-                "_source": "CACHE",
-            }
+            conf = float(cached.get("confidence_score") or 0)
+            if conf >= CACHE_CONFIDENCE_THRESHOLD:
+                # มั่นใจ → ใช้ cache เลย ฟรี
+                return {
+                    "hs_code": cached["hs_code"],
+                    "hs_description": cached.get("hs_description") or "",
+                    "confidence_score": conf,
+                    "reasoning": None,
+                    "_source": "CACHE",
+                }
+            # มีในคลังแต่มั่นใจน้อย → ส่ง Claude ตรวจ (fall through)
     except Exception:
         pass
 
