@@ -27,7 +27,23 @@ async def _get_pool():
 # ─── Classify 1 item ─────────────────────────────────────────────────────────
 
 async def _classify_item(description: str, country_origin: str = "", dest_country: str = "TH") -> dict:
-    """ใช้ classification_agent (เหมือน sandbox)"""
+    """Cache-first → Claude fallback (ประหยัดค่า API)"""
+    # 1. ลองดู cache ก่อน — ไม่เสียค่า Claude
+    try:
+        from cache_classification import cache_lookup
+        cached = await cache_lookup(None, description)
+        if cached and cached.get("hs_code"):
+            return {
+                "hs_code": cached["hs_code"],
+                "hs_description": cached.get("hs_description") or "",
+                "confidence_score": float(cached.get("confidence_score") or 0),
+                "reasoning": None,
+                "_source": "CACHE",
+            }
+    except Exception:
+        pass
+
+    # 2. Cache miss → เรียก Claude
     try:
         from classification_agent import classify_item
         result = await classify_item(
@@ -36,13 +52,24 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
         )
         if result is None:
             return {}
-        # ClassificationResult is a dataclass — convert to plain dict
-        return {
+        cl = {
             "hs_code": result.hs_code,
             "hs_description": result.hs_description,
             "confidence_score": result.confidence_score,
             "reasoning": result.notes,
+            "_source": "CLAUDE",
         }
+        # 3. บันทึกลง cache — ครั้งต่อไปไม่ต้องจ่าย
+        try:
+            from cache_classification import cache_save
+            await cache_save(None, description, {
+                "hs_code": result.hs_code,
+                "hs_description": result.hs_description,
+                "confidence_score": result.confidence_score,
+            }, source="CLAUDE")
+        except Exception:
+            pass
+        return cl
     except Exception as e:
         return {"error": str(e)}
 
