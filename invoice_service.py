@@ -173,7 +173,9 @@ async def _save_item(pool, sub_id: str, line_no: int, item: dict, result: dict) 
     if cif_usd and duty_rate is not None and fta_rate is not None:
         fta_saving = cif_usd * (duty_rate - fta_rate) / 100
 
-    oga_agencies = oga.get("agencies") or oga.get("required_agencies") or []
+    _oga_permits = oga.get("requires_permits") or []
+    oga_agencies = [p.get("agency_abbr") for p in _oga_permits if p.get("agency_abbr")] \
+                   or oga.get("agencies") or oga.get("required_agencies") or []
     if isinstance(oga_agencies, str):
         oga_agencies = [oga_agencies]
 
@@ -296,7 +298,7 @@ async def _process_one_item(
 
         conf = cl_result.get("confidence_score") or cl_result.get("confidence") or 0
         fta_elig = bool(fta_result.get("eligible"))
-        oga_req = bool(oga_result.get("required") or oga_result.get("oga_required"))
+        oga_req = bool(oga_result.get("is_restricted") or oga_result.get("required") or oga_result.get("oga_required"))
 
         # XAI Reasoning (Claude API call)
         try:
@@ -336,7 +338,11 @@ async def _process_one_item(
             "fta_agreement": fta_result.get("form"),
             "fta_saving_usd": round(fta_sav, 2),
             "oga_required": oga_req,
+            "oga_risk_level": oga_result.get("risk_level") or "HIGH",
+            "oga_note_th": oga_result.get("note_th") or "",
+            "oga_note_en": oga_result.get("note_en") or "",
             "oga_agencies": oga_result.get("agencies") or [],
+            "oga_permits": oga_result.get("requires_permits") or [],
             "halal_required": bool(halal_result.get("required")),
             "halal_cert_body": halal_result.get("cert_body") or halal_result.get("certification_body"),
             "reasoning": reasoning,

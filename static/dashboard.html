@@ -1911,10 +1911,22 @@ function buildDetailPanel(it, cur) {
   `);
 
   // Section E — OGA
+  const _ogaPermits = it.oga_permits || [];
+  const _ogaNote = currentLang === 'en' ? (it.oga_note_en || it.oga_note_th) : it.oga_note_th;
+  const _ogaRisk = it.oga_risk_level || 'HIGH';
+  const _riskColor = {CRITICAL:'var(--red)',HIGH:'var(--yellow)',MEDIUM:'var(--yellow)',LOW:'var(--green)',NONE:'var(--green)'}[_ogaRisk] || 'var(--yellow)';
   const ogaSection = section('📋', t('inv_sec_oga'), it.oga_required ? `
-    <div style="padding:8px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:6px">
-      <div style="font-size:.8rem;color:var(--yellow);font-weight:700;margin-bottom:4px">${t('inv_oga_yes')}</div>
-      ${(it.oga_agencies||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${(it.oga_agencies||[]).map(a=>chip(a,'var(--yellow)')).join('')}</div>` : ''}
+    <div style="padding:10px 12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px">
+      <div style="font-size:.82rem;color:${_riskColor};font-weight:700;margin-bottom:6px">
+        ⚠️ ${t('inv_oga_yes')} <span style="font-size:.7rem;background:rgba(245,158,11,.2);padding:1px 6px;border-radius:4px;margin-left:6px">${_ogaRisk}</span>
+      </div>
+      ${_ogaNote ? `<div style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:8px">${_ogaNote}</div>` : ''}
+      ${_ogaPermits.length ? `<div style="display:flex;flex-direction:column;gap:6px">${_ogaPermits.map(p => `
+        <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:.7rem;font-weight:700;background:rgba(245,158,11,.2);color:var(--yellow);padding:2px 7px;border-radius:4px;white-space:nowrap">${p.agency_abbr||''}</span>
+          <span style="flex:1;font-size:.78rem;color:var(--text)">${p.name_th||p.name_en||p.agency_abbr||''}</span>
+          ${p.url ? `<a href="${p.url}" target="_blank" style="font-size:.72rem;color:var(--accent);text-decoration:none;white-space:nowrap">${t('inv_oga_agency')} →</a>` : ''}
+        </div>`).join('')}</div>` : (it.oga_agencies||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:4px">${(it.oga_agencies||[]).map(a=>chip(a,'var(--yellow)')).join('')}</div>` : ''}
     </div>` : `<div style="color:var(--green);font-size:.82rem">${t('inv_oga_no')}</div>`
   );
 
