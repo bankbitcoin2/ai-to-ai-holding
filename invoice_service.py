@@ -378,8 +378,10 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
     for idx, r in enumerate(item_results):
         if isinstance(r, Exception):
             line_no = idx + 1
+            desc = (items_raw[idx].get("description") or "")[:60] if idx < len(items_raw) else ""
             warnings.append({"line_no": line_no, "type": "ITEM_ERROR",
-                "message": f"บรรทัด {line_no}: ประมวลผลไม่สำเร็จ — {str(r)[:120]}"})
+                "message": f"บรรทัด {line_no} — \"{desc}\" ประมวลผลไม่สำเร็จ ({str(r)[:80]}) "
+                           f"→ กรุณาตรวจสอบด้วย Sandbox (/v1/classify)"})
             continue
         lv = r.pop("_lv", 0)
         duty_est = r.pop("_duty_est", 0)
