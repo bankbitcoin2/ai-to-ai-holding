@@ -458,4 +458,41 @@ Endpoint: `/v1/agents/command` → ยัง NotImplementedError
 
 ---
 
-*อัปเดตครั้งล่าสุด: 23 มิถุนายน 2026 | Tasks: 95 | Production: Online ✅ | Commits: 10 | Phases: 14 (9/14 Done)*
+## 22. Session 23 มิถุนายน 2026 — สิ่งที่ทำเพิ่ม
+
+### invoice_service.py
+| รายการ | รายละเอียด | Commit |
+|--------|-----------|--------|
+| Cache-first classification | `_classify_item` เช็ค `cache_lookup()` ก่อน — confidence ≥ 80% ใช้เลย ฟรี, < 80% ส่ง Claude ตรวจอีกรอบ | perf: cache-first |
+| ITEM_ERROR warning | `asyncio.gather` exception ไม่ข้ามเงียบแล้ว — แสดงชื่อสินค้า + แนะนำ Sandbox | fix: ITEM_ERROR |
+
+### dashboard.html
+| รายการ | รายละเอียด | Commit |
+|--------|-----------|--------|
+| HS Cell 3-state | noAI → แสดง declared เป็นหลัก + badge "⚠ AI ไม่สามารถจัดพิกัดได้" / mismatch → แดง declared ขีดฆ่า / ตรง → accent | fix: HS cell |
+| Drop zone ซ่อนทันที | ซ่อนตั้งแต่เริ่ม `handleInvoiceFile` ไม่รอ success — error คืน drop zone กลับ | fix: dropzone |
+| HS Mismatch Analysis | วิเคราะห์ 3 ระดับ Chapter/Heading/Subheading + เหตุผล + recommendation + confidence warning | feat: mismatch |
+| Loading Animation | กรอบแสงไล่สี indigo→purple→cyan วิ่งรอบ + dual spinning ring + 4 step badges กระพริบ | ui: loading |
+
+### Logic สำคัญ — Cache Flow
+```
+invoice item description
+    ↓
+cache_lookup(description)   ← sha256(normalize(desc))
+    ├── MISS                → Claude API → cache_save() → return
+    ├── HIT conf ≥ 80%      → return ทันที (ฟรี 100%)
+    └── HIT conf < 80%      → Claude ตรวจ → cache_save(update) → return
+```
+
+### Parallel Processing + Error Isolation
+```
+8 items → asyncio.gather(*tasks, return_exceptions=True) + Semaphore(4)
+    รอบ 1: item 1,2,3,4 พร้อมกัน
+    รอบ 2: item 5,6,7,8 พร้อมกัน
+    item ล้มเหลว → warning "บรรทัด N — [ชื่อสินค้า] → ตรวจด้วย Sandbox"
+    item อื่นไม่กระทบ
+```
+
+---
+
+*อัปเดตครั้งล่าสุด: 23 มิถุนายน 2026 | Tasks: 100 | Production: Online ✅ | Commits: 14 | Phases: 14 (9/14 Done)*
