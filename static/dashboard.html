@@ -175,6 +175,12 @@
       <div class="credit-label" data-i18n="credit_label">Credit คงเหลือ</div>
       <div class="credit-amount">$<span id="creditBalance">0.00</span></div>
       <div class="credit-sub">≈ <span id="callsRemaining">0</span> <span data-i18n="calls_remaining">calls remaining</span> · $0.50 / <span data-i18n="per_item">รายการ</span></div>
+      <!-- API Key inline — masked -->
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;background:rgba(0,0,0,0.2);border-radius:8px;padding:7px 12px">
+        <span style="font-size:.72rem;color:rgba(255,255,255,.5);white-space:nowrap">🔑 API Key</span>
+        <span id="keyDisplay" style="flex:1;font-family:monospace;font-size:.78rem;color:rgba(255,255,255,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.05em;filter:blur(4px);transition:filter .2s" onmouseenter="this.style.filter='none'" onmouseleave="this.style.filter='blur(4px)'"></span>
+        <button onclick="copyKey()" style="background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);font-size:.7rem;padding:2px 8px;border-radius:4px;cursor:pointer;white-space:nowrap" data-i18n="copy">Copy</button>
+      </div>
       <div class="credit-actions">
         <button class="btn-topup" onclick="openTopup()" data-i18n="topup_btn">+ เติม Credit</button>
         <button class="btn btn-outline" onclick="refreshBalance()" style="color:white;border-color:rgba(255,255,255,0.2)" data-i18n="refresh_btn">🔄 รีเฟรช</button>
@@ -292,15 +298,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="section-card">
-      <h3>🔑 <span data-i18n="apikey_title">API Key ของคุณ</span></h3>
-      <div class="key-box">
-        <span id="keyDisplay"></span>
-        <button class="copy-btn" onclick="copyKey()" data-i18n="copy">Copy</button>
-      </div>
-      <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem"><span data-i18n="apikey_hint">ใช้ header:</span> <code style="color:var(--accent)">X-API-Key: &lt;your-key&gt;</code> <span data-i18n="apikey_hint2">กับทุก production endpoint</span></p>
     </div>
 
     <!-- ═══ INVOICE UPLOAD SECTION ═══ -->
@@ -1265,8 +1262,17 @@ async function handleInvoiceFile(file) {
     });
     const json = await res.json();
     if (!res.ok) { showInvError(json.detail || 'Error ' + res.status); return; }
+    // ซ่อน drop zone + แสดงปุ่ม Upload ใหม่
+    const zone = document.getElementById('invDropZone');
+    if (zone) zone.style.display = 'none';
     renderInvoiceResult(json.data, file.name);
   } catch(e) { showInvError('เชื่อมต่อไม่ได้: ' + e.message); }
+}
+
+function resetInvoiceUpload() {
+  const zone = document.getElementById('invDropZone');
+  if (zone) zone.style.display = '';
+  document.getElementById('invResult').innerHTML = '';
 }
 
 function showInvLoading(name) {
@@ -1349,25 +1355,21 @@ function renderInvoiceResult(d, filename) {
   // ── Summary table ──
   const tableHtml = items.length === 0
     ? '<div style="padding:1rem;color:var(--muted)">ไม่พบรายการสินค้า</div>'
-    : `<div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px">
-    <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+    : `<div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px;-webkit-overflow-scrolling:touch">
+    <table style="width:100%;min-width:700px;border-collapse:collapse;font-size:.77rem">
       <thead>
         <tr style="background:rgba(99,102,241,0.08);color:var(--muted);text-align:left">
-          <th style="padding:9px 10px;white-space:nowrap">#</th>
-          <th style="padding:9px 10px">สินค้า</th>
-          <th style="padding:9px 10px;white-space:nowrap">HS Code (AI)</th>
-          <th style="padding:9px 10px;white-space:nowrap">Declared</th>
-          <th style="padding:9px 10px;white-space:nowrap">Qty × Unit</th>
-          <th style="padding:9px 10px;white-space:nowrap">Unit Price</th>
-          <th style="padding:9px 10px;white-space:nowrap">Line Value</th>
-          <th style="padding:9px 10px;white-space:nowrap">MFN %</th>
-          <th style="padding:9px 10px;white-space:nowrap">FTA %</th>
-          <th style="padding:9px 10px;white-space:nowrap">ภาษี ($)</th>
-          <th style="padding:9px 10px;white-space:nowrap">FTA Saving</th>
-          <th style="padding:9px 10px;white-space:nowrap">OGA</th>
-          <th style="padding:9px 10px;white-space:nowrap">Halal</th>
-          <th style="padding:9px 10px;white-space:nowrap">มั่นใจ</th>
-          <th style="padding:9px 10px"></th>
+          <th style="padding:8px 8px;white-space:nowrap;width:32px">#</th>
+          <th style="padding:8px 8px;min-width:140px;max-width:200px">สินค้า</th>
+          <th style="padding:8px 8px;white-space:nowrap">HS Code (AI)</th>
+          <th style="padding:8px 8px;white-space:nowrap">Line Value</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:center">MFN%</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:center">FTA%</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:right">ภาษี ($)</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:right">FTA Saving</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:center">Flags</th>
+          <th style="padding:8px 8px;white-space:nowrap;text-align:center">มั่นใจ</th>
+          <th style="padding:8px 8px;width:90px"></th>
         </tr>
       </thead>
       <tbody>
@@ -1380,54 +1382,45 @@ function renderInvoiceResult(d, filename) {
           const aiCode = it.hs_code || '—';
           const isMismatch = hasDecl && aiCode !== '—' && hasDecl.replace('.','').slice(0,6) !== aiCode.replace('.','').slice(0,6);
           const rowBg = isMismatch ? 'background:rgba(239,68,68,0.04)' : (idx % 2 === 1 ? 'background:rgba(255,255,255,0.015)' : '');
+          const flags = [
+            isMismatch ? `<span title="HS Mismatch" style="color:var(--red);font-size:.75rem">⚠HS</span>` : '',
+            it.oga_required ? `<span title="OGA Required" style="color:var(--yellow);font-size:.75rem">🟡OGA</span>` : '',
+            it.halal_required ? `<span title="Halal Cert" style="color:var(--red);font-size:.75rem">🚫H</span>` : '',
+          ].filter(Boolean).join(' ') || '<span style="color:var(--green);font-size:.8rem">✓</span>';
           return `
           <tr style="${rowBg};border-top:1px solid var(--border);cursor:pointer" onclick="toggleInvDetail(${idx})">
-            <td style="padding:8px 10px;color:var(--muted)">${it.line_no}</td>
-            <td style="padding:8px 10px;max-width:200px">
-              <div style="font-size:.79rem;line-height:1.4;color:var(--text)">${it.description||'—'}</div>
-              <div style="font-size:.7rem;color:var(--muted)">${it.country_origin ? '🌍 '+it.country_origin : ''}</div>
+            <td style="padding:7px 8px;color:var(--muted)">${it.line_no}</td>
+            <td style="padding:7px 8px;max-width:200px">
+              <div style="font-size:.76rem;line-height:1.35;color:var(--text);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${it.description||'—'}</div>
+              ${it.country_origin ? `<div style="font-size:.68rem;color:var(--muted);margin-top:1px">🌍 ${it.country_origin}</div>` : ''}
             </td>
-            <td style="padding:8px 10px;font-family:monospace;font-weight:700;color:var(--accent);white-space:nowrap">${aiCode}</td>
-            <td style="padding:8px 10px;font-family:monospace;font-size:.78rem;color:${isMismatch?'var(--red)':'var(--muted)'}">
-              ${hasDecl ? (isMismatch ? '⚠ ' : '') + hasDecl : '—'}
+            <td style="padding:7px 8px;font-family:monospace;font-weight:700;font-size:.78rem;color:${isMismatch?'var(--red)':'var(--accent)'};white-space:nowrap">
+              ${isMismatch?'⚠ ':''}${aiCode}
+              ${hasDecl && !isMismatch ? `<div style="font-size:.65rem;color:var(--muted)">${hasDecl}</div>` : ''}
+              ${hasDecl && isMismatch ? `<div style="font-size:.65rem;color:var(--red);text-decoration:line-through">${hasDecl}</div>` : ''}
             </td>
-            <td style="padding:8px 10px;white-space:nowrap;color:var(--muted)">
-              ${it.qty != null ? it.qty.toLocaleString() : '—'}${it.unit ? ' '+it.unit : ''}
-            </td>
-            <td style="padding:8px 10px;white-space:nowrap;text-align:right">
-              ${it.unit_price != null ? '$'+it.unit_price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}
-            </td>
-            <td style="padding:8px 10px;white-space:nowrap;text-align:right;font-weight:600;color:var(--text)">
+            <td style="padding:7px 8px;white-space:nowrap;text-align:right;font-weight:600;color:var(--text)">
               ${it.line_value != null ? '$'+it.line_value.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}
             </td>
-            <td style="padding:8px 10px;text-align:center;color:var(--yellow)">${mfn}</td>
-            <td style="padding:8px 10px;text-align:center;color:${it.fta_eligible?'var(--green)':'var(--muted)'}">${fta}</td>
-            <td style="padding:8px 10px;text-align:right;color:var(--yellow)">
+            <td style="padding:7px 8px;text-align:center;color:var(--yellow)">${mfn}</td>
+            <td style="padding:7px 8px;text-align:center;color:${it.fta_eligible?'var(--green)':'var(--muted)'}">${fta}</td>
+            <td style="padding:7px 8px;text-align:right;color:var(--yellow)">
               ${it.duty_estimate_usd != null && it.duty_estimate_usd > 0 ? '$'+it.duty_estimate_usd.toFixed(2) : '—'}
             </td>
-            <td style="padding:8px 10px;text-align:right;color:var(--green)">
+            <td style="padding:7px 8px;text-align:right;color:var(--green)">
               ${it.fta_saving_usd > 0 ? '💚 $'+it.fta_saving_usd.toFixed(2) : '—'}
             </td>
-            <td style="padding:8px 10px;text-align:center">
-              ${it.oga_required
-                ? `<span style="background:rgba(245,158,11,.15);color:var(--yellow);border-radius:4px;padding:1px 6px;font-size:.72rem;white-space:nowrap">⚠ OGA</span>`
-                : `<span style="color:var(--green);font-size:.8rem">✓</span>`}
-            </td>
-            <td style="padding:8px 10px;text-align:center">
-              ${it.halal_required
-                ? `<span style="background:rgba(239,68,68,.12);color:var(--red);border-radius:4px;padding:1px 6px;font-size:.72rem">🚫 Halal</span>`
-                : `<span style="color:var(--green);font-size:.8rem">✓</span>`}
-            </td>
-            <td style="padding:8px 10px;text-align:center;font-weight:700;color:${confColor}">
+            <td style="padding:7px 8px;text-align:center">${flags}</td>
+            <td style="padding:7px 8px;text-align:center;font-weight:700;color:${confColor}">
               ${confPct != null ? confPct + '%' : '—'}
             </td>
-            <td style="padding:8px 10px">
+            <td style="padding:7px 8px">
               <button id="inv-btn-${idx}" class="inv-row-btn" onclick="event.stopPropagation();toggleInvDetail(${idx})"
-                style="font-size:.7rem;padding:3px 8px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.25);border-radius:4px;cursor:pointer;white-space:nowrap">▶ ดูรายละเอียด</button>
+                style="font-size:.68rem;padding:3px 7px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.25);border-radius:4px;cursor:pointer;white-space:nowrap">▶ รายละเอียด</button>
             </td>
           </tr>
           <tr>
-            <td colspan="15" style="padding:0">
+            <td colspan="11" style="padding:0">
               <div id="inv-detail-${idx}" class="inv-detail-panel" style="display:none">
                 ${buildDetailPanel(it, cur)}
               </div>
@@ -1438,7 +1431,10 @@ function renderInvoiceResult(d, filename) {
     </table>
   </div>`;
 
-  document.getElementById('invResult').innerHTML = metaHtml + summaryHtml + warningsHtml + tableHtml;
+  const resetBtn = `<div style="margin-bottom:12px;display:flex;justify-content:flex-end">
+    <button onclick="resetInvoiceUpload()" style="font-size:.8rem;padding:6px 16px;background:rgba(99,102,241,.12);color:var(--accent);border:1px solid rgba(99,102,241,.3);border-radius:8px;cursor:pointer">📤 อัพโหลดใบใหม่</button>
+  </div>`;
+  document.getElementById('invResult').innerHTML = resetBtn + metaHtml + summaryHtml + warningsHtml + tableHtml;
 }
 
 function buildDetailPanel(it, cur) {
