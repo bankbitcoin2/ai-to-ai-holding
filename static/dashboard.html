@@ -302,14 +302,14 @@
 
     <!-- ═══ INVOICE UPLOAD SECTION ═══ -->
     <div class="section-card">
-      <h3>📄 Invoice Intelligence <span style="font-size:.75rem;color:var(--muted);font-weight:400;margin-left:8px">อัปโหลด Invoice → HS Code + ภาษี + FTA อัตโนมัติ</span></h3>
+      <h3>📄 Invoice Intelligence <span data-i18n="inv_section_sub" style="font-size:.75rem;color:var(--muted);font-weight:400;margin-left:8px">อัปโหลด Invoice → HS Code + ภาษี + FTA อัตโนมัติ</span></h3>
 
       <!-- Drop Zone -->
       <div class="inv-drop" id="invDropZone">
         <div class="inv-drop-icon">📂</div>
-        <div style="font-weight:600;margin-bottom:4px">ลากไฟล์มาวางที่นี่ หรือ คลิกเพื่อเลือกไฟล์</div>
-        <div class="inv-drop-txt">รองรับ PDF · JPG · PNG · XLSX · CSV (สูงสุด 10 MB)</div>
-        <div class="inv-drop-sub">Claude AI จะอ่าน Invoice และจัดพิกัด HS Code พร้อมคำนวณภาษีนำเข้า + FTA ให้อัตโนมัติ</div>
+        <div data-i18n="inv_drop_title" style="font-weight:600;margin-bottom:4px">ลากไฟล์มาวางที่นี่ หรือ คลิกเพื่อเลือกไฟล์</div>
+        <div data-i18n="inv_drop_sub" class="inv-drop-txt">รองรับ PDF · JPG · PNG · XLSX · CSV (สูงสุด 10 MB)</div>
+        <div data-i18n="inv_loading_sub" class="inv-drop-sub">Claude AI จะอ่าน Invoice และจัดพิกัด HS Code พร้อมคำนวณภาษีนำเข้า + FTA ให้อัตโนมัติ</div>
       </div>
       <input type="file" id="invFileInput" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.csv,.webp" style="display:none">
 
@@ -548,8 +548,8 @@ const i18n = {
     // Invoice
     inv_section_title: 'Invoice Intelligence',
     inv_section_sub: 'อัปโหลด Invoice → HS Code + ภาษี + FTA อัตโนมัติ',
-    inv_drop_title: 'วางไฟล์ที่นี่ หรือคลิกเพื่อเลือก',
-    inv_drop_sub: 'รองรับ PDF, JPG, PNG, Excel, CSV (สูงสุด 10MB)',
+    inv_drop_title: 'ลากไฟล์มาวางที่นี่ หรือ คลิกเพื่อเลือกไฟล์',
+    inv_drop_sub: 'รองรับ PDF · JPG · PNG · XLSX · CSV (สูงสุด 10 MB)',
     inv_upload_new: '📤 อัพโหลดใบใหม่',
     inv_loading_sub: 'Claude AI กำลังอ่านเอกสารและจัดพิกัด HS Code',
     inv_step1: '📄 อ่านเอกสาร', inv_step2: '🎯 จัดพิกัด HS',
@@ -647,7 +647,7 @@ const i18n = {
     inv_section_title: 'Invoice Intelligence',
     inv_section_sub: 'Upload Invoice → HS Code + Duty + FTA Automatically',
     inv_drop_title: 'Drop file here or click to select',
-    inv_drop_sub: 'Supports PDF, JPG, PNG, Excel, CSV (max 10MB)',
+    inv_drop_sub: 'Supports PDF · JPG · PNG · XLSX · CSV (max 10MB)',
     inv_upload_new: '📤 Upload New Invoice',
     inv_loading_sub: 'Claude AI is reading the document and classifying HS Codes',
     inv_step1: '📄 Reading Doc', inv_step2: '🎯 HS Classify',
@@ -745,7 +745,7 @@ const i18n = {
     inv_section_title: '发票智能分析',
     inv_section_sub: '上传发票 → 自动识别 HS 编码 + 关税 + FTA',
     inv_drop_title: '将文件拖到此处或点击选择',
-    inv_drop_sub: '支持 PDF、JPG、PNG、Excel、CSV（最大 10MB）',
+    inv_drop_sub: '支持 PDF · JPG · PNG · XLSX · CSV（最大 10MB）',
     inv_upload_new: '📤 上传新发票',
     inv_loading_sub: 'Claude AI 正在读取文件并分类 HS 编码',
     inv_step1: '📄 读取文件', inv_step2: '🎯 HS 分类',
@@ -843,7 +843,7 @@ const i18n = {
     inv_section_title: '請求書インテリジェンス',
     inv_section_sub: '請求書をアップロード → HSコード + 関税 + FTAを自動分析',
     inv_drop_title: 'ここにファイルをドロップまたはクリックして選択',
-    inv_drop_sub: 'PDF、JPG、PNG、Excel、CSV対応（最大10MB）',
+    inv_drop_sub: 'PDF · JPG · PNG · XLSX · CSV 対応（最大 10MB）',
     inv_upload_new: '📤 新しい請求書をアップロード',
     inv_loading_sub: 'Claude AIがドキュメントを読み取りHSコードを分類中',
     inv_step1: '📄 文書読取', inv_step2: '🎯 HS分類',
