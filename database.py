@@ -69,6 +69,7 @@ async def _init_postgres():
     schema_files = [
         "schema_v1.sql", "schema_comms_v1.sql", "schema_learning_v1.sql",
         "schema_registry_v1.sql", "schema_billing_v1.sql", "schema_cache_v1.sql", "schema_learning_v2_pg.sql",
+        "schema_invoice.sql",
     ]
     async with pool.acquire() as conn:
         # enable uuid extension
