@@ -1388,12 +1388,40 @@ function renderInvoiceResult(d, filename) {
           const hasDecl = it.hs_code_declared;
           const aiCode = it.hs_code || '—';
           const isMismatch = hasDecl && aiCode !== '—' && hasDecl.replace('.','').slice(0,6) !== aiCode.replace('.','').slice(0,6);
-          const rowBg = isMismatch ? 'background:rgba(239,68,68,0.04)' : (idx % 2 === 1 ? 'background:rgba(255,255,255,0.015)' : '');
+          const noAI = aiCode === '—' || !aiCode || aiCode === '–';
+          const rowBg = isMismatch ? 'background:rgba(239,68,68,0.04)' : noAI ? 'background:rgba(245,158,11,0.03)' : (idx % 2 === 1 ? 'background:rgba(255,255,255,0.015)' : '');
           const flags = [
+            noAI ? `<span title="AI จัดพิกัดไม่ได้" style="color:var(--yellow);font-size:.75rem">⚠AI</span>` : '',
             isMismatch ? `<span title="HS Mismatch" style="color:var(--red);font-size:.75rem">⚠HS</span>` : '',
             it.oga_required ? `<span title="OGA Required" style="color:var(--yellow);font-size:.75rem">🟡OGA</span>` : '',
             it.halal_required ? `<span title="Halal Cert" style="color:var(--red);font-size:.75rem">🚫H</span>` : '',
           ].filter(Boolean).join(' ') || '<span style="color:var(--green);font-size:.8rem">✓</span>';
+
+          // HS Cell: แสดงผลตาม 3 กรณี
+          let hsCell;
+          if (noAI && hasDecl) {
+            // AI ไม่มีพิกัด แต่มี declared — แสดง declared เป็นหลัก + badge
+            hsCell = `<td style="padding:7px 8px;font-family:monospace;font-weight:700;font-size:.78rem;white-space:nowrap">
+              <div style="color:var(--muted)">${hasDecl}</div>
+              <div style="font-size:.65rem;color:var(--yellow);margin-top:1px">⚠ AI ไม่สามารถจัดพิกัดได้</div>
+            </td>`;
+          } else if (noAI) {
+            // ไม่มีทั้งคู่
+            hsCell = `<td style="padding:7px 8px;font-size:.72rem;color:var(--yellow)">⚠ ไม่มีพิกัด</td>`;
+          } else if (isMismatch) {
+            // มีทั้งคู่ แต่ไม่ตรงกัน
+            hsCell = `<td style="padding:7px 8px;font-family:monospace;font-weight:700;font-size:.78rem;color:var(--red);white-space:nowrap">
+              <div>⚠ ${aiCode}</div>
+              <div style="font-size:.65rem;color:var(--red);text-decoration:line-through;opacity:.7">${hasDecl}</div>
+            </td>`;
+          } else {
+            // ตรงกัน หรือไม่มี declared
+            hsCell = `<td style="padding:7px 8px;font-family:monospace;font-weight:700;font-size:.78rem;color:var(--accent);white-space:nowrap">
+              <div>${aiCode}</div>
+              ${hasDecl ? `<div style="font-size:.65rem;color:var(--muted)">${hasDecl}</div>` : ''}
+            </td>`;
+          }
+
           return `
           <tr style="${rowBg};border-top:1px solid var(--border);cursor:pointer" onclick="toggleInvDetail(${idx})">
             <td style="padding:7px 8px;color:var(--muted)">${it.line_no}</td>
@@ -1401,11 +1429,7 @@ function renderInvoiceResult(d, filename) {
               <div style="font-size:.76rem;line-height:1.35;color:var(--text);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${it.description||'—'}</div>
               ${it.country_origin ? `<div style="font-size:.68rem;color:var(--muted);margin-top:1px">🌍 ${it.country_origin}</div>` : ''}
             </td>
-            <td style="padding:7px 8px;font-family:monospace;font-weight:700;font-size:.78rem;color:${isMismatch?'var(--red)':'var(--accent)'};white-space:nowrap">
-              ${isMismatch?'⚠ ':''}${aiCode}
-              ${hasDecl && !isMismatch ? `<div style="font-size:.65rem;color:var(--muted)">${hasDecl}</div>` : ''}
-              ${hasDecl && isMismatch ? `<div style="font-size:.65rem;color:var(--red);text-decoration:line-through">${hasDecl}</div>` : ''}
-            </td>
+            ${hsCell}
             <td style="padding:7px 8px;white-space:nowrap;text-align:right;font-weight:600;color:var(--text)">
               ${it.line_value != null ? '$'+it.line_value.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}
             </td>
@@ -1419,7 +1443,7 @@ function renderInvoiceResult(d, filename) {
             </td>
             <td style="padding:7px 8px;text-align:center">${flags}</td>
             <td style="padding:7px 8px;text-align:center;font-weight:700;color:${confColor}">
-              ${confPct != null ? confPct + '%' : '—'}
+              ${noAI ? `<span style="font-size:.7rem;color:var(--yellow)">ล้มเหลว</span>` : confPct != null ? confPct + '%' : '—'}
             </td>
             <td style="padding:7px 8px">
               <button id="inv-btn-${idx}" class="inv-row-btn" onclick="event.stopPropagation();toggleInvDetail(${idx})"
