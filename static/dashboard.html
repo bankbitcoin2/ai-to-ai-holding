@@ -291,6 +291,23 @@
       <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem"><span data-i18n="apikey_hint">ใช้ header:</span> <code style="color:var(--accent)">X-API-Key: &lt;your-key&gt;</code> <span data-i18n="apikey_hint2">กับทุก production endpoint</span></p>
     </div>
 
+    <!-- ═══ INVOICE UPLOAD SECTION ═══ -->
+    <div class="section-card">
+      <h3>📄 Invoice Intelligence <span style="font-size:.75rem;color:var(--muted);font-weight:400;margin-left:8px">อัปโหลด Invoice → HS Code + ภาษี + FTA อัตโนมัติ</span></h3>
+
+      <!-- Drop Zone -->
+      <div class="inv-drop" id="invDropZone">
+        <div class="inv-drop-icon">📂</div>
+        <div style="font-weight:600;margin-bottom:4px">ลากไฟล์มาวางที่นี่ หรือ คลิกเพื่อเลือกไฟล์</div>
+        <div class="inv-drop-txt">รองรับ PDF · JPG · PNG · XLSX · CSV (สูงสุด 10 MB)</div>
+        <div class="inv-drop-sub">Claude AI จะอ่าน Invoice และจัดพิกัด HS Code พร้อมคำนวณภาษีนำเข้า + FTA ให้อัตโนมัติ</div>
+      </div>
+      <input type="file" id="invFileInput" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.csv,.webp" style="display:none">
+
+      <!-- Result area -->
+      <div id="invResult" style="margin-top:1rem"></div>
+    </div>
+
     <!-- GUIDE SECTION -->
     <div class="section-card">
       <h3>📖 <span data-i18n="guide_title">คู่มือการใช้งาน</span></h3>
@@ -1142,6 +1159,158 @@ document.getElementById('keyInput').addEventListener('keydown', e => {
 document.getElementById('topupModal').addEventListener('click', e => {
   if (e.target === document.getElementById('topupModal')) closeTopup();
 });
+</script>
+
+<!-- ═══ INVOICE UPLOAD SECTION ═══ -->
+<style>
+.inv-drop{border:2px dashed var(--border);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.inv-drop:hover,.inv-drop.drag{border-color:var(--accent);background:rgba(99,102,241,.05)}
+.inv-drop-icon{font-size:2.5rem;margin-bottom:.75rem}
+.inv-drop-txt{color:var(--muted);font-size:.9rem}
+.inv-drop-sub{color:var(--muted);font-size:.75rem;margin-top:.4rem}
+.inv-item-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:.82rem;align-items:center}
+.inv-item-row:last-child{border-bottom:none}
+.inv-item-head{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px}
+.inv-badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:.7rem;font-weight:700}
+.inv-badge.ok{background:rgba(16,185,129,.15);color:#10b981}
+.inv-badge.warn{background:rgba(245,158,11,.15);color:#f59e0b}
+.inv-badge.err{background:rgba(239,68,68,.15);color:#ef4444}
+.inv-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1rem 0}
+.inv-sum-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.inv-sum-label{font-size:.72rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.inv-sum-val{font-size:1.4rem;font-weight:700}
+.inv-warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px 14px;margin-top:12px;font-size:.82rem}
+.inv-warn-item{display:flex;gap:8px;padding:4px 0;color:#f59e0b}
+</style>
+
+<script>
+// ── Invoice Upload ────────────────────────────────────────────────
+function initInvoiceUpload() {
+  const zone = document.getElementById('invDropZone');
+  const fileInp = document.getElementById('invFileInput');
+  if (!zone) return;
+  zone.addEventListener('click', () => fileInp.click());
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    if (e.dataTransfer.files[0]) handleInvoiceFile(e.dataTransfer.files[0]);
+  });
+  fileInp.addEventListener('change', () => {
+    if (fileInp.files[0]) handleInvoiceFile(fileInp.files[0]);
+  });
+}
+
+async function handleInvoiceFile(file) {
+  const allowed = ['pdf','jpg','jpeg','png','xlsx','xls','csv','webp'];
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!allowed.includes(ext)) {
+    showInvError('ไฟล์ประเภทนี้ไม่รองรับ: .' + ext); return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showInvError('ไฟล์ใหญ่เกิน 10MB'); return;
+  }
+  const apiKey = localStorage.getItem('aitai_key') || sessionStorage.getItem('aitai_key');
+  if (!apiKey) { showInvError('กรุณา login ก่อน'); return; }
+
+  showInvLoading(file.name);
+
+  const form = new FormData();
+  form.append('file', file);
+  try {
+    const res = await fetch('/v1/invoice/upload', {
+      method: 'POST',
+      headers: { 'X-API-Key': apiKey },
+      body: form
+    });
+    const json = await res.json();
+    if (!res.ok) { showInvError(json.detail || 'Error ' + res.status); return; }
+    renderInvoiceResult(json.data, file.name);
+  } catch(e) { showInvError('เชื่อมต่อไม่ได้: ' + e.message); }
+}
+
+function showInvLoading(name) {
+  document.getElementById('invResult').innerHTML = `
+    <div style="text-align:center;padding:2rem;color:var(--muted)">
+      <div style="font-size:2rem;margin-bottom:.5rem">⏳</div>
+      <div>กำลังวิเคราะห์ <b>${name}</b>...</div>
+      <div style="font-size:.8rem;margin-top:.4rem">Claude AI กำลังอ่านเอกสารและจัดพิกัด HS Code</div>
+    </div>`;
+}
+
+function showInvError(msg) {
+  document.getElementById('invResult').innerHTML = `
+    <div style="padding:1rem;color:var(--red);background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">
+      ❌ ${msg}
+    </div>`;
+}
+
+function renderInvoiceResult(d, filename) {
+  const items = d.items || [];
+  const warnings = d.warnings || [];
+
+  const summaryHtml = `
+    <div class="inv-summary-grid">
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">รายการสินค้า</div>
+        <div class="inv-sum-val">${d.total_items} items</div>
+      </div>
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">มูลค่ารวม</div>
+        <div class="inv-sum-val" style="color:var(--green)">$${(d.total_value_usd||0).toFixed(2)}</div>
+      </div>
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">ประมาณการภาษี</div>
+        <div class="inv-sum-val" style="color:var(--yellow)">$${(d.total_duty_estimate_usd||0).toFixed(2)}</div>
+      </div>
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">FTA ประหยัดได้</div>
+        <div class="inv-sum-val" style="color:var(--green)">$${(d.total_fta_saving_usd||0).toFixed(2)}</div>
+      </div>
+    </div>`;
+
+  const itemsHtml = items.length === 0 ? '<div style="padding:1rem;color:var(--muted)">ไม่พบรายการสินค้า</div>' : `
+    <div style="overflow:auto;border:1px solid var(--border);border-radius:10px;margin-top:12px">
+      <div class="inv-item-head">
+        <span>สินค้า</span><span>HS Code</span><span>ภาษี %</span><span>FTA</span><span>OGA</span><span>ความมั่นใจ</span>
+      </div>
+      ${items.map(it => `
+      <div class="inv-item-row">
+        <span style="font-size:.8rem;color:var(--text)">${it.description||'—'}</span>
+        <span style="font-family:monospace;font-weight:700;color:var(--accent)">${it.hs_code||'—'}</span>
+        <span>${it.duty_rate != null ? it.duty_rate.toFixed(1)+'%' : '—'}</span>
+        <span>${it.fta_eligible
+          ? `<span class="inv-badge ok">✓ ประหยัด $${(it.fta_saving_usd||0).toFixed(2)}</span>`
+          : `<span class="inv-badge warn">—</span>`}</span>
+        <span>${it.oga_required
+          ? `<span class="inv-badge err">⚠ ${(it.oga_agencies||[]).join(',')}</span>`
+          : `<span class="inv-badge ok">ผ่าน</span>`}</span>
+        <span style="color:${(it.confidence||0)>=0.85?'var(--green)':'var(--yellow)'}">
+          ${it.confidence != null ? Math.round(it.confidence*100)+'%' : '—'}
+        </span>
+      </div>`).join('')}
+    </div>`;
+
+  const warningsHtml = warnings.length === 0 ? '' : `
+    <div class="inv-warn-box">
+      <div style="font-weight:700;margin-bottom:6px;color:var(--yellow)">⚠️ คำเตือน (${warnings.length})</div>
+      ${warnings.map(w => `<div class="inv-warn-item">▸ ${w.message}</div>`).join('')}
+    </div>`;
+
+  const metaHtml = `
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-bottom:8px">
+      <span>📄 ${filename}</span>
+      ${d.invoice_no ? `<span>Invoice: <b>${d.invoice_no}</b></span>` : ''}
+      ${d.seller_country ? `<span>ต้นทาง: <b>${d.seller_country}</b></span>` : ''}
+      ${d.buyer_country ? `<span>ปลายทาง: <b>${d.buyer_country}</b></span>` : ''}
+      ${d.incoterms ? `<span>Incoterms: <b>${d.incoterms}</b></span>` : ''}
+      <span style="margin-left:auto;color:var(--muted);font-size:.72rem">ID: ${d.submission_id||''}</span>
+    </div>`;
+
+  document.getElementById('invResult').innerHTML = metaHtml + summaryHtml + itemsHtml + warningsHtml;
+}
+
+document.addEventListener('DOMContentLoaded', initInvoiceUpload);
 </script>
 
 <!-- Floating Home Button -->
