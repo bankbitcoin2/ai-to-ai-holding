@@ -23,3 +23,8 @@ stripe>=7.0.0
 
 # Scheduling / Utilities
 python-multipart==0.0.9
+
+# Invoice parsing
+openpyxl==3.1.5
+pandas==2.2.3
+pdfplumber==0.11.4
