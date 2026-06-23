@@ -135,6 +135,7 @@ class ResultItem(BaseModel):
     import_total_estimate: Optional[float] = None  # duty + VAT รวม
     notes: Optional[str]
     candidates: list[CandidateItem] = []   # ranked list >= 75%
+    reasoning: Optional[dict] = None       # XAI Reasoning Block (Phase 11)
     watermark: str = "[SANDBOX — NOT FOR PRODUCTION USE]"
 
 class SandboxResp(BaseModel):
@@ -261,6 +262,23 @@ async def sandbox_classify(body: SandboxReq, req: Request):
             ]
             best = cls.best
             permits_raw = [p for p in oga.get("requires_permits", []) if isinstance(p, dict)]
+            # XAI Reasoning
+            _reasoning = None
+            try:
+                from xai_reasoning import generate_reasoning as _xai
+                _reasoning = await _xai(
+                    description=item.description,
+                    hs_code=best.hs_code if best else "",
+                    confidence=float(cls.confidence_score or 0),
+                    origin_country=item.origin_country or "",
+                    dest_country=body.destination_country or "TH",
+                    duty_rate=dr,
+                    fta_eligible=bool(_fta_info.get("eligible")),
+                    oga_required=bool(oga.get("is_restricted")),
+                )
+            except Exception:
+                pass
+
             results.append(ResultItem(
                 line_number=i, description=item.description,
                 hs_code=best.hs_code if best else None,
@@ -298,6 +316,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
                 halal_note=_halal.get("notes"),
                 notes=cls.notes,
                 candidates=candidates_out,
+                reasoning=_reasoning,
             ))
     except HTTPException:
         raise

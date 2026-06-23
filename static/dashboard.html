@@ -267,6 +267,18 @@
             <div style="font-size:0.72rem;color:var(--yellow);font-weight:600;margin-bottom:0.3rem">⚠️ <span data-i18n="rc_note">ข้อควรระวัง</span></div>
             <div id="rcNote" style="font-size:0.82rem;color:var(--muted);line-height:1.6">—</div>
           </div>
+          <!-- XAI REASONING BLOCK -->
+          <div id="rcReasoningWrap" style="display:none;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:1rem">
+            <div style="font-size:0.72rem;color:var(--accent);font-weight:700;margin-bottom:0.5rem;letter-spacing:.05em">🧠 XAI — เหตุผลการจัดพิกัด</div>
+            <div id="rcReasoning" style="font-size:0.88rem;line-height:1.6;color:var(--text);margin-bottom:0.75rem"></div>
+            <div id="rcReasoningDetail" style="display:none;margin-top:0.5rem">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0.5rem" id="rcKeyFactors"></div>
+              <div style="font-size:0.78rem;color:var(--muted)" id="rcLegalBasis"></div>
+              <div style="font-size:0.78rem;color:var(--yellow);margin-top:0.4rem" id="rcAltConsidered"></div>
+            </div>
+            <button onclick="document.getElementById('rcReasoningDetail').style.display=document.getElementById('rcReasoningDetail').style.display==='none'?'block':'none'" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;padding:0">▶ ดูรายละเอียด</button>
+          </div>
+
           <!-- CANDIDATES RANKED -->
           <div id="rcCandidatesWrap" style="display:none;border-top:1px solid var(--border);padding-top:0.85rem">
             <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem">🏆 <span data-i18n="rc_candidates">ตัวเลือกที่เป็นไปได้ (≥75% ทั้งหมด)</span></div>
@@ -981,6 +993,34 @@ function renderCard(data) {
        <span style="font-size:0.8rem;color:var(--muted)">${item.hs_description || ''}</span>`;
   }
 
+  // XAI Reasoning block
+  const reasoning = data.items?.[0]?.reasoning;
+  const rWrap = document.getElementById('rcReasoningWrap');
+  if (reasoning && reasoning.summary) {
+    rWrap.style.display = 'block';
+    document.getElementById('rcReasoning').textContent = reasoning.summary;
+    // key factors badges
+    const factors = reasoning.key_factors || [];
+    document.getElementById('rcKeyFactors').innerHTML = factors.map(f =>
+      `<span style="background:rgba(99,102,241,0.12);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:0.75rem">${f}</span>`
+    ).join('');
+    // legal basis
+    const lb = document.getElementById('rcLegalBasis');
+    lb.textContent = reasoning.legal_basis ? '⚖️ ' + reasoning.legal_basis : '';
+    // alternative considered
+    const ac = document.getElementById('rcAltConsidered');
+    ac.textContent = reasoning.alternative_considered ? '↔ พิจารณาแล้วตัดออก: ' + reasoning.alternative_considered : '';
+    // warning
+    if (reasoning.warning) {
+      const noteWrap = document.getElementById('rcNoteWrap');
+      const noteEl = document.getElementById('rcNote');
+      noteWrap.style.display = 'block';
+      noteEl.textContent = (noteEl.textContent ? noteEl.textContent + ' | ' : '') + reasoning.warning;
+    }
+  } else {
+    rWrap.style.display = 'none';
+  }
+
   // candidates ranked
   const candidates = data.items?.[0]?.candidates || [];
   const cWrap = document.getElementById('rcCandidatesWrap');
@@ -1274,21 +1314,36 @@ function renderInvoiceResult(d, filename) {
       <div class="inv-item-head">
         <span>สินค้า</span><span>HS Code</span><span>ภาษี %</span><span>FTA</span><span>OGA</span><span>ความมั่นใจ</span>
       </div>
-      ${items.map(it => `
-      <div class="inv-item-row">
-        <span style="font-size:.8rem;color:var(--text)">${it.description||'—'}</span>
-        <span style="font-family:monospace;font-weight:700;color:var(--accent)">${it.hs_code||'—'}</span>
-        <span>${it.duty_rate != null ? it.duty_rate.toFixed(1)+'%' : '—'}</span>
-        <span>${it.fta_eligible
-          ? `<span class="inv-badge ok">✓ ประหยัด $${(it.fta_saving_usd||0).toFixed(2)}</span>`
-          : `<span class="inv-badge warn">—</span>`}</span>
-        <span>${it.oga_required
-          ? `<span class="inv-badge err">⚠ ${(it.oga_agencies||[]).join(',')}</span>`
-          : `<span class="inv-badge ok">ผ่าน</span>`}</span>
-        <span style="color:${(it.confidence||0)>=0.85?'var(--green)':'var(--yellow)'}">
-          ${it.confidence != null ? Math.round(it.confidence*100)+'%' : '—'}
-        </span>
-      </div>`).join('')}
+      ${items.map((it, idx) => {
+        const r = it.reasoning || {};
+        const hasReasoning = r.summary;
+        const confPct = it.confidence != null ? Math.round(it.confidence*100) : null;
+        const confColor = (it.confidence||0)>=0.85?'var(--green)':'var(--yellow)';
+        return `
+      <div class="inv-item-row" style="flex-direction:column;display:block;padding:12px">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:center">
+          <span style="font-size:.8rem;color:var(--text)">${it.description||'—'}</span>
+          <span style="font-family:monospace;font-weight:700;color:var(--accent)">${it.hs_code||'—'}</span>
+          <span>${it.duty_rate != null ? it.duty_rate.toFixed(1)+'%' : '—'}</span>
+          <span>${it.fta_eligible
+            ? `<span class="inv-badge ok">✓ $${(it.fta_saving_usd||0).toFixed(2)}</span>`
+            : `<span class="inv-badge warn">—</span>`}</span>
+          <span>${it.oga_required
+            ? `<span class="inv-badge err">⚠ ${(it.oga_agencies||[]).join(',')}</span>`
+            : `<span class="inv-badge ok">ผ่าน</span>`}</span>
+          <span style="color:${confColor}">${confPct != null ? confPct+'%' : '—'}</span>
+        </div>
+        ${hasReasoning ? `
+        <div style="margin-top:8px;padding:8px 10px;background:rgba(99,102,241,0.06);border-radius:8px;border-left:3px solid var(--accent)">
+          <div style="font-size:.75rem;color:var(--accent);font-weight:700;margin-bottom:4px">🧠 XAI</div>
+          <div style="font-size:.8rem;color:var(--text);line-height:1.5">${r.summary}</div>
+          ${(r.key_factors||[]).length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${(r.key_factors||[]).map(f=>`<span style="font-size:.7rem;background:rgba(99,102,241,0.12);color:var(--accent);border-radius:999px;padding:1px 8px">${f}</span>`).join('')}</div>` : ''}
+          ${r.legal_basis ? `<div style="font-size:.72rem;color:var(--muted);margin-top:4px">⚖️ ${r.legal_basis}</div>` : ''}
+          ${r.alternative_considered ? `<div style="font-size:.72rem;color:var(--yellow);margin-top:2px">↔ ${r.alternative_considered}</div>` : ''}
+          ${r.warning ? `<div style="font-size:.72rem;color:var(--red);margin-top:4px">⚠️ ${r.warning}</div>` : ''}
+        </div>` : ''}
+      </div>`;
+      }).join('')}
     </div>`;
 
   const warningsHtml = warnings.length === 0 ? '' : `

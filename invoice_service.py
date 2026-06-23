@@ -11,6 +11,7 @@ from typing import Optional
 
 from db_adapter import get_pool
 from normalize_description import normalize as normalize_description
+from xai_reasoning import generate_reasoning
 
 
 def _now():
@@ -278,18 +279,38 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
                 "message": f"บรรทัด {i+1}: ต้องขออนุญาต {', '.join(agencies)}"
             })
 
+        conf = cl_result.get("confidence_score") or cl_result.get("confidence") or 0
+        fta_elig = bool(fta_result.get("eligible"))
+        oga_req = bool(oga_result.get("required") or oga_result.get("oga_required"))
+
+        # XAI Reasoning
+        try:
+            reasoning = await generate_reasoning(
+                description=desc,
+                hs_code=hs_ai,
+                confidence=float(conf),
+                origin_country=origin,
+                dest_country=dest_country,
+                duty_rate=duty_rate,
+                fta_eligible=fta_elig,
+                oga_required=oga_req,
+            )
+        except Exception:
+            reasoning = None
+
         results.append({
             "line_no": i + 1,
             "description": desc,
             "hs_code": hs_ai,
-            "confidence": cl_result.get("confidence_score") or cl_result.get("confidence"),
+            "confidence": conf,
             "duty_rate": duty_rate,
             "duty_estimate_usd": round(duty_est, 2),
-            "fta_eligible": bool(fta_result.get("eligible")),
+            "fta_eligible": fta_elig,
             "fta_saving_usd": round(fta_sav, 2),
-            "oga_required": bool(oga_result.get("required")),
+            "oga_required": oga_req,
             "oga_agencies": oga_result.get("agencies") or [],
             "halal_required": bool(halal_result.get("required")),
+            "reasoning": reasoning,
         })
 
     await _mark_done(pool, sub_id, total_value or None, len(results))
