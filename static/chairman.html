@@ -433,7 +433,8 @@ async function loadClients() {
   try {
     const r = await fetch(BASE + '/v1/chairman/clients', {headers: {'X-API-Key': CK}});
     if (!r.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:24px">Error ${r.status} — ตรวจสอบ CHAIRMAN_API_KEY</td></tr>`; return; }
-    const data = (await r.json()).data || [];
+    const json = await r.json();
+    const data = json.clients || json.data || [];
     if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--dim)">ยังไม่มี client</td></tr>'; return; }
     tbody.innerHTML = data.map((c, i) => `<tr>
       <td style="color:var(--muted)">${i+1}</td>
@@ -450,7 +451,7 @@ async function loadRevenue() {
   try {
     const r = await fetch(BASE + '/v1/chairman/stats', {headers: {'X-API-Key': CK}});
     if (r.ok) {
-      const d = (await r.json()).data || {};
+      const json = await r.json(); const d = json.data || json || {};
       const g = parseFloat(d.total_revenue_usd || 0);
       document.getElementById('rev-total').textContent = '$' + g.toFixed(2);
       document.getElementById('rev-corp').textContent = '$' + (g * 0.6).toFixed(2);
@@ -463,7 +464,8 @@ async function loadRevenue() {
   try {
     const r = await fetch(BASE + '/v1/chairman/topups?limit=30', {headers: {'X-API-Key': CK}});
     if (!r.ok) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:24px">Error ${r.status}</td></tr>`; return; }
-    const data = (await r.json()).data || [];
+    const json2 = await r.json();
+    const data = json2.topups || json2.data || [];
     if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--dim)">ยังไม่มีธุรกรรม</td></tr>'; return; }
     tbody.innerHTML = data.map(t => `<tr>
       <td style="font-weight:600">${t.agent_name||'—'}</td>
