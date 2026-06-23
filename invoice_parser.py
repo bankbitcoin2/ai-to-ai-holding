@@ -237,6 +237,44 @@ async def extract_with_claude_text(raw_text: str) -> dict:
         return {"error": str(e)}
 
 
+# ─── Excel Compiler (อ่าน cell → clean text → Claude) ───────────────────────
+
+def _compile_excel_text(content: bytes, filename: str) -> str:
+    """
+    อ่านทุก cell ใน Excel ที่มีค่า → จัด format เป็น text ที่ Claude อ่านได้ดี
+    ไม่ต้องตรวจ header เอง — ให้ Claude ทำหน้าที่ interpret structure
+    """
+    if filename.lower().endswith(".csv"):
+        try:
+            import pandas as pd
+            df = pd.read_csv(io.BytesIO(content), encoding="utf-8", errors="replace")
+            return df.to_string(index=False)
+        except Exception as e:
+            return f"[CSV error: {e}]"
+
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(io.BytesIO(content), data_only=True)
+        ws = wb.active or wb[wb.sheetnames[0]]
+
+        lines = []
+        for row in ws.iter_rows(values_only=True):
+            # เก็บทุก cell ที่มีค่า (ไม่ว่าง)
+            cells = []
+            for v in row:
+                if v is None or str(v).strip() == "":
+                    cells.append("")
+                else:
+                    cells.append(str(v).strip())
+            # ข้ามแถวที่ทุก cell ว่างหมด
+            if any(c for c in cells):
+                lines.append(" | ".join(cells))
+
+        return "\n".join(lines)
+    except Exception as e:
+        return f"[Excel read error: {e}]"
+
+
 # ─── Smart Excel Parser ──────────────────────────────────────────────────────
 
 # keywords ที่บ่งบอกว่าแถวนี้คือ header ของตาราง items
@@ -407,18 +445,9 @@ async def parse_invoice(filename: str, content: bytes) -> dict:
         raw_text = json.dumps(extracted, ensure_ascii=False)
 
     elif file_type in ("EXCEL", "CSV"):
-        # ลอง smart parse โดยตรงก่อน (หา header row → extract items)
-        smart = _smart_parse_excel(content, filename)
-        _saved_debug = smart.get("_debug")
-        _saved_err = smart.get("_smart_parse_error")
-        if not smart.get("items"):
-            # Fallback: ส่ง raw text ให้ Claude
-            raw_text = extract_text_from_excel(content, filename)
-            extracted = await extract_with_claude_text(raw_text)
-            extracted["_debug"] = _saved_debug
-            extracted["_smart_parse_error"] = _saved_err
-        else:
-            extracted = smart
+        # อ่าน cell ทั้งหมดก่อน compile เป็น text ที่ clean แล้วส่ง Claude
+        raw_text = _compile_excel_text(content, filename)
+        extracted = await extract_with_claude_text(raw_text)
 
     else:
         return {"error": f"Unsupported file type: {filename}", "file_type": "UNKNOWN"}
