@@ -48,7 +48,22 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
     except Exception:
         pass
 
-    # 2. Cache miss → เรียก Claude
+    # 2. Cache miss หรือ low-conf → เรียก Claude
+    _cache_fallback = None  # เก็บ cache ไว้ fallback ถ้า Claude error
+    try:
+        from cache_classification import cache_lookup as _cl2
+        _cached2 = await _cl2(None, description)
+        if _cached2 and _cached2.get("hs_code"):
+            _cache_fallback = {
+                "hs_code": _cached2["hs_code"],
+                "hs_description": _cached2.get("hs_description") or "",
+                "confidence_score": float(_cached2.get("confidence_score") or 0),
+                "reasoning": None,
+                "_source": "CACHE_FALLBACK",
+            }
+    except Exception:
+        pass
+
     try:
         from classification_agent import classify_item
         result = await classify_item(
@@ -56,7 +71,7 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
             origin_country=country_origin,
         )
         if result is None:
-            return {}
+            return _cache_fallback or {}
         cl = {
             "hs_code": result.hs_code,
             "hs_description": result.hs_description,
@@ -76,6 +91,9 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
             pass
         return cl
     except Exception as e:
+        # Claude error (quota/timeout) → fallback ใช้ cache เดิมแม้ confidence ต่ำ
+        if _cache_fallback:
+            return _cache_fallback
         return {"error": str(e)}
 
 
