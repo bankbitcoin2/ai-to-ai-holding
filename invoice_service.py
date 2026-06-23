@@ -375,9 +375,12 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
     total_value = 0.0
     warnings = []
 
-    for r in item_results:
+    for idx, r in enumerate(item_results):
         if isinstance(r, Exception):
-            continue  # skip failed items
+            line_no = idx + 1
+            warnings.append({"line_no": line_no, "type": "ITEM_ERROR",
+                "message": f"บรรทัด {line_no}: ประมวลผลไม่สำเร็จ — {str(r)[:120]}"})
+            continue
         lv = r.pop("_lv", 0)
         duty_est = r.pop("_duty_est", 0)
         fta_sav = r.pop("_fta_sav", 0)
