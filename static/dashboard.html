@@ -1481,7 +1481,45 @@ function buildDetailPanel(it, cur) {
   const hsSection = section('🎯', 'HS Code Classification', `
     ${row2('HS Code (AI)', aiCode, 'var(--accent)')}
     ${hasDecl ? row2('HS Code (Declared)', hasDecl, isMismatch ? 'var(--red)' : 'var(--muted)') : ''}
-    ${isMismatch ? `<div style="margin:6px 0;padding:6px 10px;background:rgba(239,68,68,.1);border-radius:6px;font-size:.78rem;color:var(--red)">⚠️ HS Code ที่ระบุ <b>${hasDecl}</b> ไม่ตรงกับ AI แนะนำ <b>${aiCode}</b> — ควรตรวจสอบ</div>` : ''}
+    ${isMismatch ? (() => {
+      const d = (hasDecl||'').replace(/\./g,'');
+      const a = (aiCode||'').replace(/\./g,'');
+      const dCh = d.slice(0,2), aCh = a.slice(0,2);
+      const dHd = d.slice(0,4), aHd = a.slice(0,4);
+      const dSub = d.slice(0,6), aSub = a.slice(0,6);
+      let severity, sevColor, sevLabel, analysis, recommendation;
+      if (dCh !== aCh) {
+        severity = 'high'; sevColor = 'var(--red)'; sevLabel = '🔴 ต่างกันคนละหมวด (Chapter)';
+        analysis = `Chapter ที่ระบุ <b>${dCh}xx</b> vs AI แนะนำ <b>${aCh}xx</b> — คนละประเภทสินค้าหลัก สาเหตุที่พบบ่อย: สินค้าที่มีหลายฟังก์ชัน (เช่น Smart Watch = นาฬิกา vs อุปกรณ์อิเล็กทรอนิกส์), ระบุ description ไม่ครบ, หรือเจตนาใช้พิกัดภาษีต่ำกว่า`;
+        recommendation = 'ตรวจสอบ Chapter Notes ของทั้งสอง Chapter และดู GRI 1–3 เพื่อหาพิกัดที่ถูกต้อง หากมีข้อสงสัยควรขอ Advance Ruling จากกรมศุลกากร';
+      } else if (dHd !== aHd) {
+        severity = 'medium'; sevColor = 'var(--yellow)'; sevLabel = '🟡 ต่างกันระดับ Heading (4 หลัก)';
+        analysis = `Chapter เดียวกัน (<b>${dCh}xx</b>) แต่ Heading ต่างกัน: ที่ระบุ <b>${dHd}.xx</b> vs AI แนะนำ <b>${aHd}.xx</b> — สาเหตุที่พบบ่อย: สินค้าอยู่ระหว่าง 2 Heading ใน Chapter เดียวกัน, คำบรรยายไม่ชัดเจนเรื่อง material หรือ function`;
+        recommendation = 'เปรียบเทียบ Heading Notes ของทั้งสอง Heading อาจต่างเพียงวัสดุหรือรูปแบบ — ตรวจสอบ Explanatory Notes ของ WCO';
+      } else {
+        severity = 'low'; sevColor = 'var(--yellow)'; sevLabel = '🟡 ต่างกันระดับ Subheading (6 หลัก)';
+        analysis = `Heading เดียวกัน (<b>${dHd}</b>) แต่ Subheading ต่างกัน: ที่ระบุ <b>${hasDecl}</b> vs AI แนะนำ <b>${aiCode}</b> — ความต่างมักเกิดจาก ขนาด, กำลังไฟ, วัสดุ, หรือ sub-category เฉพาะ`;
+        recommendation = 'ตรวจสอบรายละเอียดสินค้าให้ครบ (กำลังไฟ, ขนาด, ส่วนประกอบ) เพื่อเลือก Subheading ที่ถูกต้อง';
+      }
+      const confWarn = (it.confidence||0) < 0.75 ? `<div style="margin-top:6px;font-size:.73rem;color:var(--yellow)">⚡ AI มั่นใจ ${Math.round((it.confidence||0)*100)}% — ควรให้ผู้เชี่ยวชาญตรวจสอบเพิ่มเติม</div>` : '';
+      return `<div style="margin:8px 0;padding:10px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px">
+        <div style="font-size:.78rem;font-weight:700;color:${sevColor};margin-bottom:6px">${sevLabel}</div>
+        <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <div style="flex:1;min-width:120px;background:rgba(0,0,0,.2);border-radius:6px;padding:6px 10px;text-align:center">
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px">ที่ระบุ (Declared)</div>
+            <div style="font-family:monospace;font-size:.95rem;font-weight:700;color:var(--red)">${hasDecl}</div>
+          </div>
+          <div style="display:flex;align-items:center;color:var(--muted);font-size:.8rem">≠</div>
+          <div style="flex:1;min-width:120px;background:rgba(0,0,0,.2);border-radius:6px;padding:6px 10px;text-align:center">
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:2px">AI แนะนำ</div>
+            <div style="font-family:monospace;font-size:.95rem;font-weight:700;color:var(--accent)">${aiCode}</div>
+          </div>
+        </div>
+        <div style="font-size:.76rem;color:rgba(255,255,255,.75);line-height:1.55;margin-bottom:6px">${analysis}</div>
+        <div style="font-size:.73rem;color:var(--green);background:rgba(16,185,129,.06);border-radius:4px;padding:5px 8px">💡 ${recommendation}</div>
+        ${confWarn}
+      </div>`;
+    })() : ''}
     <div style="margin-top:6px">
       <span style="font-size:.72rem;color:var(--muted)">ความมั่นใจ</span>
       <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
