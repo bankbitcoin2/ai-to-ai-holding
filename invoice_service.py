@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from db_adapter import get_pool
-from normalize_description import normalize_description
+from normalize_description import normalize as normalize_description
 
 
 def _now():
@@ -327,4 +327,5 @@ def _parse_date(s):
         from datetime import date
         return date.fromisoformat(str(s)[:10])
     except Exception:
-        return None
+        pass
+    return None
