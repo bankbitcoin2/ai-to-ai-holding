@@ -24,12 +24,11 @@ ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".xlsx", ".xls", ".csv", 
 async def _get_client(api_key: str = Depends(API_KEY_HEADER)) -> str:
     if not api_key:
         raise HTTPException(status_code=401, detail="X-API-Key required")
-    # ตรวจ key ใน DB
     try:
         pool = await get_pool()
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
-                "SELECT agent_id FROM client_agents WHERE api_key=$1 AND is_active=TRUE",
+                "SELECT agent_id FROM client_agents WHERE api_key=$1 AND (is_active=TRUE OR status='ACTIVE')",
                 api_key
             )
         if not row:
@@ -37,8 +36,9 @@ async def _get_client(api_key: str = Depends(API_KEY_HEADER)) -> str:
         return api_key
     except HTTPException:
         raise
-    except Exception:
-        raise HTTPException(status_code=500, detail="Auth error")
+    except Exception as e:
+        print(f"[invoice_router] auth error: {e}")
+        raise HTTPException(status_code=500, detail=f"Auth error: {str(e)[:100]}")
 
 
 # ─── POST /v1/invoice/upload ──────────────────────────────────────────────────
