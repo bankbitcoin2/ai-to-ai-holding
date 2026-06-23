@@ -337,12 +337,11 @@ def _smart_parse_excel(content: bytes, filename: str) -> dict:
 
         # หา header row
         header_ri, col_map = _find_header_row(all_rows)
-        print(f"[smart_parse] total_rows={len(all_rows)} header_ri={header_ri} col_map={col_map}", flush=True)
+        result["_debug"] = f"total_rows={len(all_rows)} header_ri={header_ri} col_map={col_map}"
         if header_ri >= 0:
-            print(f"[smart_parse] header_row={all_rows[header_ri]}", flush=True)
+            result["_debug"] += f" | header={all_rows[header_ri]}"
         if header_ri == -1 or "desc" not in col_map:
-            for di, dr in enumerate(all_rows[:20]):
-                print(f"[smart_parse] row[{di}]={dr}", flush=True)
+            result["_debug"] += " | rows_sample=" + str([str(r[:3]) for r in all_rows[:15] if any(v for v in r if v)])
             return result  # ไม่เจอ table → fallback Claude
 
         # Extract items จาก rows หลัง header
