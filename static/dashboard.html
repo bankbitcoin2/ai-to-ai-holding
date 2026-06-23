@@ -917,6 +917,11 @@ function setLang(lang) {
     const key = el.getAttribute('data-i18n-placeholder');
     if (t[key]) el.placeholder = t[key];
   });
+
+  // Re-render invoice result ถ้ามีข้อมูลอยู่
+  if (_lastInvoiceData && _lastInvoiceFilename) {
+    renderInvoiceResult(_lastInvoiceData, _lastInvoiceFilename);
+  }
 }
 
 function t(key) { return (i18n[currentLang] || i18n.th)[key] || key; }
@@ -1554,6 +1559,8 @@ function showInvError(msg) {
 
 // ── Invoice Detail Panel (click-to-expand) ────────────────────
 let _invOpenIdx = null;
+let _lastInvoiceData = null;
+let _lastInvoiceFilename = null;
 
 function toggleInvDetail(idx) {
   const panel = document.getElementById('inv-detail-' + idx);
@@ -1571,6 +1578,8 @@ function toggleInvDetail(idx) {
 }
 
 function renderInvoiceResult(d, filename) {
+  _lastInvoiceData = d;
+  _lastInvoiceFilename = filename;
   const items = d.items || [];
   const warnings = d.warnings || [];
   const cur = d.currency || 'USD';
