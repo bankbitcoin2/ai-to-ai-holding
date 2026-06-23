@@ -78,7 +78,8 @@ async def upload_invoice(
 
     items = parsed.get("items") or []
     if not items:
-        raise HTTPException(status_code=422, detail=f"ไม่พบรายการสินค้าในเอกสาร | debug={parsed.get('_debug')} | smart_err={parsed.get('_smart_parse_error')}")
+        raw_sample = str(parsed.get("raw_text", ""))[:300]
+        raise HTTPException(status_code=422, detail=f"ไม่พบรายการสินค้า | raw_text={raw_sample}")
 
     # Process + classify
     result = await process_invoice(client_key, filename, parsed)
