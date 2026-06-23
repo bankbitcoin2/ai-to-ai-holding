@@ -1250,6 +1250,10 @@ async function handleInvoiceFile(file) {
   const apiKey = localStorage.getItem('aitai_key') || sessionStorage.getItem('aitai_key');
   if (!apiKey) { showInvError('กรุณา login ก่อน'); return; }
 
+  // ซ่อน drop zone ทันที — ป้องกัน re-click ระหว่างโหลด
+  const zone = document.getElementById('invDropZone');
+  if (zone) zone.style.display = 'none';
+
   showInvLoading(file.name);
 
   const form = new FormData();
@@ -1261,12 +1265,15 @@ async function handleInvoiceFile(file) {
       body: form
     });
     const json = await res.json();
-    if (!res.ok) { showInvError(json.detail || 'Error ' + res.status); return; }
-    // ซ่อน drop zone + แสดงปุ่ม Upload ใหม่
-    const zone = document.getElementById('invDropZone');
-    if (zone) zone.style.display = 'none';
+    if (!res.ok) {
+      if (zone) zone.style.display = '';  // คืน drop zone เมื่อ error
+      showInvError(json.detail || 'Error ' + res.status); return;
+    }
     renderInvoiceResult(json.data, file.name);
-  } catch(e) { showInvError('เชื่อมต่อไม่ได้: ' + e.message); }
+  } catch(e) {
+    if (zone) zone.style.display = '';  // คืน drop zone เมื่อ error
+    showInvError('เชื่อมต่อไม่ได้: ' + e.message);
+  }
 }
 
 function resetInvoiceUpload() {
