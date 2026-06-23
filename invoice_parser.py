@@ -408,11 +408,17 @@ async def parse_invoice(filename: str, content: bytes) -> dict:
 
     elif file_type in ("EXCEL", "CSV"):
         # ลอง smart parse โดยตรงก่อน (หา header row → extract items)
-        extracted = _smart_parse_excel(content, filename)
-        if not extracted.get("items"):
+        smart = _smart_parse_excel(content, filename)
+        _saved_debug = smart.get("_debug")
+        _saved_err = smart.get("_smart_parse_error")
+        if not smart.get("items"):
             # Fallback: ส่ง raw text ให้ Claude
             raw_text = extract_text_from_excel(content, filename)
             extracted = await extract_with_claude_text(raw_text)
+            extracted["_debug"] = _saved_debug
+            extracted["_smart_parse_error"] = _saved_err
+        else:
+            extracted = smart
 
     else:
         return {"error": f"Unsupported file type: {filename}", "file_type": "UNKNOWN"}
