@@ -240,10 +240,7 @@ async def extract_with_claude_text(raw_text: str) -> dict:
 # ─── Excel Compiler (อ่าน cell → clean text → Claude) ───────────────────────
 
 def _compile_excel_text(content: bytes, filename: str) -> str:
-    """
-    อ่านทุก cell ใน Excel ที่มีค่า → จัด format เป็น text ที่ Claude อ่านได้ดี
-    ไม่ต้องตรวจ header เอง — ให้ Claude ทำหน้าที่ interpret structure
-    """
+    """อ่านทุก cell → format เป็น pipe-delimited text"""
     if filename.lower().endswith(".csv"):
         try:
             import pandas as pd
@@ -251,28 +248,115 @@ def _compile_excel_text(content: bytes, filename: str) -> str:
             return df.to_string(index=False)
         except Exception as e:
             return f"[CSV error: {e}]"
-
     try:
         from openpyxl import load_workbook
         wb = load_workbook(io.BytesIO(content), data_only=True)
         ws = wb.active or wb[wb.sheetnames[0]]
-
         lines = []
         for row in ws.iter_rows(values_only=True):
-            # เก็บทุก cell ที่มีค่า (ไม่ว่าง)
-            cells = []
-            for v in row:
-                if v is None or str(v).strip() == "":
-                    cells.append("")
-                else:
-                    cells.append(str(v).strip())
-            # ข้ามแถวที่ทุก cell ว่างหมด
+            cells = [str(v).strip() if v is not None else "" for v in row]
             if any(c for c in cells):
                 lines.append(" | ".join(cells))
-
         return "\n".join(lines)
     except Exception as e:
         return f"[Excel read error: {e}]"
+
+
+def _parse_compiled_text(text: str) -> dict:
+    """
+    Parse pipe-delimited text จาก _compile_excel_text
+    หา header row ที่มี description/hs code/qty แล้ว extract items โดยตรง
+    ไม่ต้องพึ่ง Claude — ทำงานบน text แทน openpyxl cells
+    """
+    import re
+
+    result = {"items": []}
+    lines = text.splitlines()
+
+    # Keywords สำหรับ header detection (case-insensitive)
+    DESC_KW = ("description", "goods", "commodity", "item", "product", "สินค้า")
+    HS_KW   = ("hs code", "hscode", "hs_code", "tariff")
+    QTY_KW  = ("qty", "quantity", "จำนวน")
+    PRICE_KW = ("unit price", "price", "ราคา")
+    AMOUNT_KW = ("amount", "value", "มูลค่า")
+    ORIGIN_KW = ("origin",)
+
+    # สกัด meta จาก text ทั้งหมด
+    inv_m = re.search(r'(INV[-\s]?[\w\-]+)', text, re.IGNORECASE)
+    result["invoice_no"] = inv_m.group(1) if inv_m else None
+
+    date_m = re.search(r'(\d{4}[-/]\d{2}[-/]\d{2})', text)
+    result["invoice_date"] = date_m.group(1) if date_m else None
+
+    inco_m = re.search(r'\b(CIF|FOB|EXW|DDP|CFR|DAP|FCA)\b', text, re.IGNORECASE)
+    result["incoterms"] = inco_m.group(1).upper() if inco_m else None
+
+    cur_m = re.search(r'\b(USD|THB|CNY|EUR|GBP|JPY)\b', text, re.IGNORECASE)
+    result["currency"] = cur_m.group(1).upper() if cur_m else "USD"
+
+    result["seller_country"] = "CN" if "china" in text.lower() else None
+    result["buyer_country"] = "TH" if ("thailand" in text.lower() or "bangkok" in text.lower()) else None
+
+    # หา header line
+    header_idx = -1
+    col_map = {}
+    for i, line in enumerate(lines):
+        cols = [c.strip().lower() for c in line.split("|")]
+        desc_ci = next((ci for ci, v in enumerate(cols) if any(kw in v for kw in DESC_KW)), None)
+        if desc_ci is not None:
+            col_map["desc"] = desc_ci
+            for ci, v in enumerate(cols):
+                if any(kw in v for kw in HS_KW):    col_map["hs"] = ci
+                if any(kw in v for kw in QTY_KW):   col_map["qty"] = ci
+                if any(kw in v for kw in PRICE_KW): col_map["price"] = ci
+                if any(kw in v for kw in AMOUNT_KW): col_map.setdefault("amount", ci)
+                if any(kw in v for kw in ORIGIN_KW): col_map["origin"] = ci
+            # ถัดจาก qty = unit
+            if "qty" in col_map:
+                unit_ci = col_map["qty"] + 1
+                if unit_ci not in col_map.values():
+                    col_map["unit"] = unit_ci
+            header_idx = i
+            break
+
+    if header_idx == -1:
+        return result  # ไม่เจอ header → fallback
+
+    # Extract items
+    items = []
+    SKIP_KW = ("total", "subtotal", "freight", "insurance", "remark", "signature", "authorized")
+    for line in lines[header_idx + 1:]:
+        cols_raw = [c.strip() for c in line.split("|")]
+        if col_map["desc"] >= len(cols_raw):
+            continue
+        desc = cols_raw[col_map["desc"]]
+        if not desc or any(kw in desc.lower() for kw in SKIP_KW):
+            continue
+
+        def get(key):
+            ci = col_map.get(key)
+            return cols_raw[ci].strip() if ci is not None and ci < len(cols_raw) else None
+
+        def to_float(v):
+            try:
+                return float(str(v).replace(",", "")) if v else None
+            except Exception:
+                return None
+
+        items.append({
+            "line_no": len(items) + 1,
+            "description": desc,
+            "hs_code_declared": get("hs"),
+            "qty": to_float(get("qty")),
+            "unit": get("unit"),
+            "unit_price": to_float(get("price")),
+            "line_value": to_float(get("amount")),
+            "country_origin": get("origin") or result.get("seller_country"),
+            "marks_numbers": None,
+        })
+
+    result["items"] = items
+    return result
 
 
 # ─── Smart Excel Parser ──────────────────────────────────────────────────────
@@ -445,9 +529,12 @@ async def parse_invoice(filename: str, content: bytes) -> dict:
         raw_text = json.dumps(extracted, ensure_ascii=False)
 
     elif file_type in ("EXCEL", "CSV"):
-        # อ่าน cell ทั้งหมดก่อน compile เป็น text ที่ clean แล้วส่ง Claude
+        # compile → parse text เอง (ไม่พึ่ง Claude สำหรับ Excel)
         raw_text = _compile_excel_text(content, filename)
-        extracted = await extract_with_claude_text(raw_text)
+        extracted = _parse_compiled_text(raw_text)
+        if not extracted.get("items"):
+            # fallback → Claude (กรณี format แปลก)
+            extracted = await extract_with_claude_text(raw_text)
 
     else:
         return {"error": f"Unsupported file type: {filename}", "file_type": "UNKNOWN"}
