@@ -71,16 +71,43 @@ def extract_text_from_pdf(content: bytes) -> str:
 
 
 def extract_text_from_excel(content: bytes, filename: str) -> str:
-    """pandas → raw text จาก Excel/CSV"""
+    """openpyxl (raw cell values) + pandas fallback — คืน text ที่ Claude อ่านได้ดี"""
+    if filename.lower().endswith(".csv"):
+        try:
+            import pandas as pd
+            df = pd.read_csv(io.BytesIO(content), encoding="utf-8", errors="replace")
+            return df.to_string(index=False)
+        except Exception as e:
+            return f"[CSV parse error: {e}]"
+
+    # Excel — อ่านด้วย openpyxl แบบ raw (ได้ทุก cell รวม merged)
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(io.BytesIO(content), data_only=True)
+        lines = []
+        for sheet_name in wb.sheetnames:
+            ws = wb[sheet_name]
+            lines.append(f"=== Sheet: {sheet_name} ===")
+            for row in ws.iter_rows(values_only=True):
+                row_vals = [str(v).strip() if v is not None else "" for v in row]
+                # ข้ามแถวว่างทั้งหมด
+                if any(v for v in row_vals):
+                    lines.append("\t".join(row_vals))
+        return "\n".join(lines)
+    except ImportError:
+        pass
+    except Exception as e:
+        pass
+
+    # Fallback pandas
     try:
         import pandas as pd
-        if filename.lower().endswith(".csv"):
-            df = pd.read_csv(io.BytesIO(content), encoding="utf-8", errors="replace")
-        else:
-            df = pd.read_excel(io.BytesIO(content))
-        return df.to_string(index=False)
-    except ImportError:
-        return "[pandas not installed]"
+        xl = pd.read_excel(io.BytesIO(content), sheet_name=None, header=None)
+        parts = []
+        for name, df in xl.items():
+            parts.append(f"=== Sheet: {name} ===")
+            parts.append(df.fillna("").to_string(index=False, header=False))
+        return "\n".join(parts)
     except Exception as e:
         return f"[Excel parse error: {e}]"
 
