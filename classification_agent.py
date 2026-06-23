@@ -178,12 +178,14 @@ async def classify_item(
 
     # ── DB-First lookup: ค้นหาจาก hs_code_master ก่อน call Claude ──────────
     db_hint = ""
+    _db_candidates = []  # เก็บไว้ fallback ถ้า Claude quota หมด
     try:
         from knowledge_service import db_search_hs
         db_result = await db_search_hs(description)
         if db_result.get("found"):
             db_hint = db_result.get("inject_prompt", "")
-            print(f"[DB-FIRST] mode={db_result['mode']} candidates={len(db_result['candidates'])}")
+            _db_candidates = db_result.get("candidates") or []
+            print(f"[DB-FIRST] mode={db_result['mode']} candidates={len(_db_candidates)}")
     except Exception as _dbe:
         print(f"[DB-FIRST] warning: {_dbe}")
 
@@ -202,17 +204,36 @@ async def classify_item(
         "messages": [{"role": "user", "content": user_content}],
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(
-            ANTHROPIC_API_URL,
-            headers={
-                "Content-Type": "application/json",
-                "x-api-key": os.getenv("ANTHROPIC_API_KEY", ""),
-                "anthropic-version": "2023-06-01",
-            },
-            json=payload,
-        )
-        response.raise_for_status()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                ANTHROPIC_API_URL,
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": os.getenv("ANTHROPIC_API_KEY", ""),
+                    "anthropic-version": "2023-06-01",
+                },
+                json=payload,
+            )
+            response.raise_for_status()
+    except Exception as _claude_err:
+        print(f"[CLAUDE-ERROR] {_claude_err} — falling back to DB-FIRST")
+        if _db_candidates:
+            top = _db_candidates[0]
+            hs = top.get("hs_code") or ""
+            best = CandidateResult(
+                rank=1,
+                hs_code=hs[:6] if hs else "",
+                hs_code_11=None,
+                hs_description=top.get("desc_en") or top.get("desc_th") or "",
+                hs_description_th=top.get("desc_th") or "",
+                confidence_score=0.60,
+                source_reference="DB-FIRST fallback (Claude unavailable)",
+                reasoning_steps=["Claude API unavailable — using DB keyword match as fallback"],
+                notes=_DISCLAIMER,
+            )
+            return ClassificationResult(candidates=[best], best=best, raw_response="[DB-FIRST FALLBACK]")
+        raise
 
     data = response.json()
     raw_text = data["content"][0]["text"].strip()
