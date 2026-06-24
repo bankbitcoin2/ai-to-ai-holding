@@ -208,12 +208,12 @@ async def _save_item(pool, sub_id: str, line_no: int, item: dict, result: dict) 
                fta_eligible, fta_agreement, fta_rate, fta_saving_usd,
                oga_required, oga_agencies, oga_details,
                halal_required, halal_cert_body,
-               valuation_flag, hs_mismatch_flag,
+               valuation_flag, valuation_note, hs_mismatch_flag,
                created_at)
             VALUES
               ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,
                $14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,
-               $26,$27,$28,$29,$30,$31,$32,$33)
+               $26,$27,$28,$29,$30,$31,$32,$33,$34)
             ON CONFLICT (id) DO NOTHING
         """,
             uuid.uuid4().hex,
@@ -247,6 +247,7 @@ async def _save_item(pool, sub_id: str, line_no: int, item: dict, result: dict) 
             bool(halal.get("halal_required")),
             halal.get("cert_body") or halal.get("certification_body"),
             False,   # valuation_flag — Phase 12
+            None,    # valuation_note — Phase 12
             hs_mismatch,
             _now(),
         )

@@ -1,23 +1,22 @@
--- ============================================================
 -- schema_learning_v2_pg.sql
--- Learning Loop Extension: Classification Cache + Candidates Log
--- PostgreSQL version — apply บน Railway
--- ============================================================
+-- PostgreSQL version — SYNCED 24 Jun 2026
+-- cache_key = PK (matches code ON CONFLICT (cache_key))
 
--- ============================================================
--- TABLE: hs_classification_cache
--- ============================================================
 CREATE TABLE IF NOT EXISTS hs_classification_cache (
-    id                  TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-    description_hash    TEXT NOT NULL UNIQUE,
-    description_sample  TEXT NOT NULL,
+    cache_key           TEXT PRIMARY KEY,
+    description         TEXT,
+    origin_country      TEXT,
+    source_reference    TEXT,
+    notes               TEXT,
+    model_used          TEXT,
+    description_sample  TEXT,
     hs_code             TEXT NOT NULL,
     hs_code_11          TEXT,
     hs_description      TEXT,
     hs_description_th   TEXT,
     confidence_score    REAL NOT NULL,
     source              TEXT NOT NULL DEFAULT 'CLAUDE'
-                        CHECK (source IN ('CLAUDE','CONFIRMED','CHAIRMAN_OVERRIDE')),
+                        CHECK (source IN ('CLAUDE','CONFIRMED','CHAIRMAN_OVERRIDE','REJECTED')),
     hit_count           INTEGER NOT NULL DEFAULT 1,
     miss_count          INTEGER NOT NULL DEFAULT 0,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -26,9 +25,6 @@ CREATE TABLE IF NOT EXISTS hs_classification_cache (
     evidence_hash       TEXT NOT NULL DEFAULT 'PENDING'
 );
 
--- ============================================================
--- TABLE: classification_candidates_log
--- ============================================================
 CREATE TABLE IF NOT EXISTS classification_candidates_log (
     id                  TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     session_id          TEXT NOT NULL,
@@ -53,19 +49,11 @@ CREATE TABLE IF NOT EXISTS classification_candidates_log (
     evidence_hash       TEXT NOT NULL DEFAULT 'PENDING'
 );
 
--- ============================================================
--- TABLE: cache_feedback_queue
--- ============================================================
 CREATE TABLE IF NOT EXISTS cache_feedback_queue (
     id                  TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     candidate_log_id    TEXT NOT NULL REFERENCES classification_candidates_log(id),
     action              TEXT NOT NULL
-                        CHECK (action IN (
-                            'PROMOTE_TO_CACHE',
-                            'DEMOTE_FROM_CACHE',
-                            'CREATE_LESSON',
-                            'NOTIFY_CHAIRMAN'
-                        )),
+                        CHECK (action IN ('PROMOTE_TO_CACHE','DEMOTE_FROM_CACHE','CREATE_LESSON','NOTIFY_CHAIRMAN')),
     status              TEXT NOT NULL DEFAULT 'PENDING'
                         CHECK (status IN ('PENDING','PROCESSING','DONE','FAILED')),
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -73,10 +61,7 @@ CREATE TABLE IF NOT EXISTS cache_feedback_queue (
     error_msg           TEXT
 );
 
--- ============================================================
--- INDEXES
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_cache_hash         ON hs_classification_cache(description_hash);
+CREATE INDEX IF NOT EXISTS idx_cache_key          ON hs_classification_cache(cache_key);
 CREATE INDEX IF NOT EXISTS idx_cache_hs           ON hs_classification_cache(hs_code);
 CREATE INDEX IF NOT EXISTS idx_cache_source       ON hs_classification_cache(source);
 CREATE INDEX IF NOT EXISTS idx_cache_hits         ON hs_classification_cache(hit_count DESC);
