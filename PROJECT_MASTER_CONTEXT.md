@@ -194,7 +194,7 @@ key = make_cache_key(description)  # sha256(normalize(desc))
 | Warning | สาเหตุ | ผลกระทบ |
 |---------|--------|---------|
 | `cannot import name 'USE_POSTGRES' from 'db_adapter'` | _fix_audit_fk + _migrate_cache_schema import ชื่อที่ไม่ export | migration skip — ไม่ crash |
-| `column "description_hash" does not exist` | schema_learning_v2_pg.sql reference column เก่า | index skip — ไม่ crash |
+| ~~`column "description_hash" does not exist`~~ | ~~schema_learning_v2_pg.sql reference column เก่า~~ | **FIXED** commit 9d3a1d6 — เปลี่ยนเป็น cache_key PK |
 
 **Fix ที่ยังค้างอยู่:**
 ```python
@@ -234,7 +234,9 @@ USE_POSTGRES = True  # Railway always PostgreSQL
 
 ---
 
-## 11. Roadmap เต็ม (14 Phases)
+## 11. Roadmap เต็ม (28 Phases) — อนุมัติโดย Chairman 25 มิ.ย. 2026
+
+### Phase 1-14 (Original)
 
 | Phase | ชื่อ | สถานะ |
 |-------|------|-------|
@@ -244,15 +246,66 @@ USE_POSTGRES = True  # Railway always PostgreSQL
 | 4 | Learning Cache — Feedback loop + 202k FTA | ✅ Done |
 | 5 | Market Discovery — MCP/GPT/RapidAPI/LangChain | ✅ Submitted |
 | 6 | CEO Real Mode (AXIS) | ⏸️ Deferred |
-| 7 | Revenue Scale — Stripe live + multi-tenant | 📋 Planned |
+| 7 | Revenue Scale — Stripe live + multi-tenant | → รวมเข้า P17-P18 |
 | 8 | Invoice Intelligence Pipeline | ✅ Done |
 | 8.1 | Invoice Upload Channel (รูปภาพ/PDF/Excel) | ✅ Done |
-| 9 | Freight Intelligence & Logistics Expansion | 📋 Planned |
+| 9 | Freight Intelligence & Logistics Expansion | → รวมเข้า P21 |
 | 10 | Customs Software Integration (Pre-flight Check) | 📋 Planned |
 | 11 | Explainable AI (XAI) Reasoning Block | ✅ Done |
-| 12 | Valuation Risk Alert (Price Benchmark) | 📋 Planned |
-| 13 | Dynamic OGA Update Pipeline | 📋 Planned |
-| 14 | Dual-Track Pricing & Revenue Structure | 📋 Planned |
+| 12 | Valuation Risk Alert (Price Benchmark) | → รวมเข้า P22 |
+| 13 | Dynamic OGA Update Pipeline | → รวมเข้า P26 |
+| 14 | Dual-Track Pricing & Revenue Structure | → รวมเข้า P17-P18 |
+
+### Phase 15-28 (Next Phase Plan — อนุมัติ 25 มิ.ย. 2026)
+
+**TIER 1 — รากฐาน (ทำก่อน)**
+
+| Phase | ชื่อ | Dependency | สถานะ |
+|-------|------|-----------|-------|
+| 15 | Invoice Validation + Backlog Cleanup | ไม่มี | 📋 Next |
+| 16 | Customer Analytics Dashboard | P15 | 📋 Planned |
+| 17 | API Pricing + Currency Exchange | P16 | 📋 Planned |
+
+**TIER 2 — Revenue & Growth**
+
+| Phase | ชื่อ | Dependency | สถานะ |
+|-------|------|-----------|-------|
+| 18 | Membership Tier System (VIP→Gold→Platinum→Diamond→SuperPremium) | P16+P17 | 📋 Planned |
+| 19 | LINE / Mobile App / Field Plugin | P17+P18 | 📋 Planned |
+| 20 | IP Protection + License + Project Valuation (฿15M+) | P16-P18 | 📋 Planned |
+
+**TIER 3 — Intelligence Layer**
+
+| Phase | ชื่อ | Dependency | สถานะ |
+|-------|------|-----------|-------|
+| 21 | Landed Cost Calculator (Pre-Calc) | freight data + tax engine | 📋 Planned |
+| 22 | Price Benchmark + Valuation Alert | invoice volume + external data | 📋 Planned |
+| 23 | Freight Rate Auditor | P21+P22 | 📋 Planned |
+| 24 | What-If Scenario Optimizer + Duty Engineering | P21+P22+FTA engine | 📋 Planned |
+
+**TIER 4 — Expansion & Premium**
+
+| Phase | ชื่อ | Dependency | สถานะ |
+|-------|------|-----------|-------|
+| 25 | Customs Audit Insurance (Risk Score) | P22+volume | 📋 Planned |
+| 26 | Dynamic OGA + NSW Integration | NSW data access | 📋 Planned |
+| 27 | Green Customs / CBAM Carbon Tracker | CBAM tables | 📋 Planned |
+| 28 | ASEAN & Global Expansion | all above stable | 📋 Planned |
+
+**Dependency Chain:**
+```
+P15 → P16 → P17 → P18 → P19 → P20
+                     ↓
+              P21 → P22 → P23 → P24
+                              ↓
+                    P25 / P26 / P27 → P28
+```
+
+**หลักการสำคัญ:**
+- การพัฒนาผ่าน Chairman คนเดียวเท่านั้น — ไม่มีทีมพัฒนาภายนอก
+- Open-Core: เปิด SDK/connector, ปิด AI logic + price DB + FTA engine + normalize rules
+- License: BSL — ใช้ฟรีแต่ห้ามนำไปขายเชิงพาณิชย์
+- รายละเอียดเต็ม: ดู NEXT_PHASE_MASTER_PLAN.md
 
 ---
 
@@ -495,4 +548,84 @@ cache_lookup(description)   ← sha256(normalize(desc))
 
 ---
 
-*อัปเดตครั้งล่าสุด: 23 มิถุนายน 2026 | Tasks: 100 | Production: Online ✅ | Commits: 14 | Phases: 14 (9/14 Done)*
+*อัปเดตครั้งล่าสุด: 25 มิถุนายน 2026 | Production: Online ✅ | Commits: 19 | Phases: 28 (9 Done, 19 Planned) | Next Phase Plan: อนุมัติแล้ว*
+
+---
+
+## Section 24 — Backlog & Design Decisions (23 June 2026)
+
+### Backlog รอทำสัปดาห์หน้า (หลัง Claude quota รีเซ็ต)
+
+#### 1. Invoice Validation Layer (ด่านคัดกรองก่อนส่ง Claude)
+**หลักการ**: garbage in → garbage out — ต้องกรองก่อนส่ง Claude
+
+**BLOCK (หยุดทันที)**
+- description < 3 คำ หรือว่างเปล่า
+- ไม่มี line_value และไม่มีทั้ง qty + unit_price
+- ผลรวม line_value ทุก item ≠ invoice total เกิน 10%
+
+**WARN (แจ้งแต่ผ่านได้)**
+- ไม่มี country_origin → ใช้ seller_country แทน
+- ไม่มี currency → ใช้ USD default
+- ไม่มี hs_code_declared → ปกติ AI classify เอง (นี่คือจุดขาย ไม่ใช่ข้อผิดพลาด)
+
+**ไฟล์ที่ต้องแก้**: `invoice_service.py` เพิ่ม `_validate_items()` ก่อน `_process_one_item()`
+**UI**: แสดง error/warn block ก่อน loading animation ขึ้น
+
+---
+
+#### 2. Top 3 Candidates (ตัวเลือก HS Code สำรอง)
+- แสดงเสมอ ทั้ง Sandbox และ Invoice detail panel
+- แค่ reference ไม่ให้ user เลือก override
+- Backend: แก้ `classification_agent.py` prompt ให้ return candidates array
+- Frontend: เพิ่ม section ใน buildDetailPanel + renderCard sandbox
+- Cost: $0 เพิ่ม (same API call, แค่ response มากขึ้น ~80 tokens)
+
+---
+
+#### 3. Cache Reasoning (ประหยัด $0.12/invoice)
+- Cache key = `sha256(hs_code + origin + dest_country)`
+- reasoning เดิมสำหรับ HS+เส้นทางเดิม = ฟรี
+- ไฟล์: `invoice_service.py` ใน `_process_one_item()` ก่อน `generate_reasoning()`
+
+---
+
+#### 4. Learning Feedback Loop (สะสมประสบการณ์)
+Schema ใหม่: `classification_knowledge`
+```sql
+description_hash, hs_code, source (CLAUDE/VERIFIED/CUSTOMS_CLEARED),
+vote_count, confidence, verified_by, last_seen
+```
+- ทุกครั้ง Claude classify → เพิ่ม vote_count
+- Admin verify UI → บันทึก source=VERIFIED
+- ผ่านศุลกากรจริง → source=CUSTOMS_CLEARED (Phase ถัดไป)
+
+---
+
+#### 5. Scalability (รองรับ user เยอะ)
+ต้องทำก่อน launch จริง:
+- Queue system — ไม่ยิง Claude พร้อมกัน
+- Per-user rate limit — จำกัด invoice upload/วัน
+- Anthropic Batch API — ถูกกว่า 50% แต่ช้า 5-10 นาที
+
+---
+
+### Claude API ที่ส่งไปทุกครั้ง (ตอนนี้)
+```
+System: Customs Classification Agent prompt
+User:   Product description: [ชื่อสินค้า]
+        Origin country: [CN/AU/...]
+        [DB-FIRST hint ถ้า keyword match ได้]
+```
+**ยังไม่ได้ส่ง**: ราคา, declared HS, วัสดุ, น้ำหนัก — เพิ่มได้เพื่อความแม่น
+
+---
+
+### Bug ที่แก้ในวันนี้
+| Bug | สาเหตุ | Fix |
+|-----|--------|-----|
+| OGA แสดงไม่ตรง sandbox | key mismatch: `required` vs `is_restricted`, `agencies` vs `requires_permits` | แก้ invoice_service.py + เพิ่ม agency card+link ใน detail panel |
+| DB-FIRST fallback ไม่ทำงาน | `_cache_fallback` ดึงจาก cache_classification ซึ่งว่าง | แก้ให้ fallback ใช้ top candidate จาก classification_agent DB-FIRST แทน |
+| Claude quota หมด → ทุก item error | raise exception ออกมาทั้งหมด | จับ exception หลัง `raise_for_status()` → return DB-FIRST top candidate แทน |
+
+*อัปเดต: 25 มิถุนายน 2026 | Commits: 19 | Schema sync fixed (commit 9d3a1d6)*

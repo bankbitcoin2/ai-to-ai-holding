@@ -1,13 +1,16 @@
 """
 invoice_service.py
 Phase 8.1 — Invoice Intelligence Pipeline
+Phase 15  — Validation Layer + Cache Reasoning + Rate Limit
 classify ทุก line item + บันทึก DB + คืนสรุปทั้งใบ
 """
 
 import uuid
 import json
+import hashlib
 import asyncio
 from datetime import datetime, timezone
+from collections import defaultdict, deque
 from typing import Optional
 
 from db_adapter import get_pool
@@ -22,6 +25,159 @@ def _now():
 async def _get_pool():
     USE_POSTGRES = True
     return await get_pool()
+
+
+# ─── Phase 15.1: Invoice Validation Layer ────────────────────────────────────
+
+def _validate_items(items: list, parsed: dict) -> dict:
+    """
+    ตรวจสอบ items ก่อนส่ง Claude — ประหยัดค่า API
+    Returns: {"valid": [...], "blocked": [...], "warnings": [...]}
+    """
+    valid = []
+    blocked = []
+    warnings = []
+
+    invoice_total = _safe_float(parsed.get("total_value"))
+
+    for i, item in enumerate(items):
+        line_no = i + 1
+        desc = (item.get("description") or "").strip()
+        lv = _safe_float(item.get("line_value"))
+        qty = _safe_float(item.get("qty"))
+        up = _safe_float(item.get("unit_price"))
+
+        # BLOCK: description ว่างหรือสั้นเกินไป
+        word_count = len(desc.split()) if desc else 0
+        if word_count < 2:
+            blocked.append({
+                "line_no": line_no,
+                "reason": "EMPTY_DESCRIPTION",
+                "message": f"บรรทัด {line_no}: คำบรรยายสินค้าสั้นเกินไป ({word_count} คำ) — ต้องมีอย่างน้อย 2 คำ",
+            })
+            continue
+
+        # BLOCK: ไม่มีมูลค่าเลย (ไม่มี line_value และไม่มีทั้ง qty + unit_price)
+        has_value = lv is not None or (qty is not None and up is not None)
+        if not has_value:
+            blocked.append({
+                "line_no": line_no,
+                "reason": "NO_VALUE",
+                "message": f"บรรทัด {line_no}: ไม่มีมูลค่าสินค้า (ต้องมี line_value หรือ qty + unit_price)",
+            })
+            continue
+
+        # WARN: ไม่มี country_origin
+        if not (item.get("country_origin") or "").strip():
+            seller_country = parsed.get("seller_country") or ""
+            if seller_country:
+                warnings.append({
+                    "line_no": line_no,
+                    "type": "MISSING_ORIGIN",
+                    "message": f"บรรทัด {line_no}: ไม่มีประเทศแหล่งกำเนิด — ใช้ประเทศผู้ขาย ({seller_country}) แทน",
+                })
+            else:
+                warnings.append({
+                    "line_no": line_no,
+                    "type": "MISSING_ORIGIN",
+                    "message": f"บรรทัด {line_no}: ไม่มีประเทศแหล่งกำเนิด — FTA อาจประเมินไม่ได้",
+                })
+
+        valid.append(item)
+
+    # WARN: ผลรวม line_value ≠ invoice total เกิน 10%
+    if invoice_total and valid:
+        sum_lv = sum(
+            _safe_float(it.get("line_value")) or (
+                (_safe_float(it.get("qty")) or 0) * (_safe_float(it.get("unit_price")) or 0)
+            )
+            for it in valid
+        )
+        if sum_lv > 0 and abs(sum_lv - invoice_total) / invoice_total > 0.10:
+            warnings.append({
+                "line_no": 0,
+                "type": "TOTAL_MISMATCH",
+                "message": f"ผลรวมมูลค่ารายการ ({sum_lv:,.2f}) ≠ ยอดรวม invoice ({invoice_total:,.2f}) — ต่างกันเกิน 10%",
+            })
+
+    return {"valid": valid, "blocked": blocked, "warnings": warnings}
+
+
+# ─── Phase 15.3: XAI Reasoning Cache ─────────────────────────────────────────
+
+_reasoning_cache: dict = {}  # key → reasoning dict (in-memory, reset on restart)
+
+def _reasoning_cache_key(hs_code: str, origin: str, dest: str) -> str:
+    """Cache key สำหรับ XAI reasoning — เพราะ HS+origin+dest เดียวกัน → reasoning เหมือนกัน"""
+    raw = f"{hs_code}|{origin}|{dest}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:32]
+
+
+async def _get_cached_reasoning(
+    description: str, hs_code: str, confidence: float,
+    origin: str, dest: str, duty_rate, fta_eligible: bool, oga_required: bool,
+) -> dict:
+    """ดึง reasoning จาก cache ถ้ามี — ไม่งั้นเรียก Claude แล้ว cache"""
+    if not hs_code:
+        return await generate_reasoning(
+            description=description, hs_code=hs_code, confidence=confidence,
+            origin_country=origin, dest_country=dest, duty_rate=duty_rate,
+            fta_eligible=fta_eligible, oga_required=oga_required,
+        )
+
+    ckey = _reasoning_cache_key(hs_code, origin, dest)
+    cached = _reasoning_cache.get(ckey)
+    if cached:
+        # อัพเดต confidence + warning ตาม item ปัจจุบัน
+        result = dict(cached)
+        result["confidence"] = round(confidence, 4)
+        if confidence < 0.75:
+            result["warning"] = f"ความมั่นใจต่ำ ({confidence:.0%}) — ควรตรวจสอบกับเจ้าหน้าที่ศุลกากรก่อนยื่น"
+        elif confidence < 0.85:
+            result["warning"] = f"ความมั่นใจปานกลาง ({confidence:.0%}) — แนะนำให้ตรวจสอบ key_factors"
+        else:
+            result["warning"] = None
+        result["_source"] = "REASONING_CACHE"
+        return result
+
+    # Cache miss → เรียก Claude
+    result = await generate_reasoning(
+        description=description, hs_code=hs_code, confidence=confidence,
+        origin_country=origin, dest_country=dest, duty_rate=duty_rate,
+        fta_eligible=fta_eligible, oga_required=oga_required,
+    )
+    _reasoning_cache[ckey] = result
+    return result
+
+
+# ─── Phase 15.5: Per-User Invoice Rate Limit ─────────────────────────────────
+
+_user_invoice_log: dict = defaultdict(deque)  # api_key → deque of timestamps
+INVOICE_RATE_LIMIT_PER_MIN = 5    # max 5 invoices/min per user
+INVOICE_RATE_LIMIT_PER_DAY = 100  # max 100 invoices/day per user
+
+def _check_invoice_rate_limit(api_key: str) -> Optional[str]:
+    """ตรวจ rate limit — return error message ถ้าเกิน, None ถ้าผ่าน"""
+    now = _now().timestamp()
+    log = _user_invoice_log[api_key]
+
+    # ลบ entries เก่ากว่า 24 ชม.
+    while log and now - log[0] > 86400:
+        log.popleft()
+
+    # เช็ค per-day
+    if len(log) >= INVOICE_RATE_LIMIT_PER_DAY:
+        return f"เกินโควตา {INVOICE_RATE_LIMIT_PER_DAY} invoices/วัน — กรุณารอ 24 ชม. หรืออัพเกรดแพ็กเกจ"
+
+    # เช็ค per-minute
+    one_min_ago = now - 60
+    recent = sum(1 for t in log if t > one_min_ago)
+    if recent >= INVOICE_RATE_LIMIT_PER_MIN:
+        return f"เกินโควตา {INVOICE_RATE_LIMIT_PER_MIN} invoices/นาที — กรุณารอสักครู่"
+
+    # ผ่าน — บันทึก
+    log.append(now)
+    return None
 
 
 # ─── Classify 1 item ─────────────────────────────────────────────────────────
@@ -72,11 +228,26 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
         )
         if result is None:
             return _cache_fallback or {}
+
+        # Phase 15.2: เก็บ top 3 candidates
+        top3 = []
+        if hasattr(result, "candidates") and result.candidates:
+            for c in result.candidates[:3]:
+                top3.append({
+                    "rank": c.rank,
+                    "hs_code": c.hs_code,
+                    "hs_description": c.hs_description,
+                    "hs_description_th": getattr(c, "hs_description_th", None),
+                    "confidence_score": c.confidence_score,
+                    "source_reference": c.source_reference,
+                })
+
         cl = {
             "hs_code": result.hs_code,
             "hs_description": result.hs_description,
             "confidence_score": result.confidence_score,
             "reasoning": result.notes,
+            "candidates": top3,  # Phase 15.2
             "_source": "CLAUDE",
         }
         # 3. บันทึกลง cache — ครั้งต่อไปไม่ต้องจ่าย
@@ -318,20 +489,23 @@ async def _process_one_item(
         fta_elig = bool(fta_result.get("eligible"))
         oga_req = bool(oga_result.get("is_restricted"))
 
-        # XAI Reasoning (Claude API call)
+        # XAI Reasoning — Phase 15.3: ใช้ cache (HS+origin+dest เดียวกัน = reasoning เดียวกัน)
         try:
-            reasoning = await generate_reasoning(
-                description=desc,
-                hs_code=hs_ai,
-                confidence=float(conf),
-                origin_country=origin,
-                dest_country=dest_country,
-                duty_rate=duty_rate,
-                fta_eligible=fta_elig,
-                oga_required=oga_req,
+            reasoning = await _get_cached_reasoning(
+                description=desc, hs_code=hs_ai, confidence=float(conf),
+                origin=origin, dest=dest_country, duty_rate=duty_rate,
+                fta_eligible=fta_elig, oga_required=oga_req,
             )
         except Exception:
             reasoning = None
+
+        # Phase 15.4: Log candidates สำหรับ learning feedback loop
+        if cl_result.get("candidates") and cl_result.get("_source") == "CLAUDE":
+            try:
+                from cache_classification import log_candidates
+                await log_candidates(None, sub_id, "PRODUCTION", desc, cl_result["candidates"])
+            except Exception:
+                pass
 
         # Save to DB
         combined = {"classification": cl_result, "fta": fta_result, "oga": oga_result, "halal": halal_result}
@@ -348,6 +522,7 @@ async def _process_one_item(
             "currency": item.get("currency") or invoice_currency,
             "country_origin": origin,
             "hs_code": hs_ai,
+            "candidates": cl_result.get("candidates", []),  # Phase 15.2: Top 3
             "confidence": conf,
             "duty_rate": mfn_rate,
             "applicable_rate": duty_rate,
@@ -373,18 +548,29 @@ async def _process_one_item(
 async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> dict:
     """
     รับ parsed dict จาก invoice_parser
-    → classify ทุก item พร้อมกัน (asyncio.gather) → บันทึก DB → คืนสรุป
+    → validate → classify ทุก item พร้อมกัน (asyncio.gather) → บันทึก DB → คืนสรุป
     """
+    # Phase 15.5: Rate limit check
+    rate_err = _check_invoice_rate_limit(client_api_key)
+    if rate_err:
+        return {"error": rate_err, "error_code": "RATE_LIMIT", "items": [], "warnings": []}
+
     sub_id = uuid.uuid4().hex
-    items_raw = [it for it in (parsed.get("items") or []) if (it.get("description") or "").strip()]
+    items_all = [it for it in (parsed.get("items") or []) if (it.get("description") or "").strip()]
     dest_country = parsed.get("buyer_country") or "TH"
     seller_country = parsed.get("seller_country") or ""
     invoice_currency = parsed.get("currency", "USD")
 
+    # Phase 15.1: Validate items before sending to Claude
+    validation = _validate_items(items_all, parsed)
+    items_raw = validation["valid"]
+    blocked_items = validation["blocked"]
+    pre_warnings = validation["warnings"]
+
     pool = await _get_pool()
     await _save_submission(pool, sub_id, client_api_key, filename, parsed, len(items_raw))
 
-    # Process ทุก item พร้อมกัน — จำกัด 4 concurrent เพื่อไม่ให้ DB pool หมด
+    # Process ทุก valid item พร้อมกัน — จำกัด 4 concurrent เพื่อไม่ให้ DB pool หมด
     sem = asyncio.Semaphore(4)
     tasks = [
         _process_one_item(sem, pool, sub_id, i + 1, item, dest_country, seller_country, invoice_currency)
@@ -397,7 +583,11 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
     total_duty = 0.0
     total_saving = 0.0
     total_value = 0.0
-    warnings = []
+    warnings = list(pre_warnings)  # เริ่มจาก validation warnings
+
+    # เพิ่ม blocked items เป็น warnings
+    for b in blocked_items:
+        warnings.append({"line_no": b["line_no"], "type": b["reason"], "message": b["message"]})
 
     for idx, r in enumerate(item_results):
         if isinstance(r, Exception):
@@ -443,6 +633,7 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
         "incoterms": parsed.get("incoterms"),
         "currency": parsed.get("currency", "USD"),
         "total_items": len(results),
+        "total_blocked": len(blocked_items),
         "total_value_usd": round(total_value, 2),
         "total_duty_estimate_usd": round(total_duty, 2),
         "total_fta_saving_usd": round(total_saving, 2),
