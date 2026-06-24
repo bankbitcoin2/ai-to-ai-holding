@@ -46,6 +46,7 @@ from pricing_router import router as pricing_router
 from membership_router import router as membership_router
 from line_webhook import router as line_router
 from mcp_handler import router as mcp_router
+from landed_cost_router import router as landed_cost_router
 
 
 async def _auto_seed():
@@ -285,3 +286,4 @@ app.include_router(pricing_router)
 app.include_router(membership_router)
 app.include_router(line_router)
 app.include_router(mcp_router)
+app.include_router(landed_cost_router)
