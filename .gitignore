@@ -19,6 +19,14 @@ chairman_wallet_recover.py
 DNA.txt
 deploy.sh
 
+# Backups (มี DB data จริง)
+backups/
+backup_via_api.py
+*.json.bak
+
+# Zombie / deprecated configs
+config.py.ZOMBIE_BACKUP
+
 # Chat history & internal docs
 แชต*.txt
 แพ็คเกจ.txt

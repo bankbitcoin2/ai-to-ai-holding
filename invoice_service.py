@@ -65,7 +65,7 @@ async def _classify_item(description: str, country_origin: str = "", dest_countr
         pass
 
     try:
-        from classification_agent import classify_item
+        from agents_router import classify_item
         result = await classify_item(
             description=description,
             origin_country=country_origin,
@@ -116,16 +116,16 @@ async def _lookup_duty_rate(hs_code: str, origin: str) -> dict:
 
 async def _check_oga(hs_code: str) -> dict:
     try:
-        from oga_engine import check_oga
-        return check_oga(hs_code) or {}
+        from oga_engine import check as oga_check
+        return oga_check(hs_code) or {}
     except Exception:
         return {}
 
 
 async def _check_halal(hs_code: str, dest_country: str) -> dict:
     try:
-        from halal_engine import check_halal_requirement
-        return check_halal_requirement(hs_code, dest_country) or {}
+        from halal_engine import check as halal_check
+        return halal_check(hs_code, dest_country) or {}
     except Exception:
         return {}
 
@@ -192,8 +192,7 @@ async def _save_item(pool, sub_id: str, line_no: int, item: dict, result: dict) 
         fta_saving = cif_usd * (duty_rate - fta_rate) / 100
 
     _oga_permits = oga.get("requires_permits") or []
-    oga_agencies = [p.get("agency_abbr") for p in _oga_permits if p.get("agency_abbr")] \
-                   or oga.get("agencies") or oga.get("required_agencies") or []
+    oga_agencies = [p.get("agency_abbr") for p in _oga_permits if p.get("agency_abbr")]
     if isinstance(oga_agencies, str):
         oga_agencies = [oga_agencies]
 
@@ -242,10 +241,10 @@ async def _save_item(pool, sub_id: str, line_no: int, item: dict, result: dict) 
             fta.get("agreement") or fta.get("fta_name"),
             fta_rate,
             fta_saving,
-            bool(oga.get("required") or oga.get("oga_required")),
+            bool(oga.get("is_restricted")),
             oga_agencies,
             json.dumps(oga) if oga else None,
-            bool(halal.get("required") or halal.get("halal_required")),
+            bool(halal.get("halal_required")),
             halal.get("cert_body") or halal.get("certification_body"),
             False,   # valuation_flag — Phase 12
             hs_mismatch,
@@ -316,7 +315,7 @@ async def _process_one_item(
 
         conf = cl_result.get("confidence_score") or cl_result.get("confidence") or 0
         fta_elig = bool(fta_result.get("eligible"))
-        oga_req = bool(oga_result.get("is_restricted") or oga_result.get("required") or oga_result.get("oga_required"))
+        oga_req = bool(oga_result.get("is_restricted"))
 
         # XAI Reasoning (Claude API call)
         try:
@@ -359,9 +358,9 @@ async def _process_one_item(
             "oga_risk_level": oga_result.get("risk_level") or "HIGH",
             "oga_note_th": oga_result.get("note_th") or "",
             "oga_note_en": oga_result.get("note_en") or "",
-            "oga_agencies": oga_result.get("agencies") or [],
+            "oga_agencies": [p.get("agency_abbr") for p in (oga_result.get("requires_permits") or []) if p.get("agency_abbr")],
             "oga_permits": oga_result.get("requires_permits") or [],
-            "halal_required": bool(halal_result.get("required")),
+            "halal_required": bool(halal_result.get("halal_required")),
             "halal_cert_body": halal_result.get("cert_body") or halal_result.get("certification_body"),
             "reasoning": reasoning,
             # internal fields for aggregation
