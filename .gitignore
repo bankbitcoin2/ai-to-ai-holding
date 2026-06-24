@@ -19,6 +19,11 @@ chairman_wallet_recover.py
 DNA.txt
 deploy.sh
 
+# Valuation & Confidential Reports (LOCAL ONLY)
+PROJECT_VALUATION_REPORT.md
+*_VALUATION_*.md
+*_CONFIDENTIAL_*.md
+
 # Backups (มี DB data จริง)
 backups/
 backup_via_api.py
