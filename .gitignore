@@ -19,6 +19,18 @@ chairman_wallet_recover.py
 DNA.txt
 deploy.sh
 
+# Core IP — ห้ามเปิดเผยบน GitHub
+gpt_system_prompt.txt
+mock_classification_agent.py
+
+# Internal architecture — ไม่จำเป็นบน repo
+org-structure.md
+nginx.conf
+migrate_v1_to_v2.py
+langchain_tool.py
+office_heads.py
+ceo_agent.py
+
 # Valuation & Confidential Reports (LOCAL ONLY)
 PROJECT_VALUATION_REPORT.md
 *_VALUATION_*.md

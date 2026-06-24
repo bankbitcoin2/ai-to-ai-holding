@@ -11,7 +11,11 @@ from db_adapter import get_pool
 from ceo_agent import AICEOAgent
 from office_heads import OFFICE_HEADS
 
-router = APIRouter(prefix="/v1/ceo", tags=["AI CEO (Chairman Interface)"])
+router = APIRouter(
+    prefix="/v1/ceo",
+    tags=["AI CEO (Chairman Interface)"],
+    include_in_schema=False,  # ซ่อนจาก Swagger /docs — Chairman only
+)
 
 ceo = AICEOAgent()
 
