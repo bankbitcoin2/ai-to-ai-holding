@@ -7,7 +7,10 @@ Agent Router — เลือก Mock หรือ Real ตาม MOCK_MODE
 from holding_config import MOCK_MODE
 
 if MOCK_MODE:
-    from mock_classification_agent import classify_item, ClassificationResult
+    try:
+        from mock_classification_agent import classify_item, ClassificationResult
+    except ImportError:
+        from classification_agent import classify_item, ClassificationResult
 else:
     from classification_agent import classify_item, ClassificationResult
 

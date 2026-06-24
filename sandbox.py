@@ -19,7 +19,10 @@ _HAS_REAL_API = bool(os.getenv("ANTHROPIC_API_KEY", ""))
 if _HAS_REAL_API:
     from classification_agent import classify_item
 else:
-    from mock_classification_agent import classify_item
+    try:
+        from mock_classification_agent import classify_item
+    except ImportError:
+        from classification_agent import classify_item
 
 _CLASSIFY_SEM = asyncio.Semaphore(5)
 

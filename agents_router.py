@@ -12,7 +12,11 @@ router = APIRouter(prefix="/v1/agents", tags=["agents"])
 from holding_config import MOCK_MODE
 
 if MOCK_MODE:
-    from mock_classification_agent import classify_item, ClassificationResult
+    try:
+        from mock_classification_agent import classify_item, ClassificationResult
+    except ImportError:
+        # mock_classification_agent removed from repo — fallback to real
+        from classification_agent import classify_item, ClassificationResult
 else:
     from classification_agent import classify_item, ClassificationResult
 

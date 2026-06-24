@@ -8,8 +8,51 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 from db_adapter import get_pool
-from ceo_agent import AICEOAgent
-from office_heads import OFFICE_HEADS
+
+# ceo_agent.py & office_heads.py — LOCAL ONLY (removed from repo for security)
+try:
+    from ceo_agent import AICEOAgent
+except ImportError:
+    from dataclasses import dataclass, field
+    from datetime import datetime, timezone
+    import uuid
+
+    @dataclass
+    class _CEODecision:
+        decision_id: str = ""
+        command_received: str = ""
+        analysis: str = ""
+        summary: str = ""
+        confidence: float = 0.0
+        actions_dispatched: list = field(default_factory=list)
+        timestamp: str = ""
+
+    class AICEOAgent:
+        ENTITY_ID = "ent-ai-ceo"
+        async def process_command(self, command, context=None):
+            return _CEODecision(
+                decision_id=f"dec-{uuid.uuid4().hex[:8]}",
+                command_received=command,
+                analysis="CEO agent running in deployment stub mode",
+                summary="Command acknowledged — full AI CEO requires local modules",
+                confidence=0.0,
+                actions_dispatched=[],
+                timestamp=datetime.now(timezone.utc).isoformat(),
+            )
+        async def daily_briefing(self, conn):
+            return {
+                "briefing_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                "prepared_by": self.ENTITY_ID,
+                "mode": "STUB",
+                "sections": {},
+                "chairman_action_required": False,
+                "notes": "Full briefing requires local ceo_agent module",
+            }
+
+try:
+    from office_heads import OFFICE_HEADS
+except ImportError:
+    OFFICE_HEADS = {}
 
 router = APIRouter(
     prefix="/v1/ceo",
