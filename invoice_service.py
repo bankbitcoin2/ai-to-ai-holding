@@ -671,9 +671,16 @@ async def _deduct_credit(pool, client_api_key: str, item_count: int) -> dict:
                 return {"charged": False, "reason": "agent_not_found"}
 
             agent_id = row["id"]
-            # ปัจจุบันทุกคนเป็น STANDARD — Phase 18 จะเพิ่ม tier field
+            # Phase 18: ดึง membership discount
             tier = "STANDARD"
-            amount = get_deduct_amount(item_count, tier=tier)
+            membership_discount = 0.0
+            try:
+                from membership_engine import get_discount_for_agent, increment_usage
+                membership_discount = await get_discount_for_agent(pool, agent_id)
+            except Exception:
+                pass
+            amount = get_deduct_amount(item_count, tier=tier,
+                                       membership_discount=membership_discount)
 
             # ตรวจ balance ก่อนหัก
             credit_row = await conn.fetchrow(
@@ -698,10 +705,19 @@ async def _deduct_credit(pool, client_api_key: str, item_count: int) -> dict:
             )
 
             new_balance = balance - amount
+
+            # Phase 18: increment usage counter for membership evaluation
+            try:
+                from membership_engine import increment_usage
+                await increment_usage(pool, agent_id, item_count)
+            except Exception:
+                pass
+
             return {
                 "charged": True,
                 "amount_usd": amount,
                 "tier": tier,
+                "membership_discount_pct": round(membership_discount * 100, 1),
                 "items_charged": item_count,
                 "balance_before": round(balance, 4),
                 "balance_after": round(new_balance, 4),

@@ -43,6 +43,7 @@ from agents_router import router as agents_router
 from invoice_router import router as invoice_router
 from client_analytics_router import router as analytics_router
 from pricing_router import router as pricing_router
+from membership_router import router as membership_router
 
 
 async def _auto_seed():
@@ -275,3 +276,4 @@ app.include_router(agents_router)
 app.include_router(invoice_router)
 app.include_router(analytics_router)
 app.include_router(pricing_router)
+app.include_router(membership_router)
