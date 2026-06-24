@@ -2,6 +2,7 @@
 invoice_service.py
 Phase 8.1 — Invoice Intelligence Pipeline
 Phase 15  — Validation Layer + Cache Reasoning + Rate Limit
+Phase 17  — Tiered Pricing + Credit Deduction + Currency
 classify ทุก line item + บันทึก DB + คืนสรุปทั้งใบ
 """
 
@@ -624,6 +625,10 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
 
     await _mark_done(pool, sub_id, total_value or None, len(results))
 
+    # Phase 17: Credit deduction + exchange rate snapshot
+    billing_info = await _deduct_credit(pool, client_api_key, len(results))
+    exchange_snapshot = await _get_exchange_snapshot(invoice_currency)
+
     return {
         "submission_id": sub_id,
         "invoice_no": parsed.get("invoice_no"),
@@ -637,9 +642,87 @@ async def process_invoice(client_api_key: str, filename: str, parsed: dict) -> d
         "total_value_usd": round(total_value, 2),
         "total_duty_estimate_usd": round(total_duty, 2),
         "total_fta_saving_usd": round(total_saving, 2),
+        "billing": billing_info,
+        "exchange_rate": exchange_snapshot,
         "items": results,
         "warnings": warnings,
     }
+
+
+# ─── Phase 17: Credit Deduction + Exchange Rate ──────────────────────────────
+
+async def _deduct_credit(pool, client_api_key: str, item_count: int) -> dict:
+    """
+    หักเครดิตลูกค้าหลัง classify — ใช้ pricing_engine คำนวณราคาตาม tier
+    คืน billing summary (ไม่ raise ถ้าหักไม่ได้ — แค่เตือน)
+    """
+    if item_count <= 0:
+        return {"charged": False, "reason": "no_items"}
+    try:
+        from pricing_engine import get_deduct_amount
+        hint = client_api_key[-8:]
+        async with pool.acquire() as conn:
+            # ดึง agent_id + tier จาก client_agents
+            row = await conn.fetchrow(
+                "SELECT id, profession FROM client_agents "
+                "WHERE api_key_hint=$1 AND status='ACTIVE'", hint
+            )
+            if not row:
+                return {"charged": False, "reason": "agent_not_found"}
+
+            agent_id = row["id"]
+            # ปัจจุบันทุกคนเป็น STANDARD — Phase 18 จะเพิ่ม tier field
+            tier = "STANDARD"
+            amount = get_deduct_amount(item_count, tier=tier)
+
+            # ตรวจ balance ก่อนหัก
+            credit_row = await conn.fetchrow(
+                "SELECT credit_balance FROM client_credits WHERE agent_id=$1",
+                agent_id
+            )
+            balance = float(credit_row["credit_balance"]) if credit_row else 0.0
+
+            if balance < amount:
+                return {
+                    "charged": False,
+                    "reason": "insufficient_credit",
+                    "required": amount,
+                    "balance": balance,
+                    "warning": "เครดิตไม่พอ — เติมเงินที่ POST /v1/billing/topup",
+                }
+
+            # หักเครดิต
+            await conn.execute(
+                "UPDATE client_credits SET credit_balance = credit_balance - $1 WHERE agent_id = $2",
+                amount, agent_id
+            )
+
+            new_balance = balance - amount
+            return {
+                "charged": True,
+                "amount_usd": amount,
+                "tier": tier,
+                "items_charged": item_count,
+                "balance_before": round(balance, 4),
+                "balance_after": round(new_balance, 4),
+            }
+    except Exception as e:
+        # billing ไม่ควร block classification flow
+        print(f"[BILLING] deduct error: {e}")
+        return {"charged": False, "reason": f"error: {str(e)[:80]}"}
+
+
+async def _get_exchange_snapshot(invoice_currency: str) -> Optional[dict]:
+    """ดึง exchange rate snapshot ณ เวลาทำรายการ"""
+    try:
+        from currency_service import record_transaction_rate
+        if invoice_currency.upper() != "USD":
+            return await record_transaction_rate(invoice_currency, "USD")
+        return {"from_currency": "USD", "to_currency": "USD", "rate": 1.0,
+                "source": "identity"}
+    except Exception as e:
+        print(f"[CURRENCY] snapshot error: {e}")
+        return None
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
