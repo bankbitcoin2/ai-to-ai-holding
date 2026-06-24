@@ -41,6 +41,7 @@ from billing import router as billing_router
 from chairman_router import router as chairman_router
 from agents_router import router as agents_router
 from invoice_router import router as invoice_router
+from client_analytics_router import router as analytics_router
 
 
 async def _auto_seed():
@@ -271,3 +272,4 @@ app.include_router(billing_router)
 app.include_router(chairman_router)
 app.include_router(agents_router)
 app.include_router(invoice_router)
+app.include_router(analytics_router)
