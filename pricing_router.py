@@ -86,7 +86,8 @@ async def convert_currency(
 # ── Chairman: Cost Analysis ────────────────────────────────────────────────────
 # IP restriction handled by SecurityMiddleware (/v1/chairman/* prefix)
 
-@router.get("/v1/chairman/pricing/costs", summary="[Chairman] โครงสร้างต้นทุน")
+@router.get("/v1/chairman/pricing/costs", summary="[Chairman] โครงสร้างต้นทุน",
+            include_in_schema=False)
 async def chairman_costs():
     """แสดงต้นทุนจริงต่อ call + margin analysis"""
     return {

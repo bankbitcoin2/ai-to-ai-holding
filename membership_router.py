@@ -59,7 +59,8 @@ async def client_membership(agent_id: str = Depends(_resolve_agent)):
 # ── Chairman Endpoints ─────────────────────────────────────────────────────────
 # IP restriction via SecurityMiddleware (/v1/chairman/*)
 
-@router.get("/v1/chairman/membership/all", summary="[Chairman] ดู tier ทุก client")
+@router.get("/v1/chairman/membership/all", summary="[Chairman] ดู tier ทุก client",
+            include_in_schema=False)
 async def chairman_all_membership():
     """ดึง membership ทุก client พร้อม tier + usage"""
     pool = await get_pool()
@@ -108,7 +109,8 @@ async def chairman_all_membership():
 
 
 @router.post("/v1/chairman/membership/evaluate",
-             summary="[Chairman] Re-evaluate tier ทุก client")
+             summary="[Chairman] Re-evaluate tier ทุก client",
+             include_in_schema=False)
 async def chairman_evaluate():
     """คำนวณ tier ใหม่จาก usage data — upgrade/downgrade อัตโนมัติ"""
     pool = await get_pool()
@@ -123,7 +125,8 @@ class SetTierRequest(BaseModel):
 
 
 @router.post("/v1/chairman/membership/set-tier",
-             summary="[Chairman] Override tier ด้วยมือ")
+             summary="[Chairman] Override tier ด้วยมือ",
+             include_in_schema=False)
 async def chairman_set_tier(req: SetTierRequest):
     """ตั้ง tier ด้วยมือ — ลูกค้าจะไม่ถูก auto-evaluate จนกว่าจะปลด override"""
     pool = await get_pool()
@@ -134,7 +137,8 @@ async def chairman_set_tier(req: SetTierRequest):
 
 
 @router.post("/v1/chairman/membership/reset",
-             summary="[Chairman] Reset monthly counters")
+             summary="[Chairman] Reset monthly counters",
+             include_in_schema=False)
 async def chairman_reset_counters():
     """รีเซ็ต queries_this_month + trade_value_month (เรียกต้นเดือน)"""
     pool = await get_pool()

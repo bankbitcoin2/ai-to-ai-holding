@@ -23,6 +23,7 @@ import kill_switch_engine
 router = APIRouter(
     prefix="/v1/chairman/kill-switch",
     tags=["Kill Switch (Chairman Only — P-01/P-02)"],
+    include_in_schema=False,  # ซ่อนจาก Swagger /docs — security
 )
 
 

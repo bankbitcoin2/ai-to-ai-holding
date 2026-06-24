@@ -24,6 +24,7 @@ import wallet_engine
 router = APIRouter(
     prefix="/v1/treasury/chairman",
     tags=["Chairman Wallet (Private)"],
+    include_in_schema=False,  # ซ่อนจาก Swagger /docs — security
 )
 
 

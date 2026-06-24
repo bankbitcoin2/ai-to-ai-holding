@@ -13,7 +13,11 @@ import aiosqlite
 from database import get_db
 from treasury_service import settle_transaction, get_ledger_summary
 
-router = APIRouter(prefix="/v1/treasury", tags=["Treasury (Internal)"])
+router = APIRouter(
+    prefix="/v1/treasury",
+    tags=["Treasury (Internal)"],
+    include_in_schema=False,  # ซ่อนจาก Swagger /docs — internal only
+)
 
 
 class SettleRequest(BaseModel):

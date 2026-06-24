@@ -7,7 +7,11 @@ from datetime import datetime, timezone
 import os
 import secrets
 
-router = APIRouter(prefix="/v1/chairman", tags=["Chairman"])
+router = APIRouter(
+    prefix="/v1/chairman",
+    tags=["Chairman"],
+    include_in_schema=False,  # ซ่อนจาก Swagger /docs — security
+)
 CHAIRMAN_KEY = os.getenv("CHAIRMAN_API_KEY", "")
 
 

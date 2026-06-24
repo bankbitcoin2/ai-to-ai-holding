@@ -62,7 +62,8 @@ async def client_analytics(
 # ── Chairman Endpoint ──────────────────────────────────────────────────────────
 # IP restriction handled by SecurityMiddleware (/v1/chairman/* prefix)
 
-@router.get("/v1/chairman/analytics/all", summary="[Chairman] ภาพรวมทุก client")
+@router.get("/v1/chairman/analytics/all", summary="[Chairman] ภาพรวมทุก client",
+            include_in_schema=False)
 async def chairman_analytics(
     period: str = Query("all", regex="^(month|year|all)$",
                         description="ช่วงเวลา: month, year, all"),
