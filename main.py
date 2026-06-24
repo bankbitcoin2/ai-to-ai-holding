@@ -49,6 +49,7 @@ from mcp_handler import router as mcp_router
 from landed_cost_router import router as landed_cost_router
 from price_benchmark_router import router as benchmark_router
 from freight_auditor_router import router as freight_audit_router
+from whatif_router import router as whatif_router
 
 
 async def _auto_seed():
@@ -291,3 +292,4 @@ app.include_router(mcp_router)
 app.include_router(landed_cost_router)
 app.include_router(benchmark_router)
 app.include_router(freight_audit_router)
+app.include_router(whatif_router)
