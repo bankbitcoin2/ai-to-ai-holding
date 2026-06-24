@@ -1,0 +1,24 @@
+{
+  "name": "AI TO AI HOLDING — Customs Intelligence",
+  "short_name": "AI Customs",
+  "description": "HS Classification + FTA + OGA — จัดพิกัดศุลกากรอัตโนมัติ",
+  "start_url": "/pwa",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#f59e0b",
+  "lang": "th",
+  "icons": [
+    {
+      "src": "/static/logo/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/logo/logo-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["business", "utilities"]
+}

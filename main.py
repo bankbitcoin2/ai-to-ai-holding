@@ -44,6 +44,8 @@ from invoice_router import router as invoice_router
 from client_analytics_router import router as analytics_router
 from pricing_router import router as pricing_router
 from membership_router import router as membership_router
+from line_webhook import router as line_router
+from mcp_handler import router as mcp_router
 
 
 async def _auto_seed():
@@ -257,6 +259,10 @@ async def dashboard():
 async def chairman_office():
     return FileResponse(_STATIC / "chairman.html", media_type="text/html")
 
+@app.get("/pwa", include_in_schema=False)
+async def pwa_app():
+    return FileResponse(_STATIC / "pwa.html", media_type="text/html")
+
 # Override root to serve landing page
 @app.get("/", include_in_schema=False)
 async def landing():
@@ -277,3 +283,5 @@ app.include_router(invoice_router)
 app.include_router(analytics_router)
 app.include_router(pricing_router)
 app.include_router(membership_router)
+app.include_router(line_router)
+app.include_router(mcp_router)

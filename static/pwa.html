@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f59e0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="icon" href="/static/logo/favicon-32.png">
+<title>AI Customs — จัดพิกัดศุลกากร</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f172a; color: #e2e8f0; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .header {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 16px 20px; text-align: center;
+    border-bottom: 2px solid #f59e0b;
+  }
+  .header h1 { font-size: 18px; color: #f59e0b; }
+  .header p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+  .main { flex: 1; padding: 20px; max-width: 480px; margin: 0 auto; width: 100%; }
+  .api-key-section { margin-bottom: 24px; }
+  .api-key-section label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 6px; }
+  .api-key-section input {
+    width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155;
+    background: #1e293b; color: #e2e8f0; font-size: 14px;
+  }
+  .upload-zone {
+    border: 2px dashed #334155; border-radius: 12px; padding: 40px 20px;
+    text-align: center; cursor: pointer; transition: all 0.3s;
+    margin-bottom: 20px;
+  }
+  .upload-zone:hover, .upload-zone.active { border-color: #f59e0b; background: #1e293b; }
+  .upload-zone .icon { font-size: 48px; margin-bottom: 12px; }
+  .upload-zone p { color: #94a3b8; font-size: 14px; }
+  .camera-btn {
+    width: 100%; padding: 14px; border-radius: 10px; border: none;
+    background: #f59e0b; color: #0f172a; font-size: 16px; font-weight: 600;
+    cursor: pointer; margin-bottom: 12px;
+  }
+  .camera-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .file-btn {
+    width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #334155;
+    background: transparent; color: #e2e8f0; font-size: 14px; cursor: pointer;
+  }
+  .result {
+    background: #1e293b; border-radius: 12px; padding: 16px;
+    margin-top: 20px; display: none;
+  }
+  .result.show { display: block; }
+  .result h3 { color: #f59e0b; margin-bottom: 12px; font-size: 16px; }
+  .result-item {
+    padding: 10px 0; border-bottom: 1px solid #334155;
+    font-size: 13px; line-height: 1.5;
+  }
+  .result-item:last-child { border-bottom: none; }
+  .result-item .hs { color: #22d3ee; font-weight: 600; }
+  .result-item .fta { color: #4ade80; }
+  .result-item .warn { color: #fb923c; }
+  .loading { text-align: center; padding: 40px; display: none; }
+  .loading.show { display: block; }
+  .spinner { width: 40px; height: 40px; border: 3px solid #334155;
+    border-top: 3px solid #f59e0b; border-radius: 50%;
+    animation: spin 1s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status-bar {
+    background: #1e293b; padding: 8px 20px; text-align: center;
+    font-size: 11px; color: #64748b;
+  }
+  input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI TO AI HOLDING</h1>
+  <p>Customs Intelligence — จัดพิกัดศุลกากรอัตโนมัติ</p>
+</div>
+
+<div class="main">
+  <div class="api-key-section">
+    <label>API Key</label>
+    <input type="password" id="apiKey" placeholder="sk-aitai-xxxx..." autocomplete="off">
+  </div>
+
+  <button class="camera-btn" id="cameraBtn" onclick="openCamera()">
+    📸 ถ่ายรูป Invoice
+  </button>
+
+  <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <div class="icon">📄</div>
+    <p>แตะเพื่อเลือกไฟล์<br>หรือลากไฟล์มาวาง</p>
+    <p style="font-size:11px; margin-top:8px;">PDF, JPG, PNG, Excel, CSV (สูงสุด 10MB)</p>
+  </div>
+
+  <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.csv,.webp"
+         onchange="handleFile(this.files[0])">
+  <input type="file" id="cameraInput" accept="image/*" capture="environment"
+         onchange="handleFile(this.files[0])">
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>กำลังวิเคราะห์ invoice...</p>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<div class="status-bar" id="statusBar">
+  ออฟไลน์: ดูผลลัพธ์ล่าสุดได้ | ออนไลน์: ส่ง invoice ใหม่ได้
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+// PWA install
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+}
+
+function openCamera() {
+  document.getElementById('cameraInput').click();
+}
+
+// Drag & drop
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('active'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('active'));
+dz.addEventListener('drop', (e) => {
+  e.preventDefault(); dz.classList.remove('active');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+
+async function handleFile(file) {
+  if (!file) return;
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { alert('กรุณาใส่ API Key ก่อน'); return; }
+  if (file.size > 10 * 1024 * 1024) { alert('ไฟล์ใหญ่เกิน 10MB'); return; }
+
+  const loading = document.getElementById('loading');
+  const resultDiv = document.getElementById('result');
+  loading.classList.add('show');
+  resultDiv.classList.remove('show');
+
+  try {
+    const form = new FormData();
+    form.append('file', file);
+
+    const resp = await fetch(`${API_BASE}/v1/invoice/upload`, {
+      method: 'POST',
+      headers: { 'X-API-Key': apiKey },
+      body: form,
+    });
+
+    const data = await resp.json();
+    loading.classList.remove('show');
+
+    if (!resp.ok) {
+      resultDiv.innerHTML = `<h3>❌ Error</h3><p>${data.detail || 'Unknown error'}</p>`;
+      resultDiv.classList.add('show');
+      return;
+    }
+
+    renderResult(data.data || data);
+
+    // Cache for offline
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'CACHE_HS_RESULT', payload: data.data || data,
+      });
+    }
+
+  } catch (err) {
+    loading.classList.remove('show');
+    resultDiv.innerHTML = `<h3>❌ Error</h3><p>${err.message}</p>`;
+    resultDiv.classList.add('show');
+  }
+}
+
+function renderResult(r) {
+  const div = document.getElementById('result');
+  let html = `<h3>✅ วิเคราะห์สำเร็จ</h3>`;
+  html += `<div class="result-item">📄 Invoice: ${r.invoice_no || '-'} | ${r.total_items || 0} รายการ</div>`;
+  html += `<div class="result-item">💰 มูลค่า: $${(r.total_value_usd || 0).toLocaleString()}</div>`;
+  html += `<div class="result-item">🏦 ภาษีประมาณ: $${(r.total_duty_estimate_usd || 0).toLocaleString()}</div>`;
+  html += `<div class="result-item fta">💚 ประหยัด FTA: $${(r.total_fta_saving_usd || 0).toLocaleString()}</div>`;
+
+  (r.items || []).forEach((item) => {
+    const fta = item.fta_eligible ? '<span class="fta"> 🟢FTA</span>' : '';
+    const oga = item.oga_required ? '<span class="warn"> ⚠️OGA</span>' : '';
+    html += `<div class="result-item">
+      ${item.line_no}. ${(item.description || '').substring(0, 40)}
+      <br><span class="hs">HS: ${item.hs_code || '-'}</span> (${((item.confidence || 0) * 100).toFixed(0)}%)${fta}${oga}
+    </div>`;
+  });
+
+  const b = r.billing || {};
+  if (b.charged) {
+    html += `<div class="result-item">💳 หัก: $${b.amount_usd} | คงเหลือ: $${b.balance_after}</div>`;
+  }
+
+  div.innerHTML = html;
+  div.classList.add('show');
+}
+</script>
+
+</body>
+</html>

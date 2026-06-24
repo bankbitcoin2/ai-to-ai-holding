@@ -1,0 +1,83 @@
+{
+  "name": "ai-to-ai-customs",
+  "display_name": "AI TO AI HOLDING — Customs Intelligence",
+  "version": "1.0.0",
+  "description": "HS Classification, FTA Check, OGA/Halal, Invoice Analysis — Thai Customs AI",
+  "author": "AI TO AI HOLDING",
+  "homepage": "https://web-production-c9da4.up.railway.app",
+  "tools": [
+    {
+      "name": "classify_hs",
+      "description": "จัดพิกัดศุลกากร (HS Code) จากคำบรรยายสินค้า พร้อม FTA, OGA, Halal check",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "คำบรรยายสินค้า เช่น 'Laptop computer 14 inch'"
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "ประเทศแหล่งกำเนิด (ISO 2-letter) เช่น 'CN', 'JP'"
+          }
+        },
+        "required": ["description"]
+      }
+    },
+    {
+      "name": "check_fta",
+      "description": "ตรวจสอบสิทธิ FTA สำหรับ HS Code ที่ระบุ — ดูว่าใช้ FTA ไหนลดภาษีได้",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code 6-11 หลัก เช่น '8471.30'"
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "ประเทศแหล่งกำเนิด"
+          },
+          "dest_country": {
+            "type": "string",
+            "default": "TH",
+            "description": "ประเทศปลายทาง (default: TH)"
+          }
+        },
+        "required": ["hs_code", "origin_country"]
+      }
+    },
+    {
+      "name": "analyze_invoice",
+      "description": "วิเคราะห์ invoice ทั้งใบ — จัดพิกัดทุก item + FTA + OGA + ประมาณภาษี",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Path ของไฟล์ invoice (PDF/Image/Excel/CSV)"
+          }
+        },
+        "required": ["file_path"]
+      }
+    },
+    {
+      "name": "exchange_rate",
+      "description": "ดึงอัตราแลกเปลี่ยนปัจจุบัน หรือแปลงสกุลเงิน",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "from": { "type": "string", "default": "USD" },
+          "to": { "type": "string", "default": "THB" },
+          "amount": { "type": "number", "default": 1 }
+        }
+      }
+    }
+  ],
+  "auth": {
+    "type": "api_key",
+    "header": "X-API-Key",
+    "instructions": "Register at POST /v1/register to get your API key"
+  },
+  "api_base": "https://web-production-c9da4.up.railway.app"
+}
