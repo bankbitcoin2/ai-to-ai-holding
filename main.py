@@ -47,6 +47,7 @@ from membership_router import router as membership_router
 from line_webhook import router as line_router
 from mcp_handler import router as mcp_router
 from landed_cost_router import router as landed_cost_router
+from price_benchmark_router import router as benchmark_router
 
 
 async def _auto_seed():
@@ -287,3 +288,4 @@ app.include_router(membership_router)
 app.include_router(line_router)
 app.include_router(mcp_router)
 app.include_router(landed_cost_router)
+app.include_router(benchmark_router)
