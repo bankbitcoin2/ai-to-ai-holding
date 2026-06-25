@@ -54,6 +54,7 @@ from customs_audit_router import router as audit_risk_router
 from oga_router import router as oga_expanded_router
 from cbam_carbon_router import router as carbon_router
 from asean_expansion_router import router as asean_router
+from valuation_router import router as valuation_router
 
 
 async def _auto_seed():
@@ -301,3 +302,4 @@ app.include_router(audit_risk_router)
 app.include_router(oga_expanded_router)
 app.include_router(carbon_router)
 app.include_router(asean_router)
+app.include_router(valuation_router)

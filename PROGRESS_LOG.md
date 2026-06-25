@@ -22,6 +22,7 @@
 | P27 | CBAM Carbon Tracker — CO₂ calculator, EU CBAM compliance, emission factors | — | 2 files (~450 lines) | READY |
 | P28 | ASEAN Expansion — 6 countries, duty comparison, multi-country compliance | — | 2 files (~450 lines) | READY |
 | Wire | Tier 4 routers wired into main.py — 22 routers total | — | main.py modified | READY |
+| VAL | Project Valuation Engine — 12-dimension automated valuation system | — | 2 new + main.py (24 routers) | READY |
 
 ### Security Actions Taken
 
