@@ -324,7 +324,7 @@ async def sandbox_classify(body: SandboxReq, req: Request):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, detail={"error": "CLASSIFICATION_ERROR", "message": str(e)})
+        raise HTTPException(500, detail={"error": "CLASSIFICATION_ERROR", "message": "Internal processing error"})
 
     avg = round(sum(scores)/len(scores), 3)
     rem = max(0, DAILY_LIMIT - used)
@@ -411,7 +411,7 @@ async def sandbox_feedback(body: FeedbackReq):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, detail={"error": "FEEDBACK_ERROR", "message": str(e)})
+        raise HTTPException(500, detail={"error": "FEEDBACK_ERROR", "message": "Internal processing error"})
 
 
 # ── Halal Countries Endpoint ──────────────────────────────────────────────────
@@ -442,7 +442,7 @@ async def halal_countries(region: Optional[str] = None):
             "countries": data,
         }
     except Exception as e:
-        raise HTTPException(500, detail={"error": "HALAL_ENGINE_ERROR", "message": str(e)})
+        raise HTTPException(500, detail={"error": "HALAL_ENGINE_ERROR", "message": "Internal processing error"})
 
 
 # ── CKAN Probe Endpoint (debug) ───────────────────────────────────────────────
@@ -453,4 +453,4 @@ async def probe_ckan(hs: str = "6802"):
         result = await fetch_hs_full(hs)
         return result
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Internal processing error"}

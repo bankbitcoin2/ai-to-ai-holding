@@ -40,7 +40,7 @@ async def _get_client(api_key: str = Depends(API_KEY_HEADER)) -> str:
         raise
     except Exception as e:
         print(f"[invoice_router] auth error: {e}")
-        raise HTTPException(status_code=500, detail=f"Auth error: {str(e)[:100]}")
+        raise HTTPException(status_code=500, detail="Auth error — internal processing failed")
 
 
 # ─── POST /v1/invoice/upload ──────────────────────────────────────────────────

@@ -187,6 +187,7 @@ h2{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--text)}
     <div class="tab" data-panel="offices">7 offices</div>
     <div class="tab" data-panel="clients">clients</div>
     <div class="tab" data-panel="revenue">revenue</div>
+    <div class="tab" data-panel="valuation">valuation</div>
     <div class="tab" data-panel="roadmap">roadmap</div>
   </div>
 
@@ -262,7 +263,18 @@ h2{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--text)}
       <div class="office-row"><span class="dot g"></span><div class="office-name">HS Code Classification</div><div class="office-desc">12,247 codes · 88%+ confidence</div><span class="badge g">LIVE</span></div>
       <div class="office-row"><span class="dot g"></span><div class="office-name">Duty & Tax Engine</div><div class="office-desc">4/6-digit rates · FTA 14 countries</div><span class="badge g">LIVE</span></div>
       <div class="office-row"><span class="dot g"></span><div class="office-name">Halal Compliance</div><div class="office-desc">21 halal zones · cert routing</div><span class="badge g">LIVE</span></div>
-      <div class="office-row"><span class="dot g"></span><div class="office-name">OGA Screening</div><div class="office-desc">DLD · FDA · DI · DSS · TISI</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">OGA Screening</div><div class="office-desc">36 agencies · batch check · document checklist</div><span class="badge g">LIVE</span></div>
+      <div style="height:20px"></div>
+      <h2>🧠 Tier 3 — Intelligence Suite</h2>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">Landed Cost Calculator</div><div class="office-desc">11 Incoterms · freight/insurance · multi-currency</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">Price Benchmark</div><div class="office-desc">under-valuation detection · risk scoring</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">Freight Auditor</div><div class="office-desc">overcharge detection · market rate comparison</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">What-If Optimizer</div><div class="office-desc">route/FTA/volume simulation · duty engineering</div><span class="badge g">LIVE</span></div>
+      <div style="height:20px"></div>
+      <h2>🌏 Tier 4 — Expansion</h2>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">Customs Audit Insurance</div><div class="office-desc">risk scoring · compliance report card</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">CBAM Carbon Tracker</div><div class="office-desc">CO₂ calculator · EU CBAM compliance</div><span class="badge g">LIVE</span></div>
+      <div class="office-row"><span class="dot g"></span><div class="office-name">ASEAN Expansion</div><div class="office-desc">6 countries · duty comparison · multi-country</div><span class="badge g">LIVE</span></div>
     </div>
 
     <!-- CLIENTS -->
@@ -294,6 +306,31 @@ h2{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--text)}
       </div>
     </div>
 
+    <!-- VALUATION -->
+    <div class="panel" id="panel-valuation">
+      <h2>📊 Project Valuation — AI TO AI HOLDING</h2>
+      <div class="kpi-grid">
+        <div class="kcard"><div class="kcard-label">Weighted Fair Value</div><div class="kcard-val green" id="val-fair">—</div><div class="kcard-sub">THB (3 approaches)</div></div>
+        <div class="kcard"><div class="kcard-label">Outright Sale</div><div class="kcard-val yellow" id="val-sale">—</div><div class="kcard-sub">1.5x control premium</div></div>
+        <div class="kcard"><div class="kcard-label">Litigation Claim</div><div class="kcard-val" id="val-lit" style="color:var(--red)">—</div><div class="kcard-sub">if IP stolen</div></div>
+        <div class="kcard"><div class="kcard-label">Feature Modules</div><div class="kcard-val" id="val-mods">20</div><div class="kcard-sub">each with intrinsic value</div></div>
+      </div>
+      <div class="two-col">
+        <div class="box">
+          <div class="box-title">Valuation by Approach</div>
+          <div id="val-approaches"><div class="ep-row"><span class="dot y"></span><span class="ep-name">กำลังโหลด...</span></div></div>
+        </div>
+        <div class="box">
+          <div class="box-title">Growth Projection (5yr)</div>
+          <div id="val-growth"><div class="ep-row"><span class="dot y"></span><span class="ep-name">กำลังโหลด...</span></div></div>
+        </div>
+      </div>
+      <div class="box" style="margin-bottom:14px">
+        <div class="box-title">12 Valuation Dimensions</div>
+        <div id="val-dims" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div>
+      </div>
+    </div>
+
     <!-- ROADMAP -->
     <div class="panel" id="panel-roadmap">
       <h2>🗺️ Roadmap</h2>
@@ -301,9 +338,13 @@ h2{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--text)}
       <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 2 — Engines</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Halal · OGA · Tax · FTA · normalize pipeline</div></div><span class="badge g">✅ Done</span></div>
       <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 3 — API & UI</div><div style="font-size:11px;color:var(--muted);margin-top:2px">sandbox · dashboard · chairman office</div></div><span class="badge g">✅ Done</span></div>
       <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 4 — Learning Cache</div><div style="font-size:11px;color:var(--muted);margin-top:2px">cross-lang cache · feedback loop · 202k FTA rows</div></div><span class="badge g">✅ Done</span></div>
-      <div class="road-row"><span class="dot" style="background:#6366f1"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 5 — Market Discovery</div><div style="font-size:11px;color:var(--muted);margin-top:2px">MCP registry · GPT Actions · RapidAPI · LangChain</div></div><span class="badge b">Submitted</span></div>
-      <div class="road-row"><span class="dot y"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 6 — CEO Real Mode (AXIS)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">AXIS _real_process() · command_queue · Claude API</div></div><span class="badge y">Deferred</span></div>
-      <div class="road-row"><span class="dot y"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Phase 7 — Revenue Scale</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Stripe live · multi-tenant · white-label</div></div><span class="badge y">Planned</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Tier 1 — Foundation (P15-P17)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Invoice validation · analytics · pricing · currency</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Tier 2 — Revenue & Growth (P18-P20)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Membership tiers · LINE/PWA/MCP · IP protection</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Tier 3 — Intelligence (P21-P24)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Landed cost · price benchmark · freight audit · what-if</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Tier 4 — Expansion (P25-P28)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Customs audit · CBAM carbon · ASEAN 6 countries · OGA 36 agencies</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot g"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Valuation Engine</div><div style="font-size:11px;color:var(--muted);margin-top:2px">12-dimension automated valuation · ฿348M+ fair value</div></div><span class="badge g">✅ Done</span></div>
+      <div class="road-row"><span class="dot" style="background:#6366f1"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">Market Discovery</div><div style="font-size:11px;color:var(--muted);margin-top:2px">MCP registry · GPT Actions · RapidAPI · LangChain</div></div><span class="badge b">Submitted</span></div>
+      <div class="road-row"><span class="dot y"></span><div style="flex:1"><div style="font-size:12px;font-weight:600">CEO Real Mode (AXIS)</div><div style="font-size:11px;color:var(--muted);margin-top:2px">AXIS _real_process() · command_queue · Claude API</div></div><span class="badge y">Deferred</span></div>
     </div>
 
   </div><!-- /panels -->
@@ -365,6 +406,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById('panel-' + name).classList.add('active');
     if (name === 'clients') loadClients();
     if (name === 'revenue') loadRevenue();
+    if (name === 'valuation') loadValuation();
   });
 });
 
@@ -475,6 +517,55 @@ async function loadRevenue() {
       <td><span class="badge ${t.action==='DEDUCT'?'r':'g'}" style="${t.action==='DEDUCT'?'background:rgba(239,68,68,.15);color:var(--red)':'background:rgba(16,185,129,.15);color:var(--green)'}">${t.action}</span></td>
     </tr>`).join('');
   } catch(e) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:24px">${e.message}</td></tr>`; }
+}
+
+// VALUATION
+async function loadValuation() {
+  try {
+    const r = await fetch(BASE + '/v1/chairman/valuation/summary', {headers: {'X-API-Key': CK}});
+    if (!r.ok) return;
+    const json = await r.json();
+    const d = json.data || {};
+    const fmt = n => '฿' + (n/1e6).toFixed(1) + 'M';
+    document.getElementById('val-fair').textContent = fmt(d.weighted_fair_value_thb || 0);
+    document.getElementById('val-sale').textContent = fmt(d.outright_sale_thb || 0);
+    document.getElementById('val-lit').textContent = fmt(d.litigation_claim_thb || 0);
+    document.getElementById('val-mods').textContent = d.total_feature_modules || 20;
+    // approaches
+    const ap = document.getElementById('val-approaches');
+    ap.innerHTML = '';
+    if (d.approaches) {
+      for (const [k,v] of Object.entries(d.approaches)) {
+        ap.innerHTML += `<div class="ep-row"><span class="dot g"></span><span class="ep-name">${k}</span><span class="ep-code ok">${fmt(v)}</span></div>`;
+      }
+    }
+  } catch(e) {}
+  // growth
+  try {
+    const r2 = await fetch(BASE + '/v1/chairman/valuation/growth?months=60', {headers: {'X-API-Key': CK}});
+    if (!r2.ok) return;
+    const json2 = await r2.json();
+    const proj = json2.data?.projections || [];
+    const gd = document.getElementById('val-growth');
+    gd.innerHTML = '';
+    const fmt2 = n => '฿' + (n/1e6).toFixed(0) + 'M';
+    proj.forEach(p => {
+      gd.innerHTML += `<div class="ep-row"><span class="dot g"></span><span class="ep-name">Year ${p.year} · ${p.projected_users} users</span><span class="ep-code ok">${fmt2(p.projected_valuation_thb)}</span></div>`;
+    });
+  } catch(e) {}
+  // dimensions
+  try {
+    const r3 = await fetch(BASE + '/v1/chairman/valuation/full', {headers: {'X-API-Key': CK}});
+    if (!r3.ok) return;
+    const json3 = await r3.json();
+    const dims = json3.data?.dimensions || [];
+    const dd = document.getElementById('val-dims');
+    dd.innerHTML = '';
+    const fmt3 = n => '฿' + (n/1e6).toFixed(1) + 'M';
+    dims.forEach(d => {
+      dd.innerHTML += `<div class="ep-row"><span class="dot g"></span><span class="ep-name" style="font-size:11px">${d.name_th || d.dimension}</span><span class="ep-code ok">${fmt3(d.value_thb)}</span></div>`;
+    });
+  } catch(e) {}
 }
 
 // KILL SWITCH

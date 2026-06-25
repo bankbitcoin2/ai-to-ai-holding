@@ -100,7 +100,7 @@ async def api_calculate_landed_cost(body: LandedCostRequest, request: Request):
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception as e:
-        raise HTTPException(500, f"Calculation error: {str(e)}")
+        raise HTTPException(500, "Calculation error — please check input parameters")
 
 
 @router.post("/compare")
@@ -131,7 +131,7 @@ async def api_compare_incoterms(body: CompareRequest, request: Request):
             "results": results,
         }
     except Exception as e:
-        raise HTTPException(500, f"Comparison error: {str(e)}")
+        raise HTTPException(500, "Comparison error — please check input parameters")
 
 
 @router.get("/incoterms")

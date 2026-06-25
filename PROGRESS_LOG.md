@@ -4,6 +4,46 @@
 
 ---
 
+## Session 4 — 25 June 2026 (Readiness Checklist)
+
+### Production Readiness
+
+| Item | Description | Files | Status |
+|------|-------------|-------|--------|
+| RC-1 | Unit Tests — 53 test cases, 14 engines, all PASS | tests/test_engines.py | DONE |
+| RC-2 | Error Handling Audit — sanitized str(e) from all public routers | 6 routers modified | DONE |
+| RC-3 | Chairman Dashboard — Valuation tab, Tier 3-4 engines, updated roadmap | chairman.html, index.html | DONE |
+| RC-4 | Railway ENV Vars Checklist | documented below | DONE |
+| RC-5 | Readiness Report + Progress Log | this file | DONE |
+
+### Railway ENV Vars Required
+
+| Variable | Purpose | Status |
+|----------|---------|--------|
+| DATABASE_URL | PostgreSQL connection | SET |
+| ANTHROPIC_API_KEY | Claude API for classification | SET |
+| API_KEYS | Comma-separated client API keys | SET |
+| CHAIRMAN_API_KEY | Chairman access key | SET |
+| CHAIRMAN_ALLOWED_IPS | IP allowlist for chairman endpoints | SET |
+| STRIPE_SECRET_KEY | Payment processing | OPTIONAL |
+| STRIPE_WEBHOOK_SECRET | Stripe webhook verification | OPTIONAL |
+| LINE_CHANNEL_SECRET | LINE bot integration | OPTIONAL |
+| LINE_CHANNEL_TOKEN | LINE bot messaging | OPTIONAL |
+| EXCHANGERATE_API_KEY | Currency exchange rates | OPTIONAL |
+| ALLOWED_ORIGINS | CORS origins | SET |
+
+### Codebase Stats (Updated)
+
+- Python files: 74 (18,000+ lines)
+- SQL schemas: 12
+- API endpoints: 108+
+- Routers: 24
+- AI Engines: 14
+- Unit Tests: 53 (all PASS)
+- Feature Modules: 20
+
+---
+
 ## Session 3 — 25 June 2026 (Continued)
 
 ### Phase 21-24 + Security Hardening + Hotfix

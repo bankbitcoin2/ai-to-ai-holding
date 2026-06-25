@@ -55,7 +55,7 @@ async def client_analytics(
     try:
         data = await get_client_analytics(pool, hint, agent_id, period)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analytics error: {str(e)[:120]}")
+        raise HTTPException(status_code=500, detail="Analytics error — internal processing failed")
     return {"success": True, "data": data}
 
 
@@ -81,5 +81,5 @@ async def chairman_analytics(
     try:
         data = await get_all_clients_analytics(pool, period)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analytics error: {str(e)[:120]}")
+        raise HTTPException(status_code=500, detail="Analytics error — internal processing failed")
     return {"success": True, "data": data}

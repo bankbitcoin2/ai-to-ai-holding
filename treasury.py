@@ -66,7 +66,7 @@ async def settle(
         )
         return result
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Invalid request parameters")
 
 
 @router.get(

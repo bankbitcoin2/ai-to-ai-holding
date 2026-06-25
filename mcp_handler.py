@@ -100,7 +100,7 @@ async def mcp_classify(req: ClassifyRequest, x_api_key: str = Header(..., alias=
         }
 
     except Exception as e:
-        raise HTTPException(500, f"Classification error: {str(e)[:120]}")
+        raise HTTPException(500, "Classification error — internal processing failed")
 
 
 @router.post("/check_fta", summary="MCP: ตรวจสอบ FTA")
@@ -115,7 +115,7 @@ async def mcp_check_fta(req: FTARequest, x_api_key: str = Header(..., alias="X-A
     except ImportError:
         return {"success": False, "error": "FTA engine not available yet"}
     except Exception as e:
-        raise HTTPException(500, f"FTA check error: {str(e)[:120]}")
+        raise HTTPException(500, "FTA check error — internal processing failed")
 
 
 @router.post("/exchange_rate", summary="MCP: แปลงสกุลเงิน")
