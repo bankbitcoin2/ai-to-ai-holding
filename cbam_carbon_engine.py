@@ -35,33 +35,33 @@ CBAM_SECTORS = {
 # Source: IPCC, EU default values for CBAM reporting
 
 EMISSION_FACTORS = {
-    # Cement
-    "2523": {"factor": 640, "unit": "kg CO₂e/tonne", "source": "IPCC default — clinker production"},
+    # Cement — IPCC AR6 Ch.11 + OECD Climate Club 2025
+    "2523": {"factor": 507, "unit": "kg CO₂e/tonne clinker", "source": "IPCC default clinker factor 0.507t CO₂/t clinker; ~60% process + ~40% fuel"},
 
-    # Iron & Steel
-    "72": {"factor": 1850, "unit": "kg CO₂e/tonne", "source": "IPCC default — blast furnace route"},
-    "7201": {"factor": 2100, "unit": "kg CO₂e/tonne", "source": "Pig iron — high emission"},
-    "7206": {"factor": 600, "unit": "kg CO₂e/tonne", "source": "EAF scrap-based steel"},
-    "7207": {"factor": 1900, "unit": "kg CO₂e/tonne", "source": "Semi-finished steel"},
-    "7208": {"factor": 1950, "unit": "kg CO₂e/tonne", "source": "Hot-rolled flat steel"},
-    "7209": {"factor": 2050, "unit": "kg CO₂e/tonne", "source": "Cold-rolled flat steel"},
-    "73": {"factor": 1800, "unit": "kg CO₂e/tonne", "source": "Steel articles — average"},
+    # Iron & Steel — worldsteel 2025 Sustainability Report + OECD 2025
+    "72": {"factor": 1850, "unit": "kg CO₂e/tonne", "source": "Global average 1.85-1.89t CO₂/t steel (worldsteel 2025)"},
+    "7201": {"factor": 1987, "unit": "kg CO₂e/tonne", "source": "BF-BOF route 1.987t CO₂/t (worldsteel 2025)"},
+    "7206": {"factor": 357, "unit": "kg CO₂e/tonne", "source": "EAF scrap-based 0.357t CO₂/t (worldsteel 2025)"},
+    "7207": {"factor": 1900, "unit": "kg CO₂e/tonne", "source": "Semi-finished steel — BF-BOF average"},
+    "7208": {"factor": 1950, "unit": "kg CO₂e/tonne", "source": "Hot-rolled flat steel — BF-BOF + finishing"},
+    "7209": {"factor": 2050, "unit": "kg CO₂e/tonne", "source": "Cold-rolled flat steel — additional rolling energy"},
+    "73": {"factor": 1800, "unit": "kg CO₂e/tonne", "source": "Steel articles — weighted global average"},
 
-    # Aluminium
-    "76": {"factor": 8400, "unit": "kg CO₂e/tonne", "source": "Primary aluminium — global average"},
-    "7601": {"factor": 10000, "unit": "kg CO₂e/tonne", "source": "Unwrought aluminium (primary)"},
-    "7602": {"factor": 500, "unit": "kg CO₂e/tonne", "source": "Aluminium scrap (secondary)"},
+    # Aluminium — International Aluminium Institute (IAI) 2024
+    "76": {"factor": 14800, "unit": "kg CO₂e/tonne", "source": "IAI 2024: global avg smelting intensity 14.8t CO₂e/t (range 4.5-22t)"},
+    "7601": {"factor": 14800, "unit": "kg CO₂e/tonne", "source": "Unwrought primary aluminium — IAI 2024 global avg 14.8t"},
+    "7602": {"factor": 500, "unit": "kg CO₂e/tonne", "source": "Secondary aluminium (scrap recycling) ~0.5t CO₂e/t"},
 
-    # Fertilizers
-    "31": {"factor": 2500, "unit": "kg CO₂e/tonne", "source": "Nitrogen fertilizer — ammonia process"},
-    "3102": {"factor": 3200, "unit": "kg CO₂e/tonne", "source": "Urea — high emission"},
+    # Fertilizers — IPCC AR6 + industry data
+    "31": {"factor": 2500, "unit": "kg CO₂e/tonne", "source": "Nitrogen fertilizer — ammonia-based (Haber-Bosch)"},
+    "3102": {"factor": 3200, "unit": "kg CO₂e/tonne", "source": "Urea — highest emission among N-fertilizers"},
     "3105": {"factor": 2000, "unit": "kg CO₂e/tonne", "source": "NPK compound fertilizer"},
 
-    # Hydrogen
-    "2804": {"factor": 9000, "unit": "kg CO₂e/tonne", "source": "Grey hydrogen (natural gas SMR)"},
+    # Hydrogen — IPCC AR6
+    "2804": {"factor": 9000, "unit": "kg CO₂e/tonne", "source": "Grey hydrogen (natural gas SMR) ~9t CO₂/t H₂"},
 
-    # Electricity
-    "2716": {"factor": 500, "unit": "kg CO₂e/MWh", "source": "Global average grid emission factor"},
+    # Electricity — IEA 2025 global average
+    "2716": {"factor": 494, "unit": "kg CO₂e/MWh", "source": "IEA 2025 global average grid emission factor"},
 }
 
 
@@ -69,14 +69,21 @@ EMISSION_FACTORS = {
 # Used for indirect emissions from electricity in production
 
 GRID_FACTORS = {
-    "TH": 470, "CN": 570, "IN": 720, "VN": 510, "ID": 650,
-    "MY": 580, "JP": 430, "KR": 420, "US": 390, "DE": 320,
-    "FR": 60,  "SE": 13,  "AU": 660, "BR": 70,  "RU": 340,
-    "TR": 440, "ZA": 900, "GB": 230, "PL": 680, "IT": 330,
+    # Source: IEA Emissions Factors 2025, TGO Thailand Nov 2025, CEIC Dec 2024
+    # Unit: kg CO₂e per MWh
+    "TH": 475, # TGO Nov 2025: 0.4750 kgCO₂e/kWh; IEA: 432; CEIC Dec2024: 399 → ใช้ TGO official
+    "CN": 555, "IN": 709, "VN": 510, "ID": 650,
+    "MY": 580, "JP": 432, "KR": 415, "US": 376, "DE": 311,
+    "FR": 56,  "SE": 13,  "AU": 640, "BR": 61,  "RU": 340,
+    "TR": 440, "ZA": 900, "GB": 207, "PL": 670, "IT": 315,
 }
 
 # ── EU ETS Price Reference ──────────────────────────────────────────────────
-EU_ETS_PRICE_EUR_PER_TONNE = 65.0   # Updated periodically; seed value ~€65
+EU_ETS_PRICE_EUR_PER_TONNE = 81.35   # Updated Jun 2026 — highest since Feb 2026
+CBAM_CERTIFICATE_PRICE_EUR = 75.36   # Q1 2026 CBAM certificate price (based on Q4 2025 EUA avg)
+# Source: tradingeconomics.com, EU Commission Apr 2026 announcement
+# Note: EUA range 2025-26 was €60-€95, CBAM full enforcement began 1 Jan 2026
+# Over 12,000 operators applied for CBAM authorisation, 4,100+ approved
 
 
 # ── Data Classes ─────────────────────────────────────────────────────────────
@@ -187,10 +194,10 @@ def calculate_carbon_footprint(
     cbam_sector = _find_cbam_sector(hs_clean)
     cbam_applicable = cbam_sector is not None
 
-    # Calculate CBAM cost
+    # Calculate CBAM cost — use CBAM certificate price (quarterly EUA avg)
     cbam_cost = 0.0
     if cbam_applicable:
-        cbam_cost = (total / 1000.0) * EU_ETS_PRICE_EUR_PER_TONNE
+        cbam_cost = (total / 1000.0) * CBAM_CERTIFICATE_PRICE_EUR
 
     return CarbonFootprint(
         hs_code=hs_code,

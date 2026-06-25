@@ -17,6 +17,12 @@ from typing import Optional
 # ── ASEAN Country Profiles ───────────────────────────────────────────────────
 
 ASEAN_COUNTRIES = {
+    # Sources: WTO Tariff Profiles 2024, trade.gov, macrotrends.net
+    # Thai avg MFN: 7.4% trade-weighted (WTO 2024); Ag 28.3%, Non-Ag 7%
+    # VN avg MFN: 9.6% (WTO 2024); recently reduced on select ag products
+    # MY avg MFN: 6.1% (WTO); ID avg MFN: 8.1% (WTO)
+    # Last verified: June 2026
+
     "TH": {
         "name_th": "ไทย",
         "name_en": "Thailand",
@@ -24,7 +30,7 @@ ASEAN_COUNTRIES = {
         "currency": "THB",
         "vat_rate": 7.0,
         "hs_digits": 11,  # HS code ใช้กี่หลัก
-        "avg_mfn_rate": 9.4,
+        "avg_mfn_rate": 7.4,  # WTO 2024 trade-weighted; simple avg ~11.5%
         "trade_agreements": ["ATIGA", "ACFTA", "JTEPA", "AKFTA", "TAFTA", "TNZFTA",
                              "AIFTA", "RCEP", "TCFTA", "TPFTA"],
         "nsw_url": "https://nsw.customs.go.th",
@@ -36,9 +42,9 @@ ASEAN_COUNTRIES = {
         "name_en": "Vietnam",
         "customs_authority": "General Department of Vietnam Customs (GDVC)",
         "currency": "VND",
-        "vat_rate": 8.0,
+        "vat_rate": 8.0,   # Reduced from 10% to 8% (extended)
         "hs_digits": 8,
-        "avg_mfn_rate": 9.6,
+        "avg_mfn_rate": 9.5,  # WTO 2024; reduced on select ag products Mar 2025
         "trade_agreements": ["ATIGA", "ACFTA", "AJCEP", "VKFTA", "EVFTA", "CPTPP",
                              "RCEP", "UKVFTA"],
         "nsw_url": "https://vnsw.gov.vn",

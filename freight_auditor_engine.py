@@ -70,29 +70,34 @@ CHARGE_CATEGORIES = {
 
 # ── Market Reference Rates ───────────────────────────────────────────────────
 # อัตราตลาดอ้างอิง (USD) — ใช้เป็นฐานเปรียบเทียบ
-# Source: Freight forwarder rate schedules (averaged), 2025-2026
+# Sources: Freightos FBX Jun 2026, Drewry WCI Jun 2026, FreightAmigo 2026
+# Intra-Asia rates: Drewry Intra-Asia Index $232/40ft (Laem Chabang-Shanghai)
+# Global WCI: $3,969/40ft (Jun 18, 2026, +12% WoW)
+# China-Asia: ~$1,500-$2,100/20ft container (Freightos 2026)
+# THC upward pressure +5-15% in Asia hubs (FreightAmigo 2026)
+# Last updated: June 2026
 
 # Per container rates (20ft / 40ft)
 MARKET_RATES_SEA: dict[str, dict] = {
     "thc_origin": {
-        "asean": {"min": 50, "typical": 80, "max": 120},
-        "east_asia": {"min": 80, "typical": 120, "max": 180},
-        "south_asia": {"min": 60, "typical": 100, "max": 150},
-        "europe": {"min": 100, "typical": 150, "max": 220},
-        "americas": {"min": 120, "typical": 180, "max": 250},
-        "default": {"min": 80, "typical": 130, "max": 200},
+        "asean": {"min": 55, "typical": 90, "max": 135},
+        "east_asia": {"min": 90, "typical": 135, "max": 200},
+        "south_asia": {"min": 65, "typical": 110, "max": 165},
+        "europe": {"min": 110, "typical": 165, "max": 245},
+        "americas": {"min": 130, "typical": 195, "max": 275},
+        "default": {"min": 85, "typical": 145, "max": 220},
     },
     "thc_destination": {
-        "default": {"min": 80, "typical": 120, "max": 180},
+        "default": {"min": 85, "typical": 135, "max": 200},
     },
     "cfs_charge": {
-        "default": {"min": 30, "typical": 50, "max": 80},
+        "default": {"min": 35, "typical": 55, "max": 90},
     },
     "seal_fee": {
-        "default": {"min": 10, "typical": 15, "max": 25},
+        "default": {"min": 10, "typical": 18, "max": 30},
     },
     "baf": {
-        "default": {"min": 100, "typical": 200, "max": 400},
+        "default": {"min": 120, "typical": 230, "max": 450},
     },
     "caf": {
         "default": {"min": 0, "typical": 30, "max": 80},
