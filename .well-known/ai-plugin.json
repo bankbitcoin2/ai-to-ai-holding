@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_model": "ai_to_ai_holding_customs",
   "name_for_human": "AI TO AI HOLDING — Thai Trade Intelligence",
-  "description_for_model": "Thai Trade Intelligence API for AI agents. One call returns: HS code classification (Thai + English input), import duty (MFN), best FTA rate across 13 agreements, OGA permit requirements from relevant Thai agencies, and Halal compliance status across 21 countries. Every response includes SHA-256 audit hash and CKAN-verified source citation. Lookup pipeline: keyword_match → CKAN_fallback → cache. Output is decision-support only — not binding legal advice. Sandbox: POST /v1/sandbox/classify (no auth, 20 req/min). Production: POST /v1/customs/classify with X-API-Key header (60 req/min, $1.50/query prepaid via Stripe).",
-  "description_for_human": "One API call. Full Thai trade compliance. HS code + 13 FTA rates + OGA permits + Halal status across 21 countries — with SHA-256 evidence chain on every answer. Accepts Thai and English product descriptions.",
+  "description_for_model": "Thai Customs Intelligence API with 14 AI engines. Core: HS code classification (Thai+English), import duty (MFN), best FTA rate across 13 agreements, OGA permits (36 agencies), Halal compliance (21 countries). Intelligence: Landed Cost Calculator (11 Incoterms), Price Benchmark (under-valuation detection), Freight Auditor (overcharge detection), What-If Optimizer (route/FTA simulation), Customs Audit Risk Score, CBAM Carbon Tracker (EU compliance), ASEAN expansion (6 countries). Every response includes SHA-256 audit hash. Sandbox: POST /v1/sandbox/classify (no auth). Production: X-API-Key required.",
+  "description_for_human": "14 AI engines for Thai trade compliance. HS classification + 13 FTA rates + 36 OGA agencies + Halal (21 countries) + Landed Cost + Freight Audit + CBAM Carbon + ASEAN 6 countries. SHA-256 evidence chain on every answer.",
   "auth": {
     "type": "service_http",
     "authorization_type": "bearer",
@@ -21,12 +21,17 @@
     "hs_code_classification",
     "import_duty_calculation",
     "fta_rate_lookup",
-    "oga_compliance_check",
-    "halal_certification_check",
-    "ckan_customs_fallback",
+    "oga_compliance_check_36_agencies",
+    "halal_certification_21_countries",
+    "landed_cost_calculator_11_incoterms",
+    "price_benchmark_undervaluation",
+    "freight_rate_auditor",
+    "whatif_scenario_optimizer",
+    "customs_audit_risk_score",
+    "cbam_carbon_tracker",
+    "asean_expansion_6_countries",
     "sha256_evidence_chain",
-    "thai_customs_law",
-    "trade_statistics"
+    "thai_customs_law"
   ],
   "gpt_actions": {
     "type": "openapi",
@@ -49,12 +54,17 @@
     "note": "Checks halal certification requirement per destination country"
   },
   "oga_engine": {
-    "agencies": [
-      "FDA (อย.)", "กรมประมง", "กรมปศุสัตว์",
-      "มอก./TISI", "กรมวิชาการเกษตร",
-      "กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่"
-    ],
-    "note": "Returns required permit agencies per HS code"
+    "agencies_count": 36,
+    "note": "Returns required permit agencies per HS code — covers all Thai regulatory bodies"
+  },
+  "intelligence_engines": {
+    "landed_cost": "11 Incoterms, freight/insurance, multi-currency",
+    "price_benchmark": "under-valuation detection, risk scoring",
+    "freight_auditor": "overcharge detection, 18 charge types",
+    "whatif_optimizer": "route/FTA/volume simulation, duty engineering",
+    "customs_audit": "risk scoring, compliance report card",
+    "cbam_carbon": "CO2 calculator, EU CBAM compliance, 6 sectors",
+    "asean_expansion": "6 countries: TH, VN, MY, ID, PH, SG"
   },
   "audit": {
     "evidence_chain": "SHA-256 hash on every response",
@@ -62,16 +72,4 @@
     "lookup_chain": ["keyword_match", "CKAN_fallback", "cache_hit"]
   },
   "pricing": {
-    "sandbox": "free — no API key required, 20 req/min",
-    "production": "$1.50 per query — prepaid credits via Stripe, no contract, no monthly fee"
-  },
-  "rate_limits": {
-    "sandbox": "20 req/min (no auth)",
-    "production": "60 req/min (X-API-Key required)"
-  },
-  "sandbox_example": {
-    "method": "POST",
-    "url": "https://web-production-c9da4.up.railway.app/v1/sandbox/classify",
-    "body": { "description": "มือถือ iPhone 16 Pro" }
-  }
-}
+    "sandbox": "free �

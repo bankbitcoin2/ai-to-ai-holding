@@ -1,0 +1,394 @@
+openapi: "3.0.3"
+info:
+  title: "AI TO AI HOLDING — Thai Customs Intelligence"
+  version: "3.0.0"
+  description: |
+    14 AI engines for Thai trade compliance.
+
+    **Core Engines:**
+    - HS Code Classification (Thai + English input)
+    - 13 FTA Rate Lookup (RCEP, AFTA, ACFTA, AJCEP, AKFTA, AANZFTA, AIFTA, TAFTA, TNZCEP, JTEPA, TCFTA, TPFTA, MFN)
+    - 36 OGA Agency Compliance Check
+    - Halal Certification (21 countries)
+
+    **Intelligence Engines:**
+    - Landed Cost Calculator (11 Incoterms)
+    - Price Benchmark (under-valuation detection)
+    - Freight Rate Auditor (overcharge detection)
+    - What-If Scenario Optimizer (route/FTA simulation)
+    - Customs Audit Risk Score
+    - CBAM Carbon Tracker (EU compliance)
+    - ASEAN Duty Comparison (6 countries)
+
+    Every response includes SHA-256 evidence chain.
+  contact:
+    name: "AI TO AI HOLDING"
+    email: "bankbitcoin2@gmail.com"
+  x-rapidapi-category: "Business"
+  x-rapidapi-subcategory: "Trade & Customs"
+
+servers:
+  - url: "https://web-production-c9da4.up.railway.app"
+    description: "Production"
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    ClassifyRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required: [description]
+            properties:
+              description:
+                type: string
+                example: "hydraulic excavator 20 ton"
+              origin_country:
+                type: string
+                example: "CN"
+              value_usd:
+                type: number
+                example: 45000
+              quantity:
+                type: number
+                example: 1
+              unit:
+                type: string
+                example: "SET"
+
+    SandboxRequest:
+      type: object
+      required: [description]
+      properties:
+        description:
+          type: string
+          example: "มือถือ iPhone 16 Pro"
+
+    LandedCostRequest:
+      type: object
+      required: [product_value, hs_code, origin_country]
+      properties:
+        product_value:
+          type: number
+          example: 10000
+        hs_code:
+          type: string
+          example: "8471.30"
+        origin_country:
+          type: string
+          example: "CN"
+        incoterm:
+          type: string
+          enum: [EXW, FCA, FAS, FOB, CFR, CIF, CPT, CIP, DAP, DPU, DDP]
+          example: "FOB"
+        weight_kg:
+          type: number
+          example: 500
+
+    FreightAuditRequest:
+      type: object
+      required: [charges]
+      properties:
+        charges:
+          type: array
+          items:
+            type: object
+            properties:
+              charge_type:
+                type: string
+                example: "THC"
+              description:
+                type: string
+                example: "Terminal handling"
+              amount_usd:
+                type: number
+                example: 350
+        shipment_mode:
+          type: string
+          enum: [sea, air, land]
+          example: "sea"
+
+    WhatIfRequest:
+      type: object
+      required: [product_value, hs_code, origin_country, mfn_duty_rate]
+      properties:
+        product_value:
+          type: number
+          example: 50000
+        hs_code:
+          type: string
+          example: "8471.30"
+        origin_country:
+          type: string
+          example: "CN"
+        mfn_duty_rate:
+          type: number
+          example: 0.10
+
+    CbamRequest:
+      type: object
+      required: [hs_code]
+      properties:
+        hs_code:
+          type: string
+          example: "7208.51"
+        weight_kg:
+          type: number
+          example: 10000
+        origin_country:
+          type: string
+          example: "CN"
+
+paths:
+  /v1/sandbox/classify:
+    post:
+      summary: "Sandbox Classify (Free — No Auth)"
+      description: "Free trial endpoint. No API key required. Rate limited to 20 req/min. Returns HS code, duty rate, FTA rates, OGA, Halal flags."
+      operationId: sandboxClassify
+      security: []
+      tags: [Sandbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SandboxRequest"
+      responses:
+        "200":
+          description: "Classification result"
+        "429":
+          description: "Rate limit exceeded (20 req/min)"
+
+  /v1/customs/classify:
+    post:
+      summary: "Full Classification (Auth Required)"
+      description: "Classify products into Thai Customs HS Code. Returns candidates ranked by confidence with FTA rates (13 agreements), OGA permits (36 agencies), Halal status (21 countries), and SHA-256 evidence chain."
+      operationId: classifyHsCode
+      tags: [Classification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassifyRequest"
+      responses:
+        "200":
+          description: "Classification result with HS code, duty, FTA, OGA, Halal"
+        "401":
+          description: "Missing or invalid API key"
+
+  /v1/fta/check:
+    post:
+      summary: "FTA Rate Lookup"
+      description: "Look up best preferential duty rate across 13 FTA agreements between Thailand and origin country."
+      operationId: checkFtaRate
+      tags: [Classification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hs_code, origin_country]
+              properties:
+                hs_code:
+                  type: string
+                  example: "8507.60"
+                origin_country:
+                  type: string
+                  example: "CN"
+      responses:
+        "200":
+          description: "FTA rates across all applicable agreements"
+
+  /v1/oga/check:
+    post:
+      summary: "OGA Compliance Check"
+      description: "Check if product requires Other Government Agency permits. Covers 36 Thai agencies including FDA, TISI, Department of Agriculture, Fisheries, Livestock."
+      operationId: checkOgaCompliance
+      tags: [Classification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hs_code]
+              properties:
+                hs_code:
+                  type: string
+                  example: "0306.17"
+                product_description:
+                  type: string
+                  example: "frozen shrimp"
+      responses:
+        "200":
+          description: "Required agencies and permits"
+
+  /v1/landed-cost/calculate:
+    post:
+      summary: "Landed Cost Calculator"
+      description: "Calculate total landed cost including product value, freight, insurance, duty, VAT 7%, and local charges. Supports 11 Incoterms."
+      operationId: calculateLandedCost
+      tags: [Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LandedCostRequest"
+      responses:
+        "200":
+          description: "Landed cost breakdown"
+
+  /v1/landed-cost/compare-incoterms:
+    post:
+      summary: "Compare Incoterms"
+      description: "Compare landed cost across all 11 Incoterms side by side."
+      operationId: compareIncoterms
+      tags: [Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product_values, hs_code, origin_country, weight_kg]
+              properties:
+                product_values:
+                  type: object
+                  example: {"FOB": 10000}
+                hs_code:
+                  type: string
+                origin_country:
+                  type: string
+                weight_kg:
+                  type: number
+      responses:
+        "200":
+          description: "Incoterm comparison table"
+
+  /v1/freight-audit/audit:
+    post:
+      summary: "Freight Bill Auditor"
+      description: "Audit freight charges against market benchmarks. Detects overcharges across 18 charge types (THC, CFS, BAF, demurrage, etc.)."
+      operationId: auditFreightBill
+      tags: [Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FreightAuditRequest"
+      responses:
+        "200":
+          description: "Audit result with flagged overcharges"
+
+  /v1/whatif/simulate:
+    post:
+      summary: "What-If Scenario Optimizer"
+      description: "Simulate 3 import scenarios (cheapest/fastest/balanced) with route, FTA, and transport mode comparison."
+      operationId: simulateWhatIf
+      tags: [Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatIfRequest"
+      responses:
+        "200":
+          description: "3 scenario options with cost comparison"
+
+  /v1/carbon/check:
+    post:
+      summary: "CBAM Carbon Check"
+      description: "Check EU CBAM applicability and calculate carbon footprint/cost for iron/steel, aluminium, cement, fertiliser, hydrogen, electricity."
+      operationId: checkCbam
+      tags: [Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CbamRequest"
+      responses:
+        "200":
+          description: "CBAM applicability and carbon cost estimate"
+
+  /v1/asean/compare-duties:
+    get:
+      summary: "ASEAN Duty Comparison"
+      description: "Compare import duties across 6 ASEAN countries (TH, VN, MY, ID, PH, SG) for the same HS code."
+      operationId: compareAseanDuties
+      tags: [Intelligence]
+      parameters:
+        - name: hs_code
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "8471.30"
+      responses:
+        "200":
+          description: "Duty comparison across 6 countries"
+
+  /v1/benchmark/check:
+    post:
+      summary: "Price Benchmark Check"
+      description: "Check if declared value is suspiciously low compared to market benchmarks. Returns risk score and recommendation."
+      operationId: assessValuationRisk
+      tags: [Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hs_code, declared_value_usd, origin_country]
+              properties:
+                hs_code:
+                  type: string
+                  example: "8471.30"
+                declared_value_usd:
+                  type: number
+                  example: 500
+                origin_country:
+                  type: string
+                  example: "CN"
+      responses:
+        "200":
+          description: "Valuation risk score"
+
+  /health:
+    get:
+      summary: "Health Check"
+      description: "Server health status"
+      operationId: healthCheck
+      security: []
+      tags: [System]
+      responses:
+        "200":
+          description: "Server status"
+
+tags:
+  - name: Sandbox
+    description: "Free trial endpoints — no API key required"
+  - name: Classification
+    description: "Core HS classification, FTA, OGA engines"
+  - name: Intelligence
+    description: "Advanced analytics — Landed Cost, Freight Audit, What-If, CBAM, ASEAN"
+  - name: System
+    description: "Health and status endpoints"

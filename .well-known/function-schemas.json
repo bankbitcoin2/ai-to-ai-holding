@@ -80,10 +80,16 @@
         "required": ["hs_code"]
       },
       "endpoint": "POST /v1/customs/classify"
-    }
-  ],
-  "langchain_tool_example": {
-    "_comment": "Python snippet for LangChain integration",
-    "code": "from langchain.tools import StructuredTool\nimport requests\n\ndef classify_product(product_description: str, origin_country: str = 'CN') -> dict:\n    resp = requests.post(\n        'https://web-production-c9da4.up.railway.app/v1/customs/classify',\n        headers={'X-API-Key': 'YOUR_KEY', 'Content-Type': 'application/json'},\n        json={'items': [{'description': product_description, 'origin_country': origin_country}]}\n    )\n    return resp.json()\n\ncustoms_tool = StructuredTool.from_function(\n    func=classify_product,\n    name='thai_customs_classifier',\n    description='Classify products for Thai customs import. Returns HS code, duty rate, FTA rates, OGA requirements.'\n)"
-  }
-}
+    },
+    {
+      "name": "calculate_landed_cost",
+      "description": "Calculate total Landed Cost including product value, freight, insurance, duty, VAT, and local charges. Supports 11 Incoterms (FOB, CIF, EXW, etc.) and multi-currency.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "product_value": { "type": "number", "description": "Product value in USD" },
+          "hs_code": { "type": "string", "description": "HS Code 4-10 digits" },
+          "origin_country": { "type": "string", "description": "2-letter ISO country code" },
+          "incoterm": { "type": "string", "description": "Incoterm 2020", "enum": ["EXW","FCA","FAS","FOB","CFR","CIF","CPT","CIP","DAP","DPU","DDP"] },
+          "weight_kg": { "type": "number", "description": "Weight in kilograms" }
+  

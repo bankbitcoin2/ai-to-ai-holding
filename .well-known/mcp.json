@@ -1,7 +1,7 @@
 {
   "name": "ai-to-ai-holding-customs",
-  "version": "2.0.0",
-  "description": "Thai Trade Intelligence MCP Server — One call returns HS code classification, best FTA rate across 13 agreements, OGA permit requirements, and Halal compliance status across 21 countries. SHA-256 evidence chain on every response. Accepts Thai and English product descriptions.",
+  "version": "3.0.0",
+  "description": "Thai Customs Intelligence MCP Server — 14 AI engines. HS classification, 13 FTA agreements, 36 OGA agencies, Halal (21 countries), Landed Cost (11 Incoterms), Price Benchmark, Freight Audit, What-If Optimizer, Customs Audit Risk, CBAM Carbon, ASEAN expansion (6 countries). SHA-256 evidence chain.",
   "protocol": "mcp",
   "transport": ["http", "stdio"],
   "server_url": "https://web-production-c9da4.up.railway.app/mcp",
@@ -88,38 +88,25 @@
     },
     {
       "name": "sandbox_classify",
-      "description": "Free trial — no API key required. Rate limited to 20 req/min. Returns full classification result including HS code, FTA rates, OGA, and Halal flags. Suitable for prototyping and integration testing.",
+      "description": "Free trial — no API key required. Rate limited to 20 req/min. Returns full classification result including HS code, FTA rates, OGA, and Halal flags.",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "product_description": {
-            "type": "string",
-            "description": "Product description in Thai, English, or mixed"
-          }
+          "product_description": { "type": "string", "description": "Product description in Thai, English, or mixed" }
         },
         "required": ["product_description"]
       }
-    }
-  ],
-  "auth": {
-    "type": "bearer",
-    "header": "X-API-Key",
-    "sandbox_bypass": true,
-    "sandbox_endpoint": "/v1/sandbox/classify"
-  },
-  "pricing": {
-    "sandbox": "free",
-    "production": "$1.50 per query — prepaid Stripe credits, no contract"
-  },
-  "audit": {
-    "evidence_chain": "SHA-256 hash on every response",
-    "lookup_pipeline": ["keyword_match", "CKAN_fallback", "cache_hit"]
-  },
-  "fta_coverage": [
-    "AFTA", "ACFTA", "AJCEP", "AKFTA", "AANZFTA",
-    "AIFTA", "TAFTA", "TNZCEP", "JTEPA", "RCEP",
-    "TCFTA", "TPFTA", "MFN"
-  ],
-  "halal_countries_covered": 21,
-  "supported_input_languages": ["th", "en", "mixed"]
-}
+    },
+    {
+      "name": "calculate_landed_cost",
+      "description": "Calculate total Landed Cost with 11 Incoterms. Returns product value + freight + insurance + duty + VAT + local charges breakdown.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_value": { "type": "number", "description": "Product value in USD" },
+          "hs_code": { "type": "string", "description": "HS Code" },
+          "origin_country": { "type": "string", "description": "ISO alpha-2" },
+          "incoterm": { "type": "string", "description": "EXW/FCA/FAS/FOB/CFR/CIF/CPT/CIP/DAP/DPU/DDP" },
+          "weight_kg": { "type": "number", "description": "Weight in kg" }
+        },
+        "r
