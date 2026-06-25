@@ -997,6 +997,8 @@ const i18n = {
     btn_evaluate:'ประเมินราคา', btn_check:'ตรวจสอบ',
     engine_processing:'กำลังประมวลผล...', engine_coming_soon:'Engine กำลังเตรียมพร้อม',
     engine_coming_desc:'Engine นี้กำลัง calibrate สำหรับบัญชีของคุณ จะพร้อมใช้งานเร็วๆ นี้สำหรับสมาชิก SuperPremium',
+    engine_auth_title:'กรุณาล็อกอินก่อนใช้งาน', engine_auth_desc:'API Key ของคุณไม่มีสิทธิ์เข้าถึง Engine นี้ กรุณาตรวจสอบสิทธิ์หรือติดต่อทีมงาน',
+    engine_credit_title:'เครดิตไม่เพียงพอ', engine_credit_desc:'กรุณาเติมเครดิตเพื่อใช้งาน Engine นี้',
     apikey_hint:'ใช้ header:', apikey_hint2:'กับทุก production endpoint',
     // Invoice
     inv_section_sub:'อัปโหลด Invoice → HS Code + ภาษี + FTA อัตโนมัติ',
@@ -1084,6 +1086,8 @@ const i18n = {
     btn_evaluate:'Evaluate', btn_check:'Check',
     engine_processing:'Processing...', engine_coming_soon:'Engine Calibrating',
     engine_coming_desc:'This engine is being calibrated for your account. Available soon for SuperPremium members.',
+    engine_auth_title:'Authentication Required', engine_auth_desc:'Your API Key does not have access to this Engine. Please check your permissions or contact support.',
+    engine_credit_title:'Insufficient Credits', engine_credit_desc:'Please top up credits to use this Engine.',
     apikey_hint:'Use header:', apikey_hint2:'with all production endpoints',
     inv_section_sub:'Upload Invoice → HS Code + Duty + FTA Automatically',
     inv_drop_title:'Drop file here or click to select', inv_drop_sub:'Supports PDF · JPG · PNG · XLSX · CSV (max 10MB)',
@@ -1164,6 +1168,8 @@ const i18n = {
     btn_evaluate:'评估', btn_check:'检查',
     engine_processing:'处理中...', engine_coming_soon:'引擎校准中',
     engine_coming_desc:'此引擎正在为您的账户校准，SuperPremium会员即将可用。',
+    engine_auth_title:'需要身份验证', engine_auth_desc:'您的API密钥无权访问此引擎，请检查权限或联系支持。',
+    engine_credit_title:'余额不足', engine_credit_desc:'请充值后使用此引擎。',
     apikey_hint:'使用header：', apikey_hint2:'用于所有接口',
     inv_section_sub:'上传发票→自动HS+关税+FTA',
     inv_drop_title:'拖放文件或点击选择', inv_drop_sub:'支持PDF·JPG·PNG·XLSX·CSV（最大10MB）',
@@ -1242,6 +1248,8 @@ const i18n = {
     btn_evaluate:'評価', btn_check:'確認',
     engine_processing:'処理中...', engine_coming_soon:'エンジン調整中',
     engine_coming_desc:'このエンジンはアカウント向けに調整中です。SuperPremiumメンバー向けにまもなく利用可能。',
+    engine_auth_title:'認証が必要です', engine_auth_desc:'APIキーにこのエンジンへのアクセス権がありません。権限を確認するかサポートにお問い合わせください。',
+    engine_credit_title:'クレジット不足', engine_credit_desc:'このエンジンを使用するにはクレジットをチャージしてください。',
     apikey_hint:'ヘッダー：', apikey_hint2:'全エンドポイントに適用',
     inv_section_sub:'請求書→HSコード+関税+FTA自動分析',
     inv_drop_title:'ファイルをドロップまたはクリック', inv_drop_sub:'PDF·JPG·PNG·XLSX·CSV対応（最大10MB）',
@@ -1428,6 +1436,12 @@ async function callEngine(name){
     const res=await fetch(API+eng.endpoint,{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':currentKey},body:JSON.stringify(eng.fields())});
     if(res.status===404||res.status===501){
       resultEl.innerHTML=`<div class="coming-soon-box"><div class="cs-icon">🚀</div><div class="cs-title">${t('engine_coming_soon')}</div><div class="cs-desc">${t('engine_coming_desc')}</div></div>`;return;
+    }
+    if(res.status===401){
+      resultEl.innerHTML=`<div style="padding:1.5rem;text-align:center;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px"><div style="font-size:2rem;margin-bottom:.5rem">🔑</div><div style="font-size:.95rem;font-weight:700;color:var(--yellow);margin-bottom:.4rem">${t('engine_auth_title')}</div><div style="font-size:.82rem;color:var(--muted)">${t('engine_auth_desc')}</div></div>`;return;
+    }
+    if(res.status===402||res.status===429){
+      resultEl.innerHTML=`<div style="padding:1.5rem;text-align:center;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px"><div style="font-size:2rem;margin-bottom:.5rem">💳</div><div style="font-size:.95rem;font-weight:700;color:var(--yellow);margin-bottom:.4rem">${t('engine_credit_title')}</div><div style="font-size:.82rem;color:var(--muted)">${t('engine_credit_desc')}</div><button onclick="openTopup()" class="btn btn-accent" style="margin-top:.8rem;font-size:.82rem">${t('topup_btn')}</button></div>`;return;
     }
     const data=await res.json();
     if(!res.ok)throw new Error(data.detail||'Error '+res.status);
