@@ -1,26 +1,16 @@
 """
-oga_engine.py — Other Government Agency (OGA) Rules Engine
+oga_engine.py — Phase 26: Dynamic OGA Rules Engine (Enhanced)
+AI TO AI HOLDING — Customs Intelligence Division
+
+กฎ OGA (Other Government Agency) 36 หน่วยงานไทย:
+  - ตรวจสอบว่า HS code ต้องขอใบอนุญาตจากหน่วยงานใดบ้าง
+  - แจ้งเอกสารที่ต้องเตรียม + เวลาดำเนินการ
+  - Batch check หลาย HS codes พร้อมกัน
+  - NSW (National Single Window) link
+
 Bundled offline rules — ทำงานได้โดยไม่ต้อง KNOWLEDGE_ROOT
-
-ครอบคลุม HS Chapters ที่ต้องขออนุญาตนำเข้า/ส่งออกในประเทศไทย
 อ้างอิง: พ.ร.บ. ศุลกากร 2560, กฎหมายเฉพาะแต่ละหน่วยงาน
-
-หน่วยงานกำกับ (agency_abbr):
-  DOF  = กรมประมง (Department of Fisheries)
-  DLD  = กรมปศุสัตว์ (Department of Livestock Development)
-  DOA  = กรมวิชาการเกษตร (Department of Agriculture)
-  FDA  = สำนักงานคณะกรรมการอาหารและยา
-  EXCISE = กรมสรรพสามิต
-  DMR  = กรมทรัพยากรธรณี (Department of Mineral Resources)
-  MOD  = กระทรวงกลาโหม (Ministry of Defence)
-  MOC  = กระทรวงพาณิชย์ (Ministry of Commerce)
-  ONCB = สำนักงาน ป.ป.ส. (Office of the Narcotics Control Board)
-  DITP = กรมส่งเสริมการค้าระหว่างประเทศ
-  CITES = อนุสัญญา CITES (Convention on International Trade in Endangered Species)
-  DNP  = กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช
-  MOE  = กระทรวงพลังงาน
-  NRC  = สำนักงานปรมาณูเพื่อสันติ (Nuclear Regulatory Commission)
-  TISI = สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม
+Roadmap: auto-sync จาก NSW API ทุกสัปดาห์
 
 หมายเหตุ: ข้อมูลนี้เป็นการประมาณการเบื้องต้น
 ยืนยันกับ กรมศุลกากร / หน่วยงานที่เกี่ยวข้องก่อนนำเข้า/ส่งออกจริง
@@ -359,8 +349,210 @@ def list_chapters() -> list[str]:
 def status() -> dict:
     return {
         "engine": "OGA_ENGINE_BUNDLED",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "rules_count": len(_RULES),
+        "agencies_count": len(_AGENCIES),
         "mode": "OFFLINE",
-        "note": "Rules bundled in repo — no external dependency required",
+        "note": "Phase 26 enhanced — 36 agencies, batch check, doc listing, processing time",
     }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 26 ENHANCED — ADDITIONAL AGENCIES
+# ─────────────────────────────────────────────────────────────────────────────
+
+_AGENCIES.update({
+    "NBTC":   {"name_th": "สำนักงาน กสทช.",                           "name_en": "National Broadcasting and Telecommunications Commission", "url": "https://www.nbtc.go.th"},
+    "DIW":    {"name_th": "กรมโรงงานอุตสาหกรรม",                      "name_en": "Department of Industrial Works",                  "url": "https://www.diw.go.th"},
+    "OIE":    {"name_th": "สำนักงานเศรษฐกิจอุตสาหกรรม",              "name_en": "Office of Industrial Economics",                  "url": "https://www.oie.go.th"},
+    "BOI":    {"name_th": "สำนักงานคณะกรรมการส่งเสริมการลงทุน",      "name_en": "Board of Investment",                              "url": "https://www.boi.go.th"},
+    "DFT":    {"name_th": "กรมการค้าต่างประเทศ",                      "name_en": "Department of Foreign Trade",                     "url": "https://www.dft.go.th"},
+    "DIT":    {"name_th": "กรมการค้าภายใน",                           "name_en": "Department of Internal Trade",                    "url": "https://www.dit.go.th"},
+    "ONEP":   {"name_th": "สำนักงานนโยบายและแผนทรัพยากรธรรมชาติฯ",   "name_en": "Office of Natural Resources and Environmental Policy and Planning", "url": "https://www.onep.go.th"},
+    "PCD":    {"name_th": "กรมควบคุมมลพิษ",                           "name_en": "Pollution Control Department",                    "url": "https://www.pcd.go.th"},
+    "DMF":    {"name_th": "กรมป่าไม้",                                 "name_en": "Royal Forest Department",                         "url": "https://www.forest.go.th"},
+    "DMSC":   {"name_th": "กรมวิทยาศาสตร์การแพทย์",                   "name_en": "Department of Medical Sciences",                  "url": "https://www.dmsc.moph.go.th"},
+    "DDC":    {"name_th": "กรมควบคุมโรค",                              "name_en": "Department of Disease Control",                   "url": "https://ddc.moph.go.th"},
+    "DEDE":   {"name_th": "กรมพัฒนาพลังงานทดแทนฯ",                   "name_en": "Department of Alternative Energy Development and Efficiency", "url": "https://www.dede.go.th"},
+    "DOEB":   {"name_th": "กรมธุรกิจพลังงาน",                         "name_en": "Department of Energy Business",                   "url": "https://www.doeb.go.th"},
+    "DPIM":   {"name_th": "กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่",     "name_en": "Department of Primary Industries and Mines",       "url": "https://www.dpim.go.th"},
+    "DPC":    {"name_th": "กรมศิลปากร",                                "name_en": "Fine Arts Department",                            "url": "https://www.finearts.go.th"},
+    "ACFS":   {"name_th": "สำนักงานมาตรฐานสินค้าเกษตรฯ",             "name_en": "National Bureau of Agricultural Commodity and Food Standards", "url": "https://www.acfs.go.th"},
+    "OAE":    {"name_th": "สำนักงานเศรษฐกิจการเกษตร",                 "name_en": "Office of Agricultural Economics",                "url": "https://www.oae.go.th"},
+    "RFD":    {"name_th": "กรมการข้าว",                                "name_en": "Rice Department",                                 "url": "https://www.ricethailand.go.th"},
+    "SCD":    {"name_th": "กรมหม่อนไหม",                              "name_en": "Queen Sirikit Department of Sericulture",          "url": "https://www.qsds.go.th"},
+    "TOBACCO": {"name_th": "การยาสูบแห่งประเทศไทย",                   "name_en": "Tobacco Authority of Thailand",                   "url": "https://www.thaitobacco.or.th"},
+    "DOPA":   {"name_th": "กรมการปกครอง",                              "name_en": "Department of Provincial Administration",         "url": "https://www.dopa.go.th"},
+    "DSI":    {"name_th": "กรมสอบสวนคดีพิเศษ",                        "name_en": "Department of Special Investigation",             "url": "https://www.dsi.go.th"},
+    "OAP":    {"name_th": "สำนักงานปรมาณูเพื่อสันติ",                 "name_en": "Office of Atoms for Peace",                       "url": "https://www.oap.go.th"},
+    "MDES":   {"name_th": "กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม",     "name_en": "Ministry of Digital Economy and Society",          "url": "https://www.mdes.go.th"},
+    "BOT":    {"name_th": "ธนาคารแห่งประเทศไทย",                      "name_en": "Bank of Thailand",                                "url": "https://www.bot.or.th"},
+    "SEC":    {"name_th": "สำนักงาน ก.ล.ต.",                          "name_en": "Securities and Exchange Commission",              "url": "https://www.sec.or.th"},
+})
+
+# Additional HS rules for enhanced coverage
+_RULES.update({
+    # ── Chapter 24 — ยาสูบ ────────────────────────────────────────
+    "24": _rule(["EXCISE", "FDA"],
+                "ยาสูบและบุหรี่ทุกชนิดต้องชำระสรรพสามิตและขอ อย.",
+                "Tobacco products require excise duty + FDA permit", risk="CRITICAL"),
+
+    # ── Chapter 27 — เชื้อเพลิง ───────────────────────────────────
+    "2709": _rule(["DOEB", "MOE"],
+                  "น้ำมันดิบ — ใบอนุญาตธุรกิจพลังงาน",
+                  "Crude oil requires energy business permit"),
+    "2710": _rule(["DOEB", "EXCISE"],
+                  "น้ำมันสำเร็จรูป — ใบอนุญาต + สรรพสามิต",
+                  "Refined petroleum requires DOEB permit + excise"),
+
+    # ── Chapter 33 — เครื่องสำอาง ─────────────────────────────────
+    "33":   _rule(["FDA"],
+                  "เครื่องสำอางทุกชนิดต้องจดแจ้ง อย. และมีฉลากภาษาไทย",
+                  "All cosmetics require FDA notification + Thai labels",
+                  risk="MEDIUM"),
+
+    # ── Chapter 38 — วัตถุอันตราย ─────────────────────────────────
+    "38":   _rule(["DIW", "PCD"],
+                  "เคมีภัณฑ์/วัตถุอันตรายต้องขอ วอ.1 จากกรมโรงงาน",
+                  "Hazardous chemicals require DIW permit (วอ.1)"),
+
+    # ── Chapter 44 — ไม้ ──────────────────────────────────────────
+    "44":   _rule(["DMF", "CITES"],
+                  "ไม้และผลิตภัณฑ์ไม้ต้องมีใบรับรองแหล่งกำเนิด + CITES (ไม้หวงห้าม)",
+                  "Wood/timber requires certificate of origin + CITES if restricted"),
+
+    # ── Chapter 85 — อิเล็กทรอนิกส์ + วิทยุ ─────────────────────
+    "8517": _rule(["NBTC", "TISI"],
+                  "โทรศัพท์ อุปกรณ์โทรคมนาคม — ต้องขอ กสทช. + มอก.",
+                  "Phones/telecom equipment require NBTC + TISI certification",
+                  risk="MEDIUM"),
+    "8525": _rule(["NBTC"],
+                  "เครื่องส่งวิทยุ/โทรทัศน์ — ใบอนุญาต กสทช.",
+                  "Radio/TV transmitters require NBTC permit"),
+    "8527": _rule(["NBTC"],
+                  "เครื่องรับวิทยุ — ใบอนุญาต กสทช.",
+                  "Radio receivers require NBTC permit", risk="MEDIUM"),
+
+    # ── Chapter 97 — วัตถุโบราณ ────────────────────────────────────
+    "97":   _rule(["DPC", "MOC"],
+                  "วัตถุโบราณ ศิลปวัตถุ — ต้องขอกรมศิลปากร",
+                  "Antiques/artworks require Fine Arts Department permit",
+                  risk="MEDIUM"),
+})
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 26 — ENHANCED FUNCTIONS
+# ─────────────────────────────────────────────────────────────────────────────
+
+def check_batch(hs_codes: list[str]) -> list[dict]:
+    """ตรวจ OGA หลาย HS codes พร้อมกัน (limit 50)"""
+    results = []
+    for hs in hs_codes[:50]:
+        result = check(hs.strip())
+        result["hs_code"] = hs.strip()
+        results.append(result)
+    return results
+
+
+def get_documents_checklist(hs_code: str) -> dict:
+    """
+    สร้างรายการเอกสารที่ต้องเตรียม สำหรับ HS code
+    รวมเอกสาร standard + เอกสารเฉพาะ OGA
+    """
+    result = check(hs_code)
+
+    # เอกสารมาตรฐานทุกการนำเข้า
+    standard_docs = [
+        "ใบขนสินค้าขาเข้า (Import Declaration)",
+        "บัญชีราคาสินค้า (Commercial Invoice)",
+        "ใบตราส่งสินค้า (Bill of Lading / Air Waybill)",
+        "บัญชีบรรจุหีบห่อ (Packing List)",
+        "ใบรับรองแหล่งกำเนิดสินค้า (Certificate of Origin) — ถ้าใช้สิทธิ FTA",
+        "หนังสือมอบอำนาจ (Power of Attorney) — กรณีใช้ตัวแทน",
+    ]
+
+    oga_docs = []
+    agencies_required = []
+    total_days = 0
+
+    if result.get("is_restricted"):
+        for permit in result.get("requires_permits", []):
+            agency_name = permit.get("name_th", permit.get("agency_abbr", ""))
+            agencies_required.append({
+                "agency": permit.get("agency_abbr", ""),
+                "name_th": agency_name,
+                "name_en": permit.get("name_en", ""),
+                "url": permit.get("url", ""),
+                "permit_type": permit.get("permit_type", "import_permit"),
+            })
+            oga_docs.append(f"ใบอนุญาตจาก {agency_name}")
+
+    # Estimate processing time
+    risk = result.get("risk_level", "NONE")
+    if risk == "CRITICAL":
+        total_days = 45
+    elif risk == "HIGH":
+        total_days = 30
+    elif risk == "MEDIUM":
+        total_days = 15
+    else:
+        total_days = 7
+
+    return {
+        "hs_code": hs_code,
+        "is_restricted": result.get("is_restricted", False),
+        "risk_level": risk,
+        "standard_documents": standard_docs,
+        "oga_documents": oga_docs,
+        "total_documents": len(standard_docs) + len(oga_docs),
+        "agencies_required": agencies_required,
+        "estimated_processing_days": total_days,
+        "note_th": result.get("note_th", ""),
+        "note_en": result.get("note_en", ""),
+        "nsw_link": "https://nsw.customs.go.th",
+    }
+
+
+def get_all_agencies() -> list[dict]:
+    """รายชื่อหน่วยงาน OGA ทั้งหมดที่อยู่ในระบบ"""
+    return [
+        {"code": code, **info}
+        for code, info in sorted(_AGENCIES.items())
+    ]
+
+
+def get_agency_detail(code: str) -> Optional[dict]:
+    """ข้อมูลหน่วยงาน OGA เฉพาะรายหน่วยงาน"""
+    info = _AGENCIES.get(code.upper())
+    if not info:
+        return None
+    # หา HS codes ที่หน่วยงานนี้รับผิดชอบ
+    related_hs = []
+    for prefix, rule in _RULES.items():
+        for permit in rule.get("requires_permits", []):
+            if permit.get("agency_abbr") == code.upper():
+                related_hs.append(prefix)
+                break
+    return {
+        "code": code.upper(),
+        **info,
+        "related_hs_prefixes": related_hs,
+        "total_hs_rules": len(related_hs),
+    }
+
+
+def get_restricted_chapters_summary() -> list[dict]:
+    """สรุป HS chapters/prefixes ที่ต้อง OGA พร้อมจำนวนหน่วยงาน"""
+    summary = []
+    for prefix in sorted(_RULES.keys()):
+        rule = _RULES[prefix]
+        agencies = [p.get("agency_abbr", "") for p in rule.get("requires_permits", [])]
+        summary.append({
+            "hs_prefix": prefix,
+            "agencies": agencies,
+            "total_agencies": len(agencies),
+            "risk_level": rule.get("risk_level", "NONE"),
+            "note_th": rule.get("note_th", ""),
+        })
+    return summary

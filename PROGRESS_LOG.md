@@ -16,7 +16,12 @@
 | Hotfix | Safe imports for removed files — fix Railway crash | b9752f3 | 4 modified | PUSHED |
 | P22 | Price Benchmark Intelligence — under-valuation detection, risk scoring | afb0c59 | 3 files (944 lines) | PUSHED |
 | P23 | Freight Rate Auditor — overcharge detection, market rates, forwarder comparison | 17d0495 | 3 files (718 lines) | PUSHED |
-| P24 | What-If Scenario Optimizer + Duty Engineering — route/FTA/volume simulation | — | 3 files (~650 lines) | READY |
+| P24 | What-If Scenario Optimizer + Duty Engineering — route/FTA/volume simulation | a6ccbe7 | 3 files (~650 lines) | PUSHED |
+| P25 | Customs Audit Insurance — Risk Score Engine, Compliance Report Card | — | 2 files (~500 lines) | READY |
+| P26 | Dynamic OGA Engine Enhanced — 36 agencies, batch check, document checklist | — | 2 files (enhanced + new router) | READY |
+| P27 | CBAM Carbon Tracker — CO₂ calculator, EU CBAM compliance, emission factors | — | 2 files (~450 lines) | READY |
+| P28 | ASEAN Expansion — 6 countries, duty comparison, multi-country compliance | — | 2 files (~450 lines) | READY |
+| Wire | Tier 4 routers wired into main.py — 22 routers total | — | main.py modified | READY |
 
 ### Security Actions Taken
 
@@ -29,7 +34,7 @@
 - Tier 1 Foundation (P15-P17): 100% COMPLETE
 - Tier 2 Revenue & Growth (P18-P20): 100% COMPLETE
 - Tier 3 Intelligence (P21-P24): 100% COMPLETE
-- Tier 4 Expansion (P25-P28): 0% — future
+- Tier 4 Expansion (P25-P28): 100% COMPLETE
 
 ---
 
@@ -51,7 +56,7 @@
 - Tier 1 Foundation (P15-P17): 100%
 - Tier 2 Revenue & Growth (P18-P20): 100%
 - Tier 3 Intelligence (P21-P24): 0% — next
-- Tier 4 Expansion (P25-P28): 0% — future
+- Tier 4 Expansion (P25-P28): 100% COMPLETE
 
 ### Codebase Stats
 
