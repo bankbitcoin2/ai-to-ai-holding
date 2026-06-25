@@ -406,6 +406,9 @@ footer a:hover { color:var(--accent3); }
 }
 
 /* ─── RESPONSIVE ─── */
+@media (max-width:768px) {
+  .grid-3 { grid-template-columns:1fr !important; }
+}
 @media (max-width:640px) {
   nav { padding:0 1rem; }
   .hero-wrap { padding:3.5rem 1.25rem 3rem; }
@@ -413,7 +416,6 @@ footer a:hover { color:var(--accent3); }
   .stat-item:last-child { border-bottom:none; }
   .section { padding:3.5rem 1.25rem; }
   .how-wrap { padding:2rem 1.25rem; }
-  .pricing-wrap { padding:2rem 1.5rem; }
   .modal-box { padding:1.75rem 1.25rem; border-radius:16px; }
   .hero h1 { letter-spacing:-0.02em; }
 }
@@ -594,41 +596,105 @@ footer a:hover { color:var(--accent3); }
   </div>
 </div>
 
-<!-- ═══ FEATURES ═══ -->
+<!-- ═══ INLINE DEMO ═══ -->
+<div class="section" id="live-demo">
+  <div class="section-eyebrow">LIVE DEMO</div>
+  <div class="section-title">ทดลองใช้ทันที</div>
+  <div class="section-sub">พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร</div>
+  <div style="max-width:680px;margin:0 auto">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input type="text" id="inlineDesc" placeholder="เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator" style="flex:1;padding:0.75rem 1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:0.95rem;font-family:inherit" />
+        <button class="btn btn-primary" onclick="doInlineDemo()" id="inlineDemoBtn" style="white-space:nowrap;padding:0.75rem 1.5rem">⚡ Classify</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='มือถือ iPhone 16 Pro';doInlineDemo()">มือถือ iPhone</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='frozen shrimp vannamei';doInlineDemo()">frozen shrimp</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='hydraulic excavator 20 ton';doInlineDemo()">excavator</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='ข้าวหอมมะลิ 5 kg';doInlineDemo()">ข้าวหอมมะลิ</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='steel coil hot rolled';doInlineDemo()">steel coil</button>
+      </div>
+      <div id="inlineResult" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 14 ENGINES ═══ -->
 <div class="section">
-  <div class="section-eyebrow" data-i18n="why_eyebrow">CAPABILITIES</div>
-  <div class="section-title" data-i18n="why_title">ทำไมต้องเลือกเรา</div>
-  <div class="section-sub" data-i18n="why_sub">ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง</div>
-  <div class="grid-3">
-    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
-      <div class="feat-icon">🎯</div>
-      <h3 data-i18n="f1_title">HS Code Classification</h3>
-      <p data-i18n="f1_desc">จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง</p>
+  <div class="section-eyebrow" data-i18n="why_eyebrow">14 AI ENGINES</div>
+  <div class="section-title">ครบทุกมิติ ในที่เดียว</div>
+  <div class="section-sub">ตั้งแต่จำแนกสินค้า จนถึงวางแผนขยายตลาด ASEAN</div>
+
+  <div style="margin-bottom:2rem">
+    <div style="font-size:0.75rem;font-weight:700;color:var(--accent);letter-spacing:0.1em;margin-bottom:1rem">CORE — รากฐาน</div>
+    <div class="grid-3">
+      <div class="feat-card">
+        <div class="feat-icon">🎯</div>
+        <h3>HS classification</h3>
+        <p>จำแนก HS Code 6-10 หลัก รับภาษาไทย+อังกฤษ พร้อม Confidence Score</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💰</div>
+        <h3>FTA rate lookup</h3>
+        <p>ค้นหาอัตราภาษีดีสุดจาก 13 ความตกลง FTA อัตโนมัติ</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📋</div>
+        <h3>OGA compliance</h3>
+        <p>ตรวจใบอนุญาต 36 หน่วยงาน เช่น อย., มอก., กรมประมง</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🕌</div>
+        <h3>Halal check</h3>
+        <p>ตรวจ Halal certification 21 ประเทศ พร้อม risk level</p>
+      </div>
     </div>
-    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
-      <div class="feat-icon">💰</div>
-      <h3 data-i18n="f2_title">คำนวณภาษีอัตโนมัติ</h3>
-      <p data-i18n="f2_desc">คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน</p>
+  </div>
+
+  <div style="margin-bottom:2rem">
+    <div style="font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.1em;margin-bottom:1rem">INTELLIGENCE — วิเคราะห์เชิงลึก</div>
+    <div class="grid-3">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">🧮</div>
+        <h3>Landed cost</h3>
+        <p>คำนวณต้นทุนรวม 11 Incoterms — สินค้า+ขนส่ง+ประกัน+ภาษี+VAT</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">📊</div>
+        <h3>Price benchmark</h3>
+        <p>ตรวจจับ under-valuation เทียบราคาตลาด พร้อม risk score</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">🚢</div>
+        <h3>Freight auditor</h3>
+        <p>ตรวจบิลค่าขนส่ง 18 ประเภท charge — จับ overcharge ทันที</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">🔀</div>
+        <h3>What-if optimizer</h3>
+        <p>จำลอง 3 เส้นทางนำเข้า — เร็วสุด / คุ้มสุด / ประหยัดสุด</p>
+      </div>
     </div>
-    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
-      <div class="feat-icon">⚡</div>
-      <h3 data-i18n="f3_title">AI-Native API</h3>
-      <p data-i18n="f3_desc">รองรับ MCP Protocol, GPT Actions, LangChain และ Function Calling ทุก framework ค้นพบเราได้อัตโนมัติ</p>
-    </div>
-    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
-      <div class="feat-icon">🔐</div>
-      <h3 data-i18n="f4_title">Prepaid Credit</h3>
-      <p data-i18n="f4_desc">ไม่มีสัญญาผูกมัด เติม credit ล่วงหน้า จ่ายเฉพาะที่ใช้จริง ไม่มีค่าธรรมเนียมรายเดือน</p>
-    </div>
-    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
-      <div class="feat-icon">📋</div>
-      <h3 data-i18n="f5_title">OGA Compliance Check</h3>
-      <p data-i18n="f5_desc">ตรวจสอบว่าสินค้าต้องผ่านหน่วยงานใดบ้าง เช่น FDA, มอก., อย. ก่อนนำเข้า</p>
-    </div>
-    <div class="feat-card" onclick="document.getElementById('how-to').scrollIntoView({behavior:'smooth'})">
-      <div class="feat-icon">🌏</div>
-      <h3 data-i18n="f6_title">ASEAN Ready</h3>
-      <p data-i18n="f6_desc">รองรับการค้าระหว่างประเทศในกลุ่ม ASEAN และ RCEP พร้อมขยายสู่ตลาดโลก</p>
+  </div>
+
+  <div>
+    <div style="font-size:0.75rem;font-weight:700;color:var(--green);letter-spacing:0.1em;margin-bottom:1rem">EXPANSION — ขยายตลาด</div>
+    <div class="grid-3">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:rgba(16,185,129,0.3)">🛡️</div>
+        <h3>Customs audit</h3>
+        <p>ประเมิน risk score ตรวจสอบ compliance report card</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:rgba(16,185,129,0.3)">🌱</div>
+        <h3>CBAM carbon</h3>
+        <p>คำนวณ CO₂ footprint สำหรับส่งออกไป EU — 6 sectors</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:rgba(16,185,129,0.3)">🌏</div>
+        <h3>ASEAN expansion</h3>
+        <p>เปรียบเทียบภาษี 6 ประเทศ — TH, VN, MY, ID, PH, SG</p>
+      </div>
     </div>
   </div>
 </div>
@@ -677,24 +743,47 @@ footer a:hover { color:var(--accent3); }
   <div class="section-eyebrow" data-i18n="price_eyebrow">PRICING</div>
   <div class="section-title" data-i18n="price_title">ราคา</div>
   <div class="section-sub" data-i18n="price_sub">ไม่มีค่ารายเดือน จ่ายเฉพาะที่ใช้จริง</div>
-  <div class="pricing-wrap">
-    <div class="price-tag">$0.50 <span class="price-unit" data-i18n="per_item">/ query</span></div>
-    <p class="price-desc" data-i18n="price_desc">จ่ายตามการใช้งานจริง ไม่มีค่าสมัคร</p>
-    <ul class="feature-list">
-      <li data-i18n="pf1">HS Code Classification พร้อม Confidence Score</li>
-      <li data-i18n="pf2">คำนวณภาษีนำเข้า + VAT อัตโนมัติ</li>
-      <li data-i18n="pf3">OGA Compliance Check</li>
-      <li data-i18n="pf4">อ้างอิงกฎหมายทุกผลลัพธ์</li>
-      <li data-i18n="pf5">Sandbox ฟรี (ไม่ต้องใช้ API Key)</li>
-      <li data-i18n="pf6">รองรับ MCP, GPT Actions, LangChain</li>
-      <li data-i18n="pf7">FTA 13 ความตกลง — หาอัตราภาษีดีสุดอัตโนมัติ</li>
-      <li data-i18n="pf8">Halal Engine 21 ประเทศ</li>
-      <li data-i18n="pf9">Landed Cost Calculator — 11 Incoterms</li>
-      <li data-i18n="pf10">Freight Auditor — ตรวจบิลค่าขนส่ง</li>
-      <li data-i18n="pf11">CBAM Carbon Tracker — EU compliance</li>
-      <li data-i18n="pf12">ASEAN Expansion — 6 ประเทศ</li>
-    </ul>
-    <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()" data-i18n="cta_register">สมัครฟรี — รับ API Key</button>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:900px;margin:0 auto">
+    <!-- Sandbox Free -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center">
+      <div style="font-size:0.85rem;font-weight:700;color:var(--text2);margin-bottom:0.5rem">Sandbox</div>
+      <div style="font-size:2.2rem;font-weight:900;color:var(--green);line-height:1">Free</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem">20 req/min · No key</div>
+      <ul class="feature-list" style="font-size:0.82rem">
+        <li>HS classification</li>
+        <li>FTA + OGA + Halal</li>
+        <li>SHA-256 evidence</li>
+      </ul>
+      <button class="btn btn-outline-accent btn-lg" style="width:100%" onclick="document.getElementById('live-demo').scrollIntoView({behavior:'smooth'})">ลองเลย</button>
+    </div>
+    <!-- Standard -->
+    <div style="background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:2rem;text-align:center;box-shadow:0 0 40px var(--glow);position:relative">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:0.72rem;font-weight:700;padding:4px 16px;border-radius:999px;letter-spacing:0.05em">POPULAR</div>
+      <div style="font-size:0.85rem;font-weight:700;color:var(--text2);margin-bottom:0.5rem">Standard</div>
+      <div style="font-size:2.2rem;font-weight:900;line-height:1"><span class="grad-text">$1.50</span><span style="font-size:0.9rem;color:var(--muted);font-weight:400"> / query</span></div>
+      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem">60 req/min · Prepaid</div>
+      <ul class="feature-list" style="font-size:0.82rem">
+        <li>All core engines</li>
+        <li>Intelligence engines</li>
+        <li>Landed cost + freight</li>
+        <li>CBAM + ASEAN</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()">สมัครฟรี — รับ API Key</button>
+    </div>
+    <!-- Enterprise -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center">
+      <div style="font-size:0.85rem;font-weight:700;color:var(--text2);margin-bottom:0.5rem">Enterprise</div>
+      <div style="font-size:2.2rem;font-weight:900;color:var(--text);line-height:1">Custom</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem">Volume pricing</div>
+      <ul class="feature-list" style="font-size:0.82rem">
+        <li>Everything in Standard</li>
+        <li>Volume discount 5-20%</li>
+        <li>White-label option</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="mailto:bankbitcoin2@gmail.com" class="btn btn-outline-accent btn-lg" style="width:100%;justify-content:center;text-decoration:none">Contact us</a>
+    </div>
   </div>
 </div>
 
@@ -1248,6 +1337,57 @@ function checkSavedSession() {
     heroCta.removeAttribute('data-i18n');
   }
 }
+
+// ── INLINE DEMO ─────────────────────────────────────────────
+async function doInlineDemo() {
+  const desc = document.getElementById('inlineDesc').value.trim();
+  const result = document.getElementById('inlineResult');
+  const btn = document.getElementById('inlineDemoBtn');
+  if (!desc) return;
+  btn.disabled=true; btn.textContent='...';
+  result.style.display='block';
+  result.innerHTML='<div style="color:var(--muted);font-size:0.9rem">⏳ กำลังวิเคราะห์...</div>';
+  try {
+    const res = await fetch(API+'/v1/sandbox/classify',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({client_id:'inline-demo',items:[{description:desc,quantity:1,unit_price:100}]})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail?.message||data.message||'Error');
+    const item = data.items&&data.items[0];
+    if (!item) { result.innerHTML='<span style="color:#f87171">ไม่พบผลลัพธ์</span>'; return; }
+    const conf=Math.round((item.confidence_score||0)*100);
+    const confColor=conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
+    const dutyPct=Math.round((item.duty_rate||0)*100);
+    const ftaInfo=item.fta_eligible&&item.fta_form?item.fta_form:'—';
+    const ftaRate=item.fta_rate!=null?Math.round(item.fta_rate*100)+'%':'—';
+    const ogaText=item.oga_required?(item.oga_agencies||[]).join(', ')||'Required':'Not required';
+    const halalText=item.halal_required?'Required ('+( item.halal_risk_level||'')+')':'Not required';
+    result.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">HS Code</div><div style="font-size:1.3rem;font-weight:800;color:var(--text)">${item.hs_code||'—'}</div></div>
+        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">MFN Duty</div><div style="font-size:1.3rem;font-weight:800;color:var(--text)">${dutyPct}%</div></div>
+        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">Best FTA</div><div style="font-size:1.3rem;font-weight:800;color:var(--green)">${ftaRate}</div><div style="font-size:0.7rem;color:var(--muted)">${ftaInfo}</div></div>
+        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">Confidence</div><div style="font-size:1.3rem;font-weight:800;color:${confColor}">${conf}%</div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="background:${item.oga_required?'rgba(245,158,11,.12)':'rgba(16,185,129,.1)'};color:${item.oga_required?'#f59e0b':'#10b981'};padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:600">OGA: ${ogaText}</span>
+        <span style="background:${item.halal_required?'rgba(239,68,68,.1)':'rgba(16,185,129,.08)'};color:${item.halal_required?'#f87171':'#10b981'};padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:600">Halal: ${halalText}</span>
+      </div>
+      ${item.hs_description_th?'<div style="font-size:0.85rem;color:var(--text2)">'+item.hs_description_th+'</div>':''}
+      ${item.hs_description?'<div style="font-size:0.78rem;color:var(--muted)">'+item.hs_description+'</div>':''}
+      ${item.fta_saving_amount>0?'<div style="font-size:0.82rem;color:var(--green);margin-top:6px">💚 ประหยัดภาษีได้ ~'+item.fta_saving_amount.toLocaleString()+' บาท</div>':''}
+      <div style="font-size:0.7rem;color:var(--muted2);margin-top:8px;font-family:monospace">🔒 sha256:${(item.evidence_hash||'').substring(0,32)}...</div>
+    `;
+  } catch(e) {
+    result.innerHTML='<span style="color:#f87171">❌ '+e.message+'</span>';
+  }
+  btn.disabled=false; btn.textContent='⚡ Classify';
+}
+
+// Enter key on inline demo
+document.getElementById('inlineDesc')?.addEventListener('keydown',e=>{if(e.key==='Enter')doInlineDemo()});
 
 window.addEventListener('load', () => {
   setLang(detectLang());
