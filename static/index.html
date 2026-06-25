@@ -578,7 +578,7 @@ footer a:hover { color:var(--accent3); }
 
     <div class="hero-cta">
       <button id="heroCtaMain" class="btn btn-primary btn-xl" onclick="openRegister()" data-i18n="cta_register">เริ่มต้นฟรี — รับ API Key</button>
-      <button class="btn btn-outline-accent btn-xl" onclick="openSandboxDemo()" data-i18n="cta_try">ทดลองใช้ฟรี</button>
+      <button id="heroCtaTry" class="btn btn-outline-accent btn-xl" onclick="openSandboxDemo()" data-i18n="cta_try">ทดลองใช้ฟรี</button>
     </div>
   </div>
 </div>
@@ -615,13 +615,13 @@ footer a:hover { color:var(--accent3); }
 
 <!-- ═══ INLINE DEMO ═══ -->
 <div class="section" id="live-demo">
-  <div class="section-eyebrow">LIVE DEMO</div>
-  <div class="section-title">ทดลองใช้ทันที</div>
-  <div class="section-sub">พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร</div>
+  <div class="section-eyebrow" data-i18n="demo_eyebrow">LIVE DEMO</div>
+  <div class="section-title" data-i18n="demo_title">ทดลองใช้ทันที</div>
+  <div class="section-sub" data-i18n="demo_sub">พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร</div>
   <div style="max-width:680px;margin:0 auto">
     <div id="demoCard" class="demo-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden">
       <div style="display:flex;gap:8px;margin-bottom:12px">
-        <input type="text" id="inlineDesc" placeholder="เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator" style="flex:1;padding:0.75rem 1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:0.95rem;font-family:inherit" />
+        <input type="text" id="inlineDesc" data-i18n-placeholder="demo_placeholder" placeholder="เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator" style="flex:1;padding:0.75rem 1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:0.95rem;font-family:inherit" />
         <button class="btn btn-primary" onclick="doInlineDemo()" id="inlineDemoBtn" style="white-space:nowrap;padding:0.75rem 1.5rem">⚡ Classify</button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
@@ -638,79 +638,79 @@ footer a:hover { color:var(--accent3); }
 
 <!-- ═══ 14 ENGINES ═══ -->
 <div class="section">
-  <div class="section-eyebrow" data-i18n="why_eyebrow">14 AI ENGINES</div>
-  <div class="section-title">ครบทุกมิติ ในที่เดียว</div>
-  <div class="section-sub">ตั้งแต่จำแนกสินค้า จนถึงวางแผนขยายตลาด ASEAN</div>
+  <div class="section-eyebrow" data-i18n="engines_eyebrow">14 AI ENGINES</div>
+  <div class="section-title" data-i18n="engines_title">ครบทุกมิติ ในที่เดียว</div>
+  <div class="section-sub" data-i18n="engines_sub">ตั้งแต่จำแนกสินค้า จนถึงวางแผนขยายตลาด ASEAN</div>
 
   <div style="margin-bottom:2rem">
-    <div style="font-size:0.75rem;font-weight:700;color:var(--accent);letter-spacing:0.1em;margin-bottom:1rem">CORE — รากฐาน</div>
+    <div style="font-size:0.75rem;font-weight:700;color:var(--accent);letter-spacing:0.1em;margin-bottom:1rem" data-i18n="tier_core">CORE — รากฐาน</div>
     <div class="grid-3">
       <div class="feat-card">
         <div class="feat-icon">🎯</div>
-        <h3>HS classification</h3>
-        <p>จำแนก HS Code 6-10 หลัก รับภาษาไทย+อังกฤษ พร้อม Confidence Score</p>
+        <h3 data-i18n="eng_hs_title">HS classification</h3>
+        <p data-i18n="eng_hs_desc">จำแนก HS Code 6-10 หลัก รับภาษาไทย+อังกฤษ พร้อม Confidence Score</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">💰</div>
-        <h3>FTA rate lookup</h3>
-        <p>ค้นหาอัตราภาษีดีสุดจาก 13 ความตกลง FTA อัตโนมัติ</p>
+        <h3 data-i18n="eng_fta_title">FTA rate lookup</h3>
+        <p data-i18n="eng_fta_desc">ค้นหาอัตราภาษีดีสุดจาก 13 ความตกลง FTA อัตโนมัติ</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">📋</div>
-        <h3>OGA compliance</h3>
-        <p>ตรวจใบอนุญาต 36 หน่วยงาน เช่น อย., มอก., กรมประมง</p>
+        <h3 data-i18n="eng_oga_title">OGA compliance</h3>
+        <p data-i18n="eng_oga_desc">ตรวจใบอนุญาต 36 หน่วยงาน เช่น อย., มอก., กรมประมง</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🕌</div>
-        <h3>Halal check</h3>
-        <p>ตรวจ Halal certification 21 ประเทศ พร้อม risk level</p>
+        <h3 data-i18n="eng_halal_title">Halal check</h3>
+        <p data-i18n="eng_halal_desc">ตรวจ Halal certification 21 ประเทศ พร้อม risk level</p>
       </div>
     </div>
   </div>
 
   <div style="margin-bottom:2rem">
-    <div style="font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.1em;margin-bottom:1rem">INTELLIGENCE — วิเคราะห์เชิงลึก</div>
+    <div style="font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.1em;margin-bottom:1rem" data-i18n="tier_intel">INTELLIGENCE — วิเคราะห์เชิงลึก</div>
     <div class="grid-3">
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">🧮</div>
-        <h3>Landed cost</h3>
-        <p>คำนวณต้นทุนรวม 11 Incoterms — สินค้า+ขนส่ง+ประกัน+ภาษี+VAT</p>
+        <h3 data-i18n="eng_landed_title">Landed cost</h3>
+        <p data-i18n="eng_landed_desc">คำนวณต้นทุนรวม 11 Incoterms — สินค้า+ขนส่ง+ประกัน+ภาษี+VAT</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">📊</div>
-        <h3>Price benchmark</h3>
-        <p>ตรวจจับ under-valuation เทียบราคาตลาด พร้อม risk score</p>
+        <h3 data-i18n="eng_bench_title">Price benchmark</h3>
+        <p data-i18n="eng_bench_desc">ตรวจจับ under-valuation เทียบราคาตลาด พร้อม risk score</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">🚢</div>
-        <h3>Freight auditor</h3>
-        <p>ตรวจบิลค่าขนส่ง 18 ประเภท charge — จับ overcharge ทันที</p>
+        <h3 data-i18n="eng_freight_title">Freight auditor</h3>
+        <p data-i18n="eng_freight_desc">ตรวจบิลค่าขนส่ง 18 ประเภท charge — จับ overcharge ทันที</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.1));border-color:rgba(245,158,11,0.3)">🔀</div>
-        <h3>What-if optimizer</h3>
-        <p>จำลอง 3 เส้นทางนำเข้า — เร็วสุด / คุ้มสุด / ประหยัดสุด</p>
+        <h3 data-i18n="eng_whatif_title">What-if optimizer</h3>
+        <p data-i18n="eng_whatif_desc">จำลอง 3 เส้นทางนำเข้า — เร็วสุด / คุ้มสุด / ประหยัดสุด</p>
       </div>
     </div>
   </div>
 
   <div>
-    <div style="font-size:0.75rem;font-weight:700;color:var(--green);letter-spacing:0.1em;margin-bottom:1rem">EXPANSION — ขยายตลาด</div>
+    <div style="font-size:0.75rem;font-weight:700;color:var(--green);letter-spacing:0.1em;margin-bottom:1rem" data-i18n="tier_expand">EXPANSION — ขยายตลาด</div>
     <div class="grid-3">
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:rgba(16,185,129,0.3)">🛡️</div>
-        <h3>Customs audit</h3>
-        <p>ประเมิน risk score ตรวจสอบ compliance report card</p>
+        <h3 data-i18n="eng_audit_title">Customs audit</h3>
+        <p data-i18n="eng_audit_desc">ประเมิน risk score ตรวจสอบ compliance report card</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:rgba(16,185,129,0.3)">🌱</div>
-        <h3>CBAM carbon</h3>
-        <p>คำนวณ CO₂ footprint สำหรับส่งออกไป EU — 6 sectors</p>
+        <h3 data-i18n="eng_cbam_title">CBAM carbon</h3>
+        <p data-i18n="eng_cbam_desc">คำนวณ CO₂ footprint สำหรับส่งออกไป EU — 6 sectors</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:rgba(16,185,129,0.3)">🌏</div>
-        <h3>ASEAN expansion</h3>
-        <p>เปรียบเทียบภาษี 6 ประเทศ — TH, VN, MY, ID, PH, SG</p>
+        <h3 data-i18n="eng_asean_title">ASEAN expansion</h3>
+        <p data-i18n="eng_asean_desc">เปรียบเทียบภาษี 6 ประเทศ — TH, VN, MY, ID, PH, SG</p>
       </div>
     </div>
   </div>
@@ -764,42 +764,42 @@ footer a:hover { color:var(--accent3); }
     <!-- Sandbox Free -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center">
       <div style="font-size:0.85rem;font-weight:700;color:var(--text2);margin-bottom:0.5rem">Sandbox</div>
-      <div style="font-size:2.2rem;font-weight:900;color:var(--green);line-height:1">Free</div>
-      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem">20 req/min · No key</div>
+      <div style="font-size:2.2rem;font-weight:900;color:var(--green);line-height:1" data-i18n="price_free">Free</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem" data-i18n="price_free_limit">20 req/min · No key</div>
       <ul class="feature-list" style="font-size:0.82rem">
-        <li>HS classification</li>
-        <li>FTA + OGA + Halal</li>
-        <li>SHA-256 evidence</li>
+        <li data-i18n="pf_sandbox1">HS classification</li>
+        <li data-i18n="pf_sandbox2">FTA + OGA + Halal</li>
+        <li data-i18n="pf_sandbox3">SHA-256 evidence</li>
       </ul>
-      <button class="btn btn-outline-accent btn-lg" style="width:100%" onclick="document.getElementById('live-demo').scrollIntoView({behavior:'smooth'})">ลองเลย</button>
+      <button class="btn btn-outline-accent btn-lg" style="width:100%" onclick="document.getElementById('live-demo').scrollIntoView({behavior:'smooth'})" data-i18n="price_try_btn">ลองเลย</button>
     </div>
     <!-- Standard -->
     <div style="background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:2rem;text-align:center;box-shadow:0 0 40px var(--glow);position:relative">
-      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:0.72rem;font-weight:700;padding:4px 16px;border-radius:999px;letter-spacing:0.05em">POPULAR</div>
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:0.72rem;font-weight:700;padding:4px 16px;border-radius:999px;letter-spacing:0.05em" data-i18n="price_popular">POPULAR</div>
       <div style="font-size:0.85rem;font-weight:700;color:var(--text2);margin-bottom:0.5rem">Standard</div>
-      <div style="font-size:2.2rem;font-weight:900;line-height:1"><span class="grad-text">$1.50</span><span style="font-size:0.9rem;color:var(--muted);font-weight:400"> / query</span></div>
-      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem">60 req/min · Prepaid</div>
+      <div style="font-size:2.2rem;font-weight:900;line-height:1"><span class="grad-text">$1.50</span><span style="font-size:0.9rem;color:var(--muted);font-weight:400" data-i18n="price_per_query"> / query</span></div>
+      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem" data-i18n="price_std_limit">60 req/min · Prepaid</div>
       <ul class="feature-list" style="font-size:0.82rem">
-        <li>All core engines</li>
-        <li>Intelligence engines</li>
-        <li>Landed cost + freight</li>
-        <li>CBAM + ASEAN</li>
-        <li>Priority support</li>
+        <li data-i18n="pf_std1">All core engines</li>
+        <li data-i18n="pf_std2">Intelligence engines</li>
+        <li data-i18n="pf_std3">Landed cost + freight</li>
+        <li data-i18n="pf_std4">CBAM + ASEAN</li>
+        <li data-i18n="pf_std5">Priority support</li>
       </ul>
-      <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()">สมัครฟรี — รับ API Key</button>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="openRegister()" data-i18n="price_signup_btn">สมัครฟรี — รับ API Key</button>
     </div>
     <!-- Enterprise -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center">
       <div style="font-size:0.85rem;font-weight:700;color:var(--text2);margin-bottom:0.5rem">Enterprise</div>
-      <div style="font-size:2.2rem;font-weight:900;color:var(--text);line-height:1">Custom</div>
-      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem">Volume pricing</div>
+      <div style="font-size:2.2rem;font-weight:900;color:var(--text);line-height:1" data-i18n="price_custom">Custom</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin:0.5rem 0 1.5rem" data-i18n="price_ent_limit">Volume pricing</div>
       <ul class="feature-list" style="font-size:0.82rem">
-        <li>Everything in Standard</li>
-        <li>Volume discount 5-20%</li>
-        <li>White-label option</li>
-        <li>Dedicated support</li>
+        <li data-i18n="pf_ent1">Everything in Standard</li>
+        <li data-i18n="pf_ent2">Volume discount 5-20%</li>
+        <li data-i18n="pf_ent3">White-label option</li>
+        <li data-i18n="pf_ent4">Dedicated support</li>
       </ul>
-      <a href="mailto:bankbitcoin2@gmail.com" class="btn btn-outline-accent btn-lg" style="width:100%;justify-content:center;text-decoration:none">Contact us</a>
+      <a href="mailto:bankbitcoin2@gmail.com" class="btn btn-outline-accent btn-lg" style="width:100%;justify-content:center;text-decoration:none" data-i18n="price_contact_btn">Contact us</a>
     </div>
   </div>
 </div>
@@ -949,7 +949,7 @@ footer a:hover { color:var(--accent3); }
       </div>
       <div id="recoverError" class="err-msg"></div>
       <div class="modal-row">
-        <button class="btn btn-cancel btn-lg" onclick="closeRecover()">ยกเลิก</button>
+        <button class="btn btn-cancel btn-lg" onclick="closeRecover()" data-i18n="cancel">ยกเลิก</button>
         <button class="btn btn-primary btn-lg" style="flex:2" id="recoverBtn" onclick="doRecover()">กู้คืน Key →</button>
       </div>
     </div>
@@ -979,7 +979,30 @@ const i18n = {
     hero_desc:'API อัจฉริยะที่จำแนก HS Code และคำนวณภาษีนำเข้า-ส่งออกสำหรับประเทศไทย พร้อมอ้างอิงกฎหมายจริง ความแม่นยำสูง สำหรับ AI Agent และระบบอัตโนมัติ',
     hero_tagline:'ระบบอัจฉริยะที่ให้บริการ เพื่ออำนวยความสะดวก และส่งเสริมธุรกิจการค้าระหว่างประเทศ ด้วยเทคโนโลยี AI ที่แม่นยำ รวดเร็ว และเชื่อถือได้',
     cta_register:'เริ่มต้นฟรี — รับ API Key', cta_try:'ทดลองใช้ฟรี',
-    stat_hs:'HS Code ที่รองรับ', stat_fta:'ความตกลง FTA', stat_price:'ต่อ 1 รายการ', stat_speed:'Response time', stat_halal:'ประเทศ Halal',
+    stat_hs:'HS Code ที่รองรับ', stat_fta:'ความตกลง FTA', stat_price:'ต่อ 1 รายการ', stat_speed:'Response time', stat_halal:'ประเทศ Halal', stat_engines:'AI Engines',
+    // Live Demo
+    demo_eyebrow:'LIVE DEMO', demo_title:'ทดลองใช้ทันที', demo_sub:'พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร', demo_placeholder:'เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator',
+    // 14 Engines
+    engines_eyebrow:'14 AI ENGINES', engines_title:'ครบทุกมิติ ในที่เดียว', engines_sub:'ตั้งแต่จำแนกสินค้า จนถึงวางแผนขยายตลาด ASEAN',
+    tier_core:'CORE — รากฐาน', tier_intel:'INTELLIGENCE — วิเคราะห์เชิงลึก', tier_expand:'EXPANSION — ขยายตลาด',
+    eng_hs_title:'HS classification', eng_hs_desc:'จำแนก HS Code 6-10 หลัก รับภาษาไทย+อังกฤษ พร้อม Confidence Score',
+    eng_fta_title:'FTA rate lookup', eng_fta_desc:'ค้นหาอัตราภาษีดีสุดจาก 13 ความตกลง FTA อัตโนมัติ',
+    eng_oga_title:'OGA compliance', eng_oga_desc:'ตรวจใบอนุญาต 36 หน่วยงาน เช่น อย., มอก., กรมประมง',
+    eng_halal_title:'Halal check', eng_halal_desc:'ตรวจ Halal certification 21 ประเทศ พร้อม risk level',
+    eng_landed_title:'Landed cost', eng_landed_desc:'คำนวณต้นทุนรวม 11 Incoterms — สินค้า+ขนส่ง+ประกัน+ภาษี+VAT',
+    eng_bench_title:'Price benchmark', eng_bench_desc:'ตรวจจับ under-valuation เทียบราคาตลาด พร้อม risk score',
+    eng_freight_title:'Freight auditor', eng_freight_desc:'ตรวจบิลค่าขนส่ง 18 ประเภท charge — จับ overcharge ทันที',
+    eng_whatif_title:'What-if optimizer', eng_whatif_desc:'จำลอง 3 เส้นทางนำเข้า — เร็วสุด / คุ้มสุด / ประหยัดสุด',
+    eng_audit_title:'Customs audit', eng_audit_desc:'ประเมิน risk score ตรวจสอบ compliance report card',
+    eng_cbam_title:'CBAM carbon', eng_cbam_desc:'คำนวณ CO₂ footprint สำหรับส่งออกไป EU — 6 sectors',
+    eng_asean_title:'ASEAN expansion', eng_asean_desc:'เปรียบเทียบภาษี 6 ประเทศ — TH, VN, MY, ID, PH, SG',
+    // Pricing
+    price_free:'Free', price_free_limit:'20 req/min · ไม่ต้องใช้ key', price_try_btn:'ลองเลย',
+    price_popular:'ยอดนิยม', price_per_query:' / query', price_std_limit:'60 req/min · Prepaid', price_signup_btn:'สมัครฟรี — รับ API Key',
+    price_custom:'Custom', price_ent_limit:'ราคาตามปริมาณ', price_contact_btn:'ติดต่อเรา',
+    pf_sandbox1:'HS classification', pf_sandbox2:'FTA + OGA + Halal', pf_sandbox3:'SHA-256 evidence',
+    pf_std1:'Core engines ทั้งหมด', pf_std2:'Intelligence engines', pf_std3:'Landed cost + freight', pf_std4:'CBAM + ASEAN', pf_std5:'Priority support',
+    pf_ent1:'ทุกอย่างใน Standard', pf_ent2:'ส่วนลดปริมาณ 5-20%', pf_ent3:'White-label option', pf_ent4:'Dedicated support',
     why_eyebrow:'CAPABILITIES', why_title:'ทำไมต้องเลือกเรา', why_sub:'ใช้งานได้ทั้งนักธุรกิจ นักพัฒนา และ AI Agent — ทุกคำขอมีหลักฐานอ้างอิง',
     f1_title:'HS Code Classification', f1_desc:'จำแนก Harmonized System Code 6-10 หลัก พร้อม Confidence Score และอ้างอิงกฎหมายศุลกากรไทยทุกครั้ง',
     f2_title:'คำนวณภาษีอัตโนมัติ', f2_desc:'คำนวณอัตราภาษีนำเข้า ภาษีมูลค่าเพิ่ม และค่าธรรมเนียมอื่นๆ ตามกฎหมายปัจจุบัน',
@@ -1015,7 +1038,27 @@ const i18n = {
     hero_desc:'Intelligent API for HS Code classification and import/export duty calculation for Thailand. Real legal references, high accuracy — built for AI agents and automated systems.',
     hero_tagline:'An intelligent platform serving to facilitate and promote international trade — powered by AI that is accurate, fast, and reliable.',
     cta_register:'Get Started Free — API Key', cta_try:'Try Free Sandbox',
-    stat_hs:'HS Codes Supported', stat_fta:'FTA Agreements', stat_price:'per query', stat_speed:'Response time', stat_halal:'Halal Countries',
+    stat_hs:'HS Codes Supported', stat_fta:'FTA Agreements', stat_price:'per query', stat_speed:'Response time', stat_halal:'Halal Countries', stat_engines:'AI Engines',
+    demo_eyebrow:'LIVE DEMO', demo_title:'Try It Now', demo_sub:'Type a product name in Thai or English — instant results, no signup required', demo_placeholder:'e.g. iPhone, frozen shrimp, hydraulic excavator',
+    engines_eyebrow:'14 AI ENGINES', engines_title:'Everything in One Place', engines_sub:'From product classification to ASEAN market expansion planning',
+    tier_core:'CORE — Foundation', tier_intel:'INTELLIGENCE — Deep Analytics', tier_expand:'EXPANSION — Market Growth',
+    eng_hs_title:'HS Classification', eng_hs_desc:'Classify HS Code 6-10 digits, Thai+English input with Confidence Score',
+    eng_fta_title:'FTA Rate Lookup', eng_fta_desc:'Auto-find best duty rate across 13 FTA agreements',
+    eng_oga_title:'OGA Compliance', eng_oga_desc:'Check permits from 36 agencies — FDA, TISI, Fisheries, etc.',
+    eng_halal_title:'Halal Check', eng_halal_desc:'Halal certification check for 21 countries with risk level',
+    eng_landed_title:'Landed Cost', eng_landed_desc:'Calculate total cost with 11 Incoterms — product+freight+insurance+duty+VAT',
+    eng_bench_title:'Price Benchmark', eng_bench_desc:'Detect under-valuation vs. market benchmarks with risk score',
+    eng_freight_title:'Freight Auditor', eng_freight_desc:'Audit freight bills across 18 charge types — catch overcharges instantly',
+    eng_whatif_title:'What-If Optimizer', eng_whatif_desc:'Simulate 3 import routes — fastest / best value / cheapest',
+    eng_audit_title:'Customs Audit', eng_audit_desc:'Assess risk score and compliance report card',
+    eng_cbam_title:'CBAM Carbon', eng_cbam_desc:'Calculate CO₂ footprint for EU exports — 6 sectors',
+    eng_asean_title:'ASEAN Expansion', eng_asean_desc:'Compare duties across 6 countries — TH, VN, MY, ID, PH, SG',
+    price_free:'Free', price_free_limit:'20 req/min · No key', price_try_btn:'Try Now',
+    price_popular:'POPULAR', price_per_query:' / query', price_std_limit:'60 req/min · Prepaid', price_signup_btn:'Get Started Free — API Key',
+    price_custom:'Custom', price_ent_limit:'Volume pricing', price_contact_btn:'Contact Us',
+    pf_sandbox1:'HS classification', pf_sandbox2:'FTA + OGA + Halal', pf_sandbox3:'SHA-256 evidence',
+    pf_std1:'All core engines', pf_std2:'Intelligence engines', pf_std3:'Landed cost + freight', pf_std4:'CBAM + ASEAN', pf_std5:'Priority support',
+    pf_ent1:'Everything in Standard', pf_ent2:'Volume discount 5-20%', pf_ent3:'White-label option', pf_ent4:'Dedicated support',
     why_eyebrow:'CAPABILITIES', why_title:'Why Choose Us', why_sub:'Built for businesses, developers, and AI Agents — every response cites real legal sources.',
     f1_title:'HS Code Classification', f1_desc:'Classify 6–10 digit Harmonized System Codes with Confidence Score and Thai customs law citations.',
     f2_title:'Automatic Tax Calculation', f2_desc:'Calculate import duties, VAT, and other fees automatically under current Thai law.',
@@ -1051,7 +1094,27 @@ const i18n = {
     hero_desc:'用于泰国HS商品编码分类和进出口关税计算的智能API。引用真实法律法规，高精度，专为AI智能体和自动化系统构建。',
     hero_tagline:'智能平台，致力于促进和推动国际贸易——由精准、快速、可靠的AI驱动。',
     cta_register:'免费开始 — 获取API Key', cta_try:'免费试用沙盒',
-    stat_hs:'支持的HS编码', stat_fta:'FTA协定', stat_price:'每项', stat_speed:'响应时间', stat_halal:'清真国家',
+    stat_hs:'支持的HS编码', stat_fta:'FTA协定', stat_price:'每项', stat_speed:'响应时间', stat_halal:'清真国家', stat_engines:'AI引擎',
+    demo_eyebrow:'在线演示', demo_title:'立即试用', demo_sub:'输入商品名称（泰语或英语）— 即时结果，无需注册', demo_placeholder:'例如 iPhone, 冻虾, 液压挖掘机',
+    engines_eyebrow:'14个AI引擎', engines_title:'一站式解决方案', engines_sub:'从商品分类到东盟市场扩展规划',
+    tier_core:'核心 — 基础功能', tier_intel:'智能 — 深度分析', tier_expand:'扩展 — 市场增长',
+    eng_hs_title:'HS编码分类', eng_hs_desc:'6-10位HS编码分类，支持泰语+英语输入，附置信度评分',
+    eng_fta_title:'FTA税率查询', eng_fta_desc:'自动从13个FTA协定中查找最优税率',
+    eng_oga_title:'OGA合规检查', eng_oga_desc:'检查36个机构的许可要求 — FDA、TISI、渔业部等',
+    eng_halal_title:'清真认证检查', eng_halal_desc:'21个国家清真认证检查，附风险等级',
+    eng_landed_title:'到岸成本', eng_landed_desc:'11种国际贸易术语的总成本计算 — 商品+运费+保险+关税+增值税',
+    eng_bench_title:'价格基准', eng_bench_desc:'与市场基准对比检测低报价值，附风险评分',
+    eng_freight_title:'运费审计', eng_freight_desc:'审计18种费用类型的运费账单 — 即时发现多收费',
+    eng_whatif_title:'情景优化器', eng_whatif_desc:'模拟3条进口路线 — 最快/最优/最省',
+    eng_audit_title:'海关审计', eng_audit_desc:'评估风险评分和合规报告卡',
+    eng_cbam_title:'CBAM碳核算', eng_cbam_desc:'计算出口至EU的CO₂足迹 — 6个行业',
+    eng_asean_title:'东盟扩展', eng_asean_desc:'比较6个国家的关税 — TH, VN, MY, ID, PH, SG',
+    price_free:'免费', price_free_limit:'20次/分钟 · 无需密钥', price_try_btn:'立即试用',
+    price_popular:'热门', price_per_query:' / 次查询', price_std_limit:'60次/分钟 · 预付费', price_signup_btn:'免费注册 — 获取API Key',
+    price_custom:'定制', price_ent_limit:'按量定价', price_contact_btn:'联系我们',
+    pf_sandbox1:'HS编码分类', pf_sandbox2:'FTA + OGA + 清真', pf_sandbox3:'SHA-256证据链',
+    pf_std1:'全部核心引擎', pf_std2:'智能分析引擎', pf_std3:'到岸成本 + 运费', pf_std4:'CBAM + 东盟', pf_std5:'优先支持',
+    pf_ent1:'Standard全部功能', pf_ent2:'批量折扣5-20%', pf_ent3:'白标选项', pf_ent4:'专属支持',
     why_eyebrow:'核心功能', why_title:'为什么选择我们', why_sub:'专为AI智能体、开发者和贸易商设计 — 每次响应均附法律引用。',
     f1_title:'HS编码分类', f1_desc:'分类6-10位HS编码，附带置信度评分和泰国海关法律引用。',
     f2_title:'自动税费计算', f2_desc:'按现行泰国法律自动计算进口关税、增值税及其他费用。',
@@ -1087,7 +1150,27 @@ const i18n = {
     hero_desc:'タイ向けHSコード分類と輸出入関税計算のためのインテリジェントAPI。実際の法律を引用、高精度。AIエージェントおよび自動化システム向け。',
     hero_tagline:'国際貿易を円滑化・促進するインテリジェントプラットフォーム — 精確・高速・信頼性の高いAI技術で支える。',
     cta_register:'無料で始める — APIキー取得', cta_try:'無料サンドボックス',
-    stat_hs:'対応HSコード数', stat_fta:'FTA協定数', stat_price:'1件あたり', stat_speed:'応答時間', stat_halal:'ハラール対応国',
+    stat_hs:'対応HSコード数', stat_fta:'FTA協定数', stat_price:'1件あたり', stat_speed:'応答時間', stat_halal:'ハラール対応国', stat_engines:'AIエンジン',
+    demo_eyebrow:'ライブデモ', demo_title:'今すぐ試す', demo_sub:'商品名をタイ語または英語で入力 — 即時結果、登録不要', demo_placeholder:'例: iPhone, 冷凍エビ, 油圧ショベル',
+    engines_eyebrow:'14 AIエンジン', engines_title:'すべてをワンストップで', engines_sub:'商品分類からASEAN市場拡大計画まで',
+    tier_core:'コア — 基盤機能', tier_intel:'インテリジェンス — 深層分析', tier_expand:'エクスパンション — 市場成長',
+    eng_hs_title:'HS分類', eng_hs_desc:'6〜10桁HSコード分類、タイ語+英語対応、信頼スコア付き',
+    eng_fta_title:'FTA税率検索', eng_fta_desc:'13のFTA協定から最優遇税率を自動検索',
+    eng_oga_title:'OGAコンプライアンス', eng_oga_desc:'36機関の許可要件チェック — FDA、TISI、水産局等',
+    eng_halal_title:'ハラール認証', eng_halal_desc:'21カ国のハラール認証チェック、リスクレベル付き',
+    eng_landed_title:'着地コスト', eng_landed_desc:'11のインコタームズで総コスト計算 — 商品+運賃+保険+関税+VAT',
+    eng_bench_title:'価格ベンチマーク', eng_bench_desc:'市場基準と比較して過少申告を検出、リスクスコア付き',
+    eng_freight_title:'運賃監査', eng_freight_desc:'18種類の費用の運賃請求書を監査 — 過大請求を即座に検出',
+    eng_whatif_title:'What-Ifオプティマイザー', eng_whatif_desc:'3つの輸入ルートをシミュレーション — 最速/最適/最安',
+    eng_audit_title:'税関監査', eng_audit_desc:'リスクスコア評価とコンプライアンスレポートカード',
+    eng_cbam_title:'CBAMカーボン', eng_cbam_desc:'EU輸出向けCO₂フットプリント計算 — 6セクター',
+    eng_asean_title:'ASEAN展開', eng_asean_desc:'6カ国の関税比較 — TH, VN, MY, ID, PH, SG',
+    price_free:'無料', price_free_limit:'20回/分 · キー不要', price_try_btn:'今すぐ試す',
+    price_popular:'人気', price_per_query:' / クエリ', price_std_limit:'60回/分 · プリペイド', price_signup_btn:'無料登録 — APIキー取得',
+    price_custom:'カスタム', price_ent_limit:'ボリュームプライシング', price_contact_btn:'お問い合わせ',
+    pf_sandbox1:'HSコード分類', pf_sandbox2:'FTA + OGA + ハラール', pf_sandbox3:'SHA-256証拠チェーン',
+    pf_std1:'全コアエンジン', pf_std2:'インテリジェンスエンジン', pf_std3:'着地コスト + 運賃', pf_std4:'CBAM + ASEAN', pf_std5:'優先サポート',
+    pf_ent1:'Standardの全機能', pf_ent2:'ボリュームディスカウント5-20%', pf_ent3:'ホワイトラベルオプション', pf_ent4:'専用サポート',
     why_eyebrow:'機能', why_title:'なぜ私たちを選ぶのか', why_sub:'ビジネス、開発者、AIエージェントに対応 — 全レスポンスに法的引用を付与。',
     f1_title:'HSコード分類', f1_desc:'6〜10桁のHSコードを分類。信頼スコアとタイ税関法の引用付き。',
     f2_title:'自動税額計算', f2_desc:'現行タイ法律に基づき輸入関税・付加価値税・その他費用を自動計算。',
@@ -1171,7 +1254,7 @@ function closeRegister() { document.getElementById('registerModal').classList.re
 
 function openSandboxDemo() {
   if (localStorage.getItem('aitai_key')) { window.location.href='/dashboard'; return; }
-  document.getElementById('sandboxModal').classList.add('show');
+  document.getElementById('live-demo').scrollIntoView({behavior:'smooth'});
 }
 function closeSandbox() { document.getElementById('sandboxModal').classList.remove('show'); }
 
@@ -1230,12 +1313,12 @@ async function doSandbox() {
   const btn = document.getElementById('sandboxBtn');
   if (!desc) {
     result.style.display='block';
-    result.innerHTML='<span style="color:#f59e0b">⚠️ กรุณาพิมพ์ชื่อสินค้าก่อน</span>';
+    result.innerHTML=`<span style="color:#f59e0b">⚠️ ${{th:'กรุณาพิมพ์ชื่อสินค้าก่อน',en:'Please enter a product name',zh:'请输入商品名称',ja:'商品名を入力してください'}[currentLang]||'Please enter a product name'}</span>`;
     return;
   }
   btn.disabled=true; btn.textContent='⏳...';
   result.style.display='block';
-  result.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#94a3b8"><span style="font-size:1.2rem;display:inline-block;animation:spin 1s linear infinite">⏳</span> กำลังวิเคราะห์...</div>';
+  result.innerHTML=`<div style="display:flex;align-items:center;gap:10px;color:#94a3b8"><span style="font-size:1.2rem;display:inline-block;animation:spin 1s linear infinite">⏳</span> ${{th:'กำลังวิเคราะห์...',en:'Analyzing...',zh:'分析中...',ja:'分析中...'}[currentLang]||'Analyzing...'}</div>`;
   try {
     const res = await fetch(API+'/v1/sandbox/classify',{
       method:'POST',
@@ -1256,21 +1339,29 @@ async function doSandbox() {
       result.innerHTML='<span style="color:#f87171">❌ '+msg+'</span>';
     } else {
       const item = data.items&&data.items[0];
-      if (!item) { result.innerHTML='<span style="color:#f87171">❌ ไม่พบผลลัพธ์</span>'; return; }
+      if (!item) { result.innerHTML=`<span style="color:#f87171">❌ ${{th:'ไม่พบผลลัพธ์',en:'No results found',zh:'未找到结果',ja:'結果が見つかりません'}[currentLang]||'No results found'}</span>`; return; }
       const conf=Math.round((item.confidence_score||0)*100);
       const confColor=conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
+      const _confLabel={th:'ความมั่นใจ',en:'Confidence',zh:'置信度',ja:'信頼度'}[currentLang]||'Confidence';
+      const _noOga={th:'ไม่ต้อง OGA',en:'No OGA required',zh:'无需OGA',ja:'OGA不要'}[currentLang];
+      const _reqPerm={th:'ต้องขออนุญาต',en:'Permit required',zh:'需要许可',ja:'許可が必要'}[currentLang];
+      const _noHalal={th:'ไม่ต้อง Halal',en:'No Halal required',zh:'无需清真',ja:'ハラール不要'}[currentLang];
+      const _dutyLabel={th:'อากร',en:'Duty',zh:'关税',ja:'関税'}[currentLang];
+      const _saveTax={th:'ประหยัดภาษีได้',en:'Tax savings',zh:'节省税费',ja:'税金節約'}[currentLang];
+      const _dutyVatSb={th:'อากร+VAT',en:'Duty+VAT',zh:'关税+增值税',ja:'関税+VAT'}[currentLang];
+      const _thbSb={th:'บาท',en:'THB',zh:'泰铢',ja:'バーツ'}[currentLang];
       const ogaBadge=item.oga_required
-        ?`<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ OGA: ${(item.oga_agencies||[]).join(', ')||'ต้องขออนุญาต'}</span>`
-        :'<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง OGA</span>';
+        ?`<span style="background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px">⚠️ OGA: ${(item.oga_agencies||[]).join(', ')||_reqPerm}</span>`
+        :`<span style="background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ${_noOga}</span>`;
       const halalBadge=item.halal_required
         ?`<span style="background:rgba(239,68,68,.12);color:#f87171;padding:2px 8px;border-radius:4px;font-size:11px">🕌 Halal (${item.halal_risk_level||''})</span>`
-        :'<span style="background:rgba(16,185,129,.08);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ไม่ต้อง Halal</span>';
+        :`<span style="background:rgba(16,185,129,.08);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">✅ ${_noHalal}</span>`;
       const ftaBadge=item.fta_eligible&&item.fta_form
         ?`<span style="background:rgba(16,185,129,.12);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">🤝 ${item.fta_form}</span>`:'';
       const savingLine=item.fta_saving_amount>0
-        ?`<div style="font-size:11px;color:#10b981">💚 ประหยัดภาษีได้ ~${item.fta_saving_amount.toLocaleString()} บาท</div>`:'';
+        ?`<div style="font-size:11px;color:#10b981">💚 ${_saveTax} ~${item.fta_saving_amount.toLocaleString()} ${_thbSb}</div>`:'';
       const importLine=item.import_total_estimate!=null
-        ?`<div style="font-size:11px;color:#818cf8">💰 อากร+VAT ~${item.import_total_estimate.toLocaleString()} บาท</div>`:'';
+        ?`<div style="font-size:11px;color:#818cf8">💰 ${_dutyVatSb} ~${item.import_total_estimate.toLocaleString()} ${_thbSb}</div>`:'';
       const descLine=item.hs_description_th
         ?`<div style="font-size:13px;color:#e2e8f0">${item.hs_description_th}</div><div style="font-size:11px;color:#64748b">${item.hs_description||''}</div>`
         :`<div style="font-size:13px;color:#94a3b8">${item.hs_description||''}</div>`;
@@ -1278,17 +1369,17 @@ async function doSandbox() {
         <div style="display:flex;flex-direction:column;gap:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
             <span style="font-size:1.4rem;font-weight:700;color:#e2e8f0">🏷️ ${item.hs_code||'—'}</span>
-            <span style="font-weight:700;color:${confColor}">${conf}% ความมั่นใจ</span>
+            <span style="font-weight:700;color:${confColor}">${conf}% ${_confLabel}</span>
           </div>
           ${descLine}
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
             ${ogaBadge}${halalBadge}${ftaBadge}
-            <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">อากร ${Math.round((item.duty_rate||0)*100)}%</span>
+            <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">${_dutyLabel} ${Math.round((item.duty_rate||0)*100)}%</span>
             <span style="background:rgba(99,102,241,.15);color:#818cf8;padding:2px 8px;border-radius:4px;font-size:11px">VAT ${Math.round((item.vat_rate||0)*100)}%</span>
           </div>
           ${savingLine}${importLine}
           <div style="font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">${item.source_reference||''}</div>
-          <a href="/dashboard?q=${encodeURIComponent(desc)}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">ดูผลเต็มใน Dashboard →</a>
+          <a href="/dashboard?q=${encodeURIComponent(desc)}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;text-align:center">${{th:'ดูผลเต็มใน Dashboard →',en:'View full results →',zh:'查看完整结果 →',ja:'全結果を表示 →'}[currentLang]||'View full results →'}</a>
         </div>`;
     }
   } catch(e) {
@@ -1353,6 +1444,14 @@ function checkSavedSession() {
     heroCta.style.background = 'linear-gradient(135deg,#059669,#10b981)';
     heroCta.removeAttribute('data-i18n');
   }
+  // ปุ่มทดลองใช้ฟรี → เปลี่ยนเป็น Sandbox (สมัครแล้ว)
+  const tryBtn = document.getElementById('heroCtaTry');
+  if (tryBtn) {
+    const sandboxMap = { th:'🧪 ทดลอง Sandbox', en:'🧪 Try Sandbox', zh:'🧪 沙盒测试', ja:'🧪 サンドボックス' };
+    tryBtn.textContent = sandboxMap[currentLang] || sandboxMap.en;
+    tryBtn.onclick = () => { document.getElementById('sandboxModal').classList.add('show'); };
+    tryBtn.removeAttribute('data-i18n');
+  }
 }
 
 // ── INLINE DEMO ─────────────────────────────────────────────
@@ -1370,7 +1469,7 @@ async function doInlineDemo() {
   result.style.display='block';
   result.innerHTML=`<div style="display:flex;align-items:center;gap:10px;color:var(--accent3);font-size:0.9rem;padding:8px 0">
     <span style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></span>
-    กำลังวิเคราะห์ "${desc}" ...
+    ${{th:'กำลังวิเคราะห์',en:'Analyzing',zh:'正在分析',ja:'分析中'}[currentLang]||'Analyzing'} "${desc}" ...
   </div>`;
 
   try {
@@ -1403,19 +1502,25 @@ async function doInlineDemo() {
     const halalColor=item.halal_required?'#f87171':'#10b981';
     const halalBg=item.halal_required?'rgba(239,68,68,.1)':'rgba(16,185,129,.08)';
 
+    // i18n labels for dynamic content
+    const _saving = {th:'ประหยัดภาษีได้',en:'Tax savings',zh:'节省税费',ja:'税金節約'}[currentLang]||'Tax savings';
+    const _via = {th:'ผ่าน',en:'via',zh:'通过',ja:'経由'}[currentLang]||'via';
+    const _dutyVat = {th:'อากร+VAT รวม',en:'Duty+VAT total',zh:'关税+增值税合计',ja:'関税+VAT合計'}[currentLang]||'Duty+VAT total';
+    const _thb = {th:'บาท',en:'THB',zh:'泰铢',ja:'バーツ'}[currentLang]||'THB';
+
     // FTA savings line
     const savingLine=item.fta_saving_amount>0
       ?`<div style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 12px;margin-top:10px">
           <span style="font-size:1.1rem">💚</span>
-          <span style="color:#10b981;font-weight:600;font-size:0.85rem">ประหยัดภาษีได้ ~${item.fta_saving_amount.toLocaleString()} บาท</span>
-          <span style="color:var(--muted);font-size:0.75rem;margin-left:auto">ผ่าน ${ftaInfo}</span>
+          <span style="color:#10b981;font-weight:600;font-size:0.85rem">${_saving} ~${item.fta_saving_amount.toLocaleString()} ${_thb}</span>
+          <span style="color:var(--muted);font-size:0.75rem;margin-left:auto">${_via} ${ftaInfo}</span>
         </div>`:'';
 
     // Import total estimate
     const importLine=item.import_total_estimate!=null
       ?`<div style="display:flex;align-items:center;gap:6px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:8px;padding:8px 12px;margin-top:6px">
           <span style="font-size:1.1rem">💰</span>
-          <span style="color:var(--accent3);font-weight:600;font-size:0.85rem">อากร+VAT รวม ~${item.import_total_estimate.toLocaleString()} บาท</span>
+          <span style="color:var(--accent3);font-weight:600;font-size:0.85rem">${_dutyVat} ~${item.import_total_estimate.toLocaleString()} ${_thb}</span>
         </div>`:'';
 
     result.innerHTML=`
@@ -1463,7 +1568,7 @@ async function doInlineDemo() {
       <!-- Evidence hash + CTA -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px">
         <div style="font-size:0.7rem;color:var(--muted2);font-family:monospace">🔒 sha256:${(item.evidence_hash||'').substring(0,40)}...</div>
-        <button class="btn btn-outline-accent" style="font-size:0.75rem;padding:4px 14px" onclick="openRegister()">สมัครฟรี — ดูผลเต็ม</button>
+        <button class="btn btn-outline-accent" style="font-size:0.75rem;padding:4px 14px" onclick="openRegister()">${{th:'สมัครฟรี — ดูผลเต็ม',en:'Sign up free — Full results',zh:'免费注册 — 完整结果',ja:'無料登録 — 全結果表示'}[currentLang]||'Sign up free'}</button>
       </div>
     `;
   } catch(e) {
