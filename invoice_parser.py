@@ -89,7 +89,7 @@ def extract_text_from_excel(content: bytes, filename: str) -> str:
             ws = wb[sheet_name]
             lines.append(f"=== Sheet: {sheet_name} ===")
             for row in ws.iter_rows(values_only=True):
-                row_vals = [str(v).strip() if v is not None else "" for v in row]
+                row_vals = [str(v).strip().replace("\n", " ") if v is not None else "" for v in row]
                 # ข้ามแถวว่างทั้งหมด
                 if any(v for v in row_vals):
                     lines.append("\t".join(row_vals))
@@ -254,7 +254,7 @@ def _compile_excel_text(content: bytes, filename: str) -> str:
         ws = wb.active or wb[wb.sheetnames[0]]
         lines = []
         for row in ws.iter_rows(values_only=True):
-            cells = [str(v).strip() if v is not None else "" for v in row]
+            cells = [str(v).strip().replace("\n", " ") if v is not None else "" for v in row]
             if any(c for c in cells):
                 lines.append(" | ".join(cells))
         return "\n".join(lines)
@@ -433,7 +433,7 @@ def _smart_parse_excel(content: bytes, filename: str) -> dict:
 
         # ดึง invoice_no, seller, buyer จาก meta_text แบบ heuristic
         import re
-        inv_match = re.search(r'INV[-\s]?([\w\-]+)', meta_text, re.IGNORECASE)
+        inv_match = re.search(r'INV[-][w\-]+', meta_text, re.IGNORECASE)
         result["invoice_no"] = inv_match.group(0) if inv_match else None
 
         date_match = re.search(r'(\d{4}[-/]\d{2}[-/]\d{2})', meta_text)
@@ -540,11 +540,24 @@ async def parse_invoice(filename: str, content: bytes) -> dict:
         raw_text = json.dumps(extracted, ensure_ascii=False)
 
     elif file_type in ("EXCEL", "CSV"):
-        # compile → parse text เอง (ไม่พึ่ง Claude สำหรับ Excel)
-        raw_text = _compile_excel_text(content, filename)
-        extracted = _parse_compiled_text(raw_text)
+        raw_text = ""
+        # 1. Smart parse: อ่าน cells โดยตรง (ไม่พึ่ง text)
+        if file_type == "EXCEL":
+            extracted = _smart_parse_excel(content, filename)
+            if extracted.get("items"):
+                raw_text = _compile_excel_text(content, filename)
+            else:
+                extracted = {"items": []}
+
+        # 2. Fallback: compile → text parse
         if not extracted.get("items"):
-            # fallback → Claude (กรณี format แปลก)
+            raw_text = _compile_excel_text(content, filename)
+            extracted = _parse_compiled_text(raw_text)
+
+        # 3. Fallback: Claude (กรณี format แปลก)
+        if not extracted.get("items"):
+            if not raw_text:
+                raw_text = _compile_excel_text(content, filename)
             extracted = await extract_with_claude_text(raw_text)
 
     else:
@@ -554,5 +567,5 @@ async def parse_invoice(filename: str, content: bytes) -> dict:
         return {"error": extracted["error"], "file_type": file_type, "raw_text": raw_text}
 
     extracted["file_type"] = file_type
-    extracted["raw_text"] = raw_text[:5000]  # เก็บแค่ 5000 chars
+    extracted["raw_text"] = raw_text[:5000]
     return extracted
