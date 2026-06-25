@@ -405,6 +405,23 @@ footer a:hover { color:var(--accent3); }
   box-shadow:0 4px 24px rgba(0,0,0,0.4); text-align:center;
 }
 
+/* ─── DEMO PROCESSING GLOW ─── */
+.demo-card { transition: border-color 0.3s, box-shadow 0.3s; }
+.demo-card.processing {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 20px var(--glow), 0 0 40px rgba(99,102,241,0.15), inset 0 0 20px rgba(99,102,241,0.05);
+  animation: demoGlow 1.5s ease-in-out infinite;
+}
+@keyframes demoGlow {
+  0%,100% { box-shadow: 0 0 20px var(--glow), 0 0 40px rgba(99,102,241,0.15); border-color: var(--accent); }
+  50%     { box-shadow: 0 0 30px rgba(139,92,246,0.5), 0 0 60px rgba(99,102,241,0.25); border-color: var(--accent2); }
+}
+.demo-card.success {
+  border-color: var(--green) !important;
+  box-shadow: 0 0 20px rgba(16,185,129,0.25), 0 0 40px rgba(16,185,129,0.1);
+  transition: border-color 0.5s, box-shadow 0.5s;
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width:768px) {
   .grid-3 { grid-template-columns:1fr !important; }
@@ -602,7 +619,7 @@ footer a:hover { color:var(--accent3); }
   <div class="section-title">ทดลองใช้ทันที</div>
   <div class="section-sub">พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร</div>
   <div style="max-width:680px;margin:0 auto">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden">
+    <div id="demoCard" class="demo-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden">
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <input type="text" id="inlineDesc" placeholder="เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator" style="flex:1;padding:0.75rem 1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:0.95rem;font-family:inherit" />
         <button class="btn btn-primary" onclick="doInlineDemo()" id="inlineDemoBtn" style="white-space:nowrap;padding:0.75rem 1.5rem">⚡ Classify</button>
@@ -1343,10 +1360,19 @@ async function doInlineDemo() {
   const desc = document.getElementById('inlineDesc').value.trim();
   const result = document.getElementById('inlineResult');
   const btn = document.getElementById('inlineDemoBtn');
+  const card = document.getElementById('demoCard');
   if (!desc) return;
-  btn.disabled=true; btn.textContent='...';
+
+  // Start processing glow
+  btn.disabled=true; btn.textContent='⏳ Analyzing...';
+  card.classList.remove('success');
+  card.classList.add('processing');
   result.style.display='block';
-  result.innerHTML='<div style="color:var(--muted);font-size:0.9rem">⏳ กำลังวิเคราะห์...</div>';
+  result.innerHTML=`<div style="display:flex;align-items:center;gap:10px;color:var(--accent3);font-size:0.9rem;padding:8px 0">
+    <span style="display:inline-block;width:20px;height:20px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></span>
+    กำลังวิเคราะห์ "${desc}" ...
+  </div>`;
+
   try {
     const res = await fetch(API+'/v1/sandbox/classify',{
       method:'POST',
@@ -1356,31 +1382,92 @@ async function doInlineDemo() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail?.message||data.message||'Error');
     const item = data.items&&data.items[0];
-    if (!item) { result.innerHTML='<span style="color:#f87171">ไม่พบผลลัพธ์</span>'; return; }
+    if (!item) { result.innerHTML='<span style="color:#f87171">ไม่พบผลลัพธ์</span>'; card.classList.remove('processing'); return; }
+
+    // Stop glow → success glow
+    card.classList.remove('processing');
+    card.classList.add('success');
+    setTimeout(()=>card.classList.remove('success'),3000);
+
     const conf=Math.round((item.confidence_score||0)*100);
     const confColor=conf>=85?'#10b981':conf>=75?'#f59e0b':'#f87171';
+    const confBar=`<div style="width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:4px"><div style="width:${conf}%;height:100%;background:${confColor};border-radius:2px;transition:width 0.5s"></div></div>`;
     const dutyPct=Math.round((item.duty_rate||0)*100);
+    const vatPct=Math.round((item.vat_rate||0.07)*100);
     const ftaInfo=item.fta_eligible&&item.fta_form?item.fta_form:'—';
     const ftaRate=item.fta_rate!=null?Math.round(item.fta_rate*100)+'%':'—';
     const ogaText=item.oga_required?(item.oga_agencies||[]).join(', ')||'Required':'Not required';
-    const halalText=item.halal_required?'Required ('+( item.halal_risk_level||'')+')':'Not required';
+    const ogaColor=item.oga_required?'#f59e0b':'#10b981';
+    const ogaBg=item.oga_required?'rgba(245,158,11,.12)':'rgba(16,185,129,.1)';
+    const halalText=item.halal_required?'Required ('+(item.halal_risk_level||'')+')':'Not required';
+    const halalColor=item.halal_required?'#f87171':'#10b981';
+    const halalBg=item.halal_required?'rgba(239,68,68,.1)':'rgba(16,185,129,.08)';
+
+    // FTA savings line
+    const savingLine=item.fta_saving_amount>0
+      ?`<div style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 12px;margin-top:10px">
+          <span style="font-size:1.1rem">💚</span>
+          <span style="color:#10b981;font-weight:600;font-size:0.85rem">ประหยัดภาษีได้ ~${item.fta_saving_amount.toLocaleString()} บาท</span>
+          <span style="color:var(--muted);font-size:0.75rem;margin-left:auto">ผ่าน ${ftaInfo}</span>
+        </div>`:'';
+
+    // Import total estimate
+    const importLine=item.import_total_estimate!=null
+      ?`<div style="display:flex;align-items:center;gap:6px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:8px;padding:8px 12px;margin-top:6px">
+          <span style="font-size:1.1rem">💰</span>
+          <span style="color:var(--accent3);font-weight:600;font-size:0.85rem">อากร+VAT รวม ~${item.import_total_estimate.toLocaleString()} บาท</span>
+        </div>`:'';
+
     result.innerHTML=`
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
-        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">HS Code</div><div style="font-size:1.3rem;font-weight:800;color:var(--text)">${item.hs_code||'—'}</div></div>
-        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">MFN Duty</div><div style="font-size:1.3rem;font-weight:800;color:var(--text)">${dutyPct}%</div></div>
-        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">Best FTA</div><div style="font-size:1.3rem;font-weight:800;color:var(--green)">${ftaRate}</div><div style="font-size:0.7rem;color:var(--muted)">${ftaInfo}</div></div>
-        <div style="text-align:center"><div style="font-size:0.7rem;color:var(--muted);margin-bottom:2px">Confidence</div><div style="font-size:1.3rem;font-weight:800;color:${confColor}">${conf}%</div></div>
+      <!-- Main stats grid -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+        <div style="text-align:center;background:var(--bg);border-radius:10px;padding:10px 6px">
+          <div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">HS Code</div>
+          <div style="font-size:1.4rem;font-weight:900;color:var(--text);letter-spacing:-0.02em">${item.hs_code||'—'}</div>
+        </div>
+        <div style="text-align:center;background:var(--bg);border-radius:10px;padding:10px 6px">
+          <div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">MFN Duty</div>
+          <div style="font-size:1.4rem;font-weight:900;color:var(--text)">${dutyPct}%</div>
+          <div style="font-size:0.65rem;color:var(--muted)">VAT ${vatPct}%</div>
+        </div>
+        <div style="text-align:center;background:var(--bg);border-radius:10px;padding:10px 6px">
+          <div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Best FTA</div>
+          <div style="font-size:1.4rem;font-weight:900;color:var(--green)">${ftaRate}</div>
+          <div style="font-size:0.65rem;color:var(--muted)">${ftaInfo}</div>
+        </div>
+        <div style="text-align:center;background:var(--bg);border-radius:10px;padding:10px 6px">
+          <div style="font-size:0.68rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">Confidence</div>
+          <div style="font-size:1.4rem;font-weight:900;color:${confColor}">${conf}%</div>
+          ${confBar}
+        </div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span style="background:${item.oga_required?'rgba(245,158,11,.12)':'rgba(16,185,129,.1)'};color:${item.oga_required?'#f59e0b':'#10b981'};padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:600">OGA: ${ogaText}</span>
-        <span style="background:${item.halal_required?'rgba(239,68,68,.1)':'rgba(16,185,129,.08)'};color:${item.halal_required?'#f87171':'#10b981'};padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:600">Halal: ${halalText}</span>
+
+      <!-- Badges row -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <span style="background:${ogaBg};color:${ogaColor};padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;border:1px solid ${ogaColor}22">${item.oga_required?'⚠️':'✅'} OGA: ${ogaText}</span>
+        <span style="background:${halalBg};color:${halalColor};padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;border:1px solid ${halalColor}22">${item.halal_required?'🕌':'✅'} Halal: ${halalText}</span>
+        <span style="background:rgba(99,102,241,.08);color:var(--accent3);padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;border:1px solid rgba(99,102,241,0.15)">📋 Duty ${dutyPct}% + VAT ${vatPct}%</span>
       </div>
-      ${item.hs_description_th?'<div style="font-size:0.85rem;color:var(--text2)">'+item.hs_description_th+'</div>':''}
-      ${item.hs_description?'<div style="font-size:0.78rem;color:var(--muted)">'+item.hs_description+'</div>':''}
-      ${item.fta_saving_amount>0?'<div style="font-size:0.82rem;color:var(--green);margin-top:6px">💚 ประหยัดภาษีได้ ~'+item.fta_saving_amount.toLocaleString()+' บาท</div>':''}
-      <div style="font-size:0.7rem;color:var(--muted2);margin-top:8px;font-family:monospace">🔒 sha256:${(item.evidence_hash||'').substring(0,32)}...</div>
+
+      <!-- Description -->
+      ${item.hs_description_th?`<div style="font-size:0.88rem;color:var(--text2);line-height:1.6;margin-bottom:4px">${item.hs_description_th}</div>`:''}
+      ${item.hs_description?`<div style="font-size:0.78rem;color:var(--muted);line-height:1.5">${item.hs_description}</div>`:''}
+
+      <!-- Savings & Cost -->
+      ${savingLine}
+      ${importLine}
+
+      <!-- Source reference -->
+      ${item.source_reference?`<div style="font-size:0.75rem;color:var(--muted);margin-top:10px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid var(--border)">📖 ${item.source_reference}</div>`:''}
+
+      <!-- Evidence hash + CTA -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px">
+        <div style="font-size:0.7rem;color:var(--muted2);font-family:monospace">🔒 sha256:${(item.evidence_hash||'').substring(0,40)}...</div>
+        <button class="btn btn-outline-accent" style="font-size:0.75rem;padding:4px 14px" onclick="openRegister()">สมัครฟรี — ดูผลเต็ม</button>
+      </div>
     `;
   } catch(e) {
+    card.classList.remove('processing');
     result.innerHTML='<span style="color:#f87171">❌ '+e.message+'</span>';
   }
   btn.disabled=false; btn.textContent='⚡ Classify';
