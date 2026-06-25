@@ -405,22 +405,49 @@ footer a:hover { color:var(--accent3); }
   box-shadow:0 4px 24px rgba(0,0,0,0.4); text-align:center;
 }
 
-/* ─── DEMO PROCESSING GLOW ─── */
-.demo-card { transition: border-color 0.3s, box-shadow 0.3s; }
+/* ─── DEMO CARD ─── */
+.demo-card {
+  position: relative;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.demo-card::before {
+  content:''; position:absolute; inset:-1px; border-radius:17px; z-index:-1;
+  background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.1), rgba(99,102,241,0.3));
+  opacity:0; transition:opacity 0.4s;
+}
+.demo-card:hover::before { opacity:1; }
+.demo-card:hover { border-color: rgba(99,102,241,0.4); box-shadow: 0 8px 32px rgba(99,102,241,0.12); }
+
+/* Processing animation */
 .demo-card.processing {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 20px var(--glow), 0 0 40px rgba(99,102,241,0.15), inset 0 0 20px rgba(99,102,241,0.05);
-  animation: demoGlow 1.5s ease-in-out infinite;
+  border-color: transparent !important;
+}
+.demo-card.processing::before {
+  opacity:1;
+  background: linear-gradient(270deg, var(--accent), var(--accent2), var(--accent3), var(--accent2), var(--accent));
+  background-size: 400% 100%;
+  animation: demoGlow 2s linear infinite;
 }
 @keyframes demoGlow {
-  0%,100% { box-shadow: 0 0 20px var(--glow), 0 0 40px rgba(99,102,241,0.15); border-color: var(--accent); }
-  50%     { box-shadow: 0 0 30px rgba(139,92,246,0.5), 0 0 60px rgba(99,102,241,0.25); border-color: var(--accent2); }
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
 }
+.demo-card.processing { box-shadow: 0 0 30px var(--glow), 0 0 60px rgba(99,102,241,0.15); }
+
+/* Success flash */
 .demo-card.success {
   border-color: var(--green) !important;
-  box-shadow: 0 0 20px rgba(16,185,129,0.25), 0 0 40px rgba(16,185,129,0.1);
-  transition: border-color 0.5s, box-shadow 0.5s;
+  box-shadow: 0 0 24px rgba(16,185,129,0.3), 0 0 48px rgba(16,185,129,0.1);
+  transition: border-color 0.6s, box-shadow 0.6s;
 }
+.demo-card.success::before { opacity:0; }
+
+/* Result fade-in */
+@keyframes fadeSlideUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.demo-result-animate { animation: fadeSlideUp 0.4s ease-out; }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width:768px) {
@@ -614,24 +641,25 @@ footer a:hover { color:var(--accent3); }
 </div>
 
 <!-- ═══ INLINE DEMO ═══ -->
-<div class="section" id="live-demo">
-  <div class="section-eyebrow" data-i18n="demo_eyebrow">LIVE DEMO</div>
-  <div class="section-title" data-i18n="demo_title">ทดลองใช้ทันที</div>
-  <div class="section-sub" data-i18n="demo_sub">พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร</div>
-  <div style="max-width:680px;margin:0 auto">
-    <div id="demoCard" class="demo-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden">
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <input type="text" id="inlineDesc" data-i18n-placeholder="demo_placeholder" placeholder="เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator" style="flex:1;padding:0.75rem 1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:0.95rem;font-family:inherit" />
-        <button class="btn btn-primary" onclick="doInlineDemo()" id="inlineDemoBtn" style="white-space:nowrap;padding:0.75rem 1.5rem">⚡ Classify</button>
+<div class="section" id="live-demo" style="padding-top:4rem;padding-bottom:4rem">
+  <div style="text-align:center;margin-bottom:2.5rem">
+    <div class="section-eyebrow" data-i18n="demo_eyebrow">LIVE DEMO</div>
+    <div class="section-title" data-i18n="demo_title">ทดลองใช้ทันที</div>
+    <div class="section-sub" style="margin-bottom:0" data-i18n="demo_sub">พิมพ์ชื่อสินค้า ภาษาไทยหรืออังกฤษ — เห็นผลทันที ไม่ต้องสมัคร</div>
+  </div>
+  <div style="max-width:720px;margin:0 auto">
+    <div id="demoCard" class="demo-card" style="background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:20px;padding:2rem 2.25rem;position:relative;overflow:hidden">
+      <!-- Subtle corner accent -->
+      <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(99,102,241,0.08),transparent 70%);pointer-events:none"></div>
+      <!-- Input row -->
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <input type="text" id="inlineDesc" data-i18n-placeholder="demo_placeholder" placeholder="เช่น มือถือ iPhone, frozen shrimp, hydraulic excavator" style="flex:1;padding:0.85rem 1.15rem;background:var(--bg);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:1rem;font-family:inherit;transition:border-color 0.2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'" />
+        <button class="btn btn-primary" onclick="doInlineDemo()" id="inlineDemoBtn" style="white-space:nowrap;padding:0.85rem 1.75rem;font-size:0.95rem;border-radius:12px">⚡ Classify</button>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='มือถือ iPhone 16 Pro';doInlineDemo()">มือถือ iPhone</button>
-        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='frozen shrimp vannamei';doInlineDemo()">frozen shrimp</button>
-        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='hydraulic excavator 20 ton';doInlineDemo()">excavator</button>
-        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='ข้าวหอมมะลิ 5 kg';doInlineDemo()">ข้าวหอมมะลิ</button>
-        <button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='steel coil hot rolled';doInlineDemo()">steel coil</button>
-      </div>
-      <div id="inlineResult" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"></div>
+      <!-- Quick-try -->
+      <div id="quickTryWrap" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
+      <!-- Results -->
+      <div id="inlineResult" style="display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)"></div>
     </div>
   </div>
 </div>
@@ -1246,6 +1274,11 @@ function setLang(lang) {
     const key = el.getAttribute('data-i18n-placeholder');
     if (t[key]) el.placeholder = t[key];
   });
+
+  // Re-apply logged-in UI labels in new language
+  updateLoggedInUI();
+  // Re-apply quick-try buttons in new language
+  updateQuickTryButtons();
 }
 
 // ── MODALS ───────────────────────────────────────────────────
@@ -1416,8 +1449,6 @@ document.head.appendChild(styleEl);
 function checkSavedSession() {
   const key = localStorage.getItem('aitai_key');
   const agent = localStorage.getItem('aitai_agent');
-  const btn = document.getElementById('navLoginBtn');
-  const heroCta = document.getElementById('heroCtaMain');
 
   const params = new URLSearchParams(window.location.search);
   if (params.get('session_expired') === '1') {
@@ -1426,6 +1457,17 @@ function checkSavedSession() {
     history.replaceState({}, '', window.location.pathname);
   }
   if (!key) return;
+
+  // เรียก updateLoggedInUI ทุกครั้งที่เปลี่ยนภาษา
+  updateLoggedInUI();
+}
+
+function updateLoggedInUI() {
+  const key = localStorage.getItem('aitai_key');
+  if (!key) return;
+  const agent = localStorage.getItem('aitai_agent');
+  const btn = document.getElementById('navLoginBtn');
+  const heroCta = document.getElementById('heroCtaMain');
 
   const name = (agent && agent.length <= 18) ? agent : 'Dashboard';
   const welcomeMap = { th:'ยินดีต้อนรับ', en:'Welcome', zh:'欢迎', ja:'ようこそ' };
@@ -1444,7 +1486,6 @@ function checkSavedSession() {
     heroCta.style.background = 'linear-gradient(135deg,#059669,#10b981)';
     heroCta.removeAttribute('data-i18n');
   }
-  // ปุ่มทดลองใช้ฟรี → เปลี่ยนเป็น Sandbox (สมัครแล้ว)
   const tryBtn = document.getElementById('heroCtaTry');
   if (tryBtn) {
     const sandboxMap = { th:'🧪 ทดลอง Sandbox', en:'🧪 Try Sandbox', zh:'🧪 沙盒测试', ja:'🧪 サンドボックス' };
@@ -1452,6 +1493,22 @@ function checkSavedSession() {
     tryBtn.onclick = () => { document.getElementById('sandboxModal').classList.add('show'); };
     tryBtn.removeAttribute('data-i18n');
   }
+}
+
+// ── QUICK-TRY BUTTONS ────────────────────────────────────────
+const QUICK_TRY = [
+  { query:'มือถือ iPhone 16 Pro',    th:'มือถือ iPhone',    en:'iPhone',         zh:'iPhone手机',    ja:'iPhone' },
+  { query:'frozen shrimp vannamei',  th:'กุ้งแช่แข็ง',       en:'Frozen shrimp',  zh:'冻虾',         ja:'冷凍エビ' },
+  { query:'hydraulic excavator 20 ton', th:'รถขุด',          en:'Excavator',      zh:'挖掘机',       ja:'油圧ショベル' },
+  { query:'ข้าวหอมมะลิ 5 kg',        th:'ข้าวหอมมะลิ',     en:'Jasmine rice',   zh:'茉莉香米',     ja:'ジャスミン米' },
+  { query:'steel coil hot rolled',   th:'เหล็กม้วน',        en:'Steel coil',     zh:'热轧钢卷',     ja:'鋼コイル' },
+];
+function updateQuickTryButtons() {
+  const wrap = document.getElementById('quickTryWrap');
+  if (!wrap) return;
+  wrap.innerHTML = QUICK_TRY.map(q =>
+    `<button class="btn btn-ghost" style="font-size:0.78rem;padding:4px 12px" onclick="document.getElementById('inlineDesc').value='${q.query}';doInlineDemo()">${q[currentLang]||q.en}</button>`
+  ).join('');
 }
 
 // ── INLINE DEMO ─────────────────────────────────────────────
@@ -1523,7 +1580,7 @@ async function doInlineDemo() {
           <span style="color:var(--accent3);font-weight:600;font-size:0.85rem">${_dutyVat} ~${item.import_total_estimate.toLocaleString()} ${_thb}</span>
         </div>`:'';
 
-    result.innerHTML=`
+    result.innerHTML=`<div class="demo-result-animate">
       <!-- Main stats grid -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
         <div style="text-align:center;background:var(--bg);border-radius:10px;padding:10px 6px">
@@ -1570,7 +1627,7 @@ async function doInlineDemo() {
         <div style="font-size:0.7rem;color:var(--muted2);font-family:monospace">🔒 sha256:${(item.evidence_hash||'').substring(0,40)}...</div>
         <button class="btn btn-outline-accent" style="font-size:0.75rem;padding:4px 14px" onclick="openRegister()">${{th:'สมัครฟรี — ดูผลเต็ม',en:'Sign up free — Full results',zh:'免费注册 — 完整结果',ja:'無料登録 — 全結果表示'}[currentLang]||'Sign up free'}</button>
       </div>
-    `;
+    </div>`;
   } catch(e) {
     card.classList.remove('processing');
     result.innerHTML='<span style="color:#f87171">❌ '+e.message+'</span>';
