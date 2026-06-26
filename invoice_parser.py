@@ -505,6 +505,10 @@ def _smart_parse_excel(content: bytes, filename: str) -> dict:
                 if unit_ci < len(row) and unit_ci not in col_map.values():
                     item["unit"] = str(row[unit_ci]).strip() if row[unit_ci] else None
 
+            # fallback: คำนวณ line_value จาก qty × unit_price ถ้าไม่มี amount column
+            if item["line_value"] is None and item["qty"] is not None and item["unit_price"] is not None:
+                item["line_value"] = round(item["qty"] * item["unit_price"], 2)
+
             items.append(item)
 
         result["items"] = items

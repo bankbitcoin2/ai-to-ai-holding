@@ -478,8 +478,14 @@ async def _process_one_item(
             fta_result["agreement"] = fta_result.get("form")
             fta_result["fta_eligible"] = True
 
-        # คำนวณตัวเลข
-        lv = _safe_float(item.get("line_value")) or 0
+        # คำนวณตัวเลข — fallback: qty × unit_price ถ้าไม่มี line_value
+        _raw_lv = _safe_float(item.get("line_value"))
+        _qty = _safe_float(item.get("qty"))
+        _up = _safe_float(item.get("unit_price"))
+        if _raw_lv is None and _qty is not None and _up is not None:
+            _raw_lv = round(_qty * _up, 2)
+            item["line_value"] = _raw_lv  # propagate back
+        lv = _raw_lv or 0
         mfn_rate = _safe_float(cl_result.get("duty_rate")) or 0
         applicable_rate = _safe_float(cl_result.get("applicable_rate"))
         duty_rate = applicable_rate if applicable_rate is not None else mfn_rate
@@ -519,7 +525,7 @@ async def _process_one_item(
             "qty": item.get("qty"),
             "unit": item.get("unit"),
             "unit_price": item.get("unit_price"),
-            "line_value": item.get("line_value"),
+            "line_value": lv if lv > 0 else item.get("line_value"),
             "currency": item.get("currency") or invoice_currency,
             "country_origin": origin,
             "hs_code": hs_ai,
