@@ -196,16 +196,76 @@
   @keyframes fade-step{0%,100%{opacity:.35}50%{opacity:1}}
   .fade-in{animation:fadeIn .4s ease}
 
-  /* RESPONSIVE */
-  @media(max-width:768px){
+  /* ═══ RESPONSIVE — TABLET (480-1024px) ═══ */
+  @media(max-width:1024px){
     .sidebar{width:64px}
     .sidebar .sidebar-label,.sidebar .sidebar-tier,.sidebar .sidebar-section-title{display:none}
     .sidebar .sidebar-item{justify-content:center;padding:.65rem}
     .sidebar .sidebar-logo span:not(.logo-icon){display:none}
     .dash-main{margin-left:64px!important}
-    .content-area{padding:1rem}
-    .engine-form .form-row{grid-template-columns:1fr}
+    .content-area{padding:1.25rem}
+    .topbar{padding:.75rem 1.25rem}
     .stats-row{grid-template-columns:1fr 1fr}
+    .engine-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+    .credit-amount{font-size:2.2rem}
+  }
+
+  /* ═══ RESPONSIVE — MOBILE (<480px) ═══ */
+  @media(max-width:480px){
+    .sidebar{width:0;transform:translateX(-100%);position:fixed;z-index:300}
+    .sidebar.mobile-open{width:260px;transform:translateX(0)}
+    .dash-main{margin-left:0!important}
+    .topbar{padding:.6rem .75rem;gap:8px}
+    .topbar-left{gap:8px}
+    .topbar-title{font-size:.85rem}
+    .topbar-right{gap:.4rem}
+    .agent-badge{font-size:.72rem}
+    .lang-btn{font-size:.65rem;padding:.15rem .35rem}
+    .content-area{padding:.75rem}
+    .panel-header h2{font-size:1.15rem}
+    .panel-header p{font-size:.8rem}
+    .stats-row{grid-template-columns:1fr}
+    .engine-grid{grid-template-columns:1fr}
+    .engine-form .form-row{grid-template-columns:1fr}
+    .credit-card{padding:1.25rem}
+    .credit-amount{font-size:1.8rem}
+    .credit-sub{font-size:.75rem;margin-bottom:1rem}
+    .credit-actions{flex-direction:column}
+    .card{padding:1rem;margin-bottom:1rem}
+    .card h3{font-size:.9rem}
+    .modal{max-width:calc(100vw - 2rem);padding:1.25rem}
+    .amount-grid{grid-template-columns:repeat(3,1fr);gap:.4rem}
+    .key-box{font-size:.7rem;flex-wrap:wrap}
+    .code-block{font-size:.68rem;padding:.75rem}
+    .inv-drop{padding:1.5rem}
+    .inv-sum-val{font-size:1.1rem}
+    .inv-sum-card{padding:10px 12px}
+    .candidate-row{gap:.5rem;padding:.5rem}
+    .faq-q{font-size:.82rem}
+    .faq-a{font-size:.78rem}
+    .login-card{padding:1.5rem}
+    .login-card h1{font-size:1.2rem}
+  }
+
+  /* Mobile hamburger button */
+  .mobile-menu-btn{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:.25rem}
+  @media(max-width:480px){.mobile-menu-btn{display:block}}
+
+  /* Mobile sidebar overlay */
+  .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:299}
+  .mobile-overlay.show{display:block}
+
+  /* Invoice summary grid responsive */
+  @media(max-width:768px){
+    .inv-sum-grid-5{grid-template-columns:repeat(3,1fr)!important}
+  }
+  @media(max-width:480px){
+    .inv-sum-grid-5{grid-template-columns:1fr 1fr!important}
+  }
+
+  /* Invoice detail panel responsive */
+  @media(max-width:640px){
+    .inv-detail-grid-2{grid-template-columns:1fr!important}
   }
 </style>
 </head>
@@ -313,11 +373,15 @@
   </div>
 </aside>
 
+<!-- Mobile overlay -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+
 <!-- ═══ MAIN CONTENT ═══ -->
 <div class="dash-main">
   <!-- TOP BAR -->
   <div class="topbar">
     <div class="topbar-left">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
       <span class="topbar-title" id="panelTitle" data-i18n="sb_overview">Overview</span>
     </div>
     <div class="topbar-right">
@@ -1297,6 +1361,8 @@ function t(key){return(i18n[currentLang]||i18n.th)[key]||key}
 <script>
 // ═══ SIDEBAR & PANELS ═══
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
+function toggleMobileMenu(){const sb=document.getElementById('sidebar');const ov=document.getElementById('mobileOverlay');sb.classList.toggle('mobile-open');ov.classList.toggle('show')}
+function closeMobileMenu(){document.getElementById('sidebar').classList.remove('mobile-open');document.getElementById('mobileOverlay').classList.remove('show')}
 function showPanel(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
@@ -1306,6 +1372,7 @@ function showPanel(name){
   if(item)item.classList.add('active');
   const titleKey=item?item.querySelector('.sidebar-label')?.getAttribute('data-i18n'):'';
   document.getElementById('panelTitle').textContent=titleKey?t(titleKey):name;
+  closeMobileMenu();
 }
 
 // ═══ LOGIN ═══
@@ -1518,7 +1585,7 @@ function renderInvoiceResult(d,filename){
   _lastInvoiceData=d;_lastInvoiceFilename=filename;
   const items=d.items||[];const warnings=d.warnings||[];const cur=d.currency||'USD';
   const effectiveRate=d.total_value_usd>0?((d.total_duty_estimate_usd/d.total_value_usd)*100).toFixed(2)+'%':'—';
-  const metaHtml=`<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border)">
+  const metaHtml=`<div style="display:flex;gap:8px 14px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border)">
     <span>📄 <b style="color:var(--text)">${filename}</b></span>
     ${d.invoice_no?`<span>Invoice: <b style="color:var(--text)">${d.invoice_no}</b></span>`:''}
     ${d.invoice_date?`<span>Date: <b style="color:var(--text)">${d.invoice_date}</b></span>`:''}
@@ -1527,7 +1594,7 @@ function renderInvoiceResult(d,filename){
     ${d.incoterms?`<span>📋 Incoterms: <b>${d.incoterms}</b></span>`:''}
     ${cur?`<span>💱 ${cur}</span>`:''}
     <span style="margin-left:auto;font-size:.7rem;opacity:.5">ID: ${d.submission_id||''}</span></div>`;
-  const summaryHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
+  const summaryHtml=`<div class="inv-sum-grid-5" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
     <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_items')}</div><div class="inv-sum-val">${d.total_items}</div></div>
     <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_total')}</div><div class="inv-sum-val" style="color:var(--green)">$${(d.total_value_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
     <div class="inv-sum-card"><div class="inv-sum-label">${t('inv_sum_duty')}</div><div class="inv-sum-val" style="color:var(--yellow)">$${(d.total_duty_estimate_usd||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
@@ -1564,7 +1631,7 @@ function buildDetailPanel(it,cur){
   const ogaSection=section('📋',t('inv_sec_oga'),it.oga_required?`<div style="padding:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px"><div style="font-size:.82rem;color:var(--yellow);font-weight:700;margin-bottom:6px">${t('inv_oga_yes')}</div>${(it.oga_permits||[]).length?`<div style="display:flex;flex-direction:column;gap:6px">${(it.oga_permits||[]).map(p=>`<div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px"><span style="font-size:.7rem;font-weight:700;background:rgba(245,158,11,.2);color:var(--yellow);padding:2px 7px;border-radius:4px">${p.agency_abbr||''}</span><span style="flex:1;font-size:.78rem">${p.name_th||p.name_en||''}</span></div>`).join('')}</div>`:''}</div>`:`<div style="color:var(--green);font-size:.82rem">${t('inv_oga_no')}</div>`);
   const halalSection=section('🌙',t('inv_sec_halal'),it.halal_required?`<div style="padding:8px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px"><div style="font-size:.8rem;color:var(--red);font-weight:700">${t('inv_halal_yes')}</div>${it.halal_cert_body?`<div style="font-size:.78rem;color:var(--muted)">${t('inv_halal_body')} <b>${it.halal_cert_body}</b></div>`:''}</div>`:`<div style="color:var(--green);font-size:.82rem">${t('inv_halal_no')}</div>`);
   const xaiSection=r.summary?section('🧠',t('inv_sec_xai'),`<div style="padding:10px;background:rgba(99,102,241,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0"><div style="font-size:.82rem;line-height:1.6;margin-bottom:8px">${r.summary}</div>${(r.key_factors||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${(r.key_factors||[]).map(f=>chip(f)).join('')}</div>`:''}${r.legal_basis?`<div style="font-size:.75rem;color:var(--muted)">⚖️ ${r.legal_basis}</div>`:''}${r.warning?`<div style="font-size:.75rem;color:var(--red)">⚠️ ${r.warning}</div>`:''}</div>`):'';
-  return`<div style="padding:16px 14px;background:rgba(15,20,35,.6);border-top:2px solid var(--accent)"><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div>${lineSection}${dutySection}${ftaSection}</div><div>${hsSection}${ogaSection}${halalSection}</div></div>${xaiSection}</div>`;
+  return`<div style="padding:16px 14px;background:rgba(15,20,35,.6);border-top:2px solid var(--accent)"><div class="inv-detail-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div>${lineSection}${dutySection}${ftaSection}</div><div>${hsSection}${ogaSection}${halalSection}</div></div>${xaiSection}</div>`;
 }
 
 // ═══ INIT ═══
